@@ -4,8 +4,7 @@ import NavTab from "../NavTab/NavTab.tsx";
 import { GrHomeRounded, GrLanguage } from "react-icons/gr";
 import { FaRegSquarePlus } from "react-icons/fa6";
 import { CiMenuBurger, CiUser, CiMap } from "react-icons/ci";
-import { NavLink } from "react-router";
-
+import { NavLink } from "react-router-dom";
 const Navbar: React.FC = () => {
     return (
         <nav className="navbar">
