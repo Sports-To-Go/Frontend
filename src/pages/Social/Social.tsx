@@ -6,6 +6,7 @@ const Social = () => {
         <div>
             this is socialism
         </div>
+
     </Layout>
   )
 }

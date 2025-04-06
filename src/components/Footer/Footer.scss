@@ -1,0 +1,45 @@
+.footer {
+    background-color: #E9F5F3;
+    position: fixed; // will be replaced maybe?
+    color: var(--text-secondary);
+    bottom: 0;
+    width: 100%;
+
+    .footer-section {
+        border-bottom: 1px solid var(--text-secondary);
+        margin: 0 20px;
+        padding: 10px 0;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+
+        .footer-section-table {
+            display: grid;
+            grid-template-columns: auto auto;
+            gap: 10px;
+        }
+
+        .footer-section-table:last-child > div {
+            text-align: right   ;
+        }
+
+        .footer-section-row {
+            display: flex;
+        }
+
+        .footer-section-row > a {
+            border-right: 1px solid var(--text-secondary);
+            padding: 0 10px;
+            text-decoration: none;
+            color: var(--text-secondary);
+        }
+
+        .footer-section-row > a:last-child {
+            border-right: none;
+        }
+    }
+
+    .footer-section:last-child {
+        border-bottom: none;
+    }
+}
