@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import "./Login.scss";
+import "./Register.scss";
 import { NavLink } from "react-router-dom";
 import Logo from "../../components/Logo/Logo";
 import Footer from "../../components/Footer/Footer";
@@ -7,43 +7,43 @@ import { FcGoogle } from "react-icons/fc";
 import { FaApple } from "react-icons/fa";
 import "../../styles/global.scss";
 
-const Login: React.FC = () => {
+const Register: React.FC = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleregister = (e: React.FormEvent) => {
     e.preventDefault();
     console.log("Logging in with:", { email, password });
   };
 
   return (
-    <div className="login-page">
+    <div className="register-page">
       {/* Logo at top-left */}
-      <div className="login-logo-wrapper">
+      <div className="register-logo-wrapper">
         <Logo />
       </div>
 
-      <div className="login-container">
-        <h1 className="login-title">Welcome Back</h1>
-        <p className="login-subtitle">Please login to your account</p>
+      <div className="register-container">
+        <h1 className="register-title">Create an account</h1>
+        <p className="register-subtitle">Please register to your account</p>
 
-        {/* Social login buttons */}
-        <div className="social-login-buttons">
+        {/* Social register buttons */}
+        <div className="social-register-buttons">
           <button className="social-button google">
             <FcGoogle className="social-icon" />
-            Continue with Google
+            Sign up with Google
           </button>
           <button className="social-button apple">
             <FaApple className="social-icon" />
-            Continue with Apple
+            Sign up with Apple
           </button>
         </div>
 
         <div className="divider">or</div>
 
-        {/* Email/password login */}
-        <form onSubmit={handleLogin} className="login-form">
+        {/* Email/password register */}
+        <form onSubmit={handleregister} className="register-form">
           <label>Email</label>
           <input
             type="email"
@@ -71,13 +71,13 @@ const Login: React.FC = () => {
             </button>
           </div>
 
-          <button type="submit" className="login-button">
-            Login
+          <button type="submit" className="register-button">
+            Register
           </button>
         </form>
 
-        <p className="login-footer">
-          Don’t have an account? <NavLink to="/register">Register</NavLink>
+        <p className="register-footer">
+          Already have an account? <NavLink to="/login">Sign into your account</NavLink>
         </p>
       </div>
 
@@ -86,4 +86,4 @@ const Login: React.FC = () => {
   );
 };
 
-export default Login;
+export default Register;

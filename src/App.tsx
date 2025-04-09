@@ -3,6 +3,7 @@ import Locations from "./pages/Locations/Locations.tsx";
 import Profile from "./pages/Profile/Profile.tsx";
 import Social from "./pages/Social/Social.tsx";
 import Login from "./pages/Login/Login.tsx";
+import Register from './pages/Register/Register.tsx';
 
 /* 
   Locations should be split into two:
@@ -21,6 +22,7 @@ const App: React.FC = () => {
     <Route path="*" element={<Navigate to="/locations" replace />} />
   </>) : (<>
     <Route path="/login" element={<Login/>}/>
+    <Route path="/register" element={<Register/>}/>
     { isLogged && <Route path="/social" element={<Social />} />}
     <Route path="/locations" element={<Locations />} />
     <Route path="/profile/:id" element={<Profile />} />
