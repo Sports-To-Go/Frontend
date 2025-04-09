@@ -26,7 +26,7 @@ const Footer: React.FC = () => {
 				</div>
 
 				<div className="footer-center">
-					{!collapsed && <FaChevronDown onClick={toggleCollapsed} className='interactive'/>}
+					{!collapsed && <FaChevronDown onClick={toggleCollapsed} cursor={"pointer"}/>}
 				</div>
 
 				<div className="footer-right">
@@ -48,7 +48,7 @@ const Footer: React.FC = () => {
 				</div>
 
 				<div className="footer-center">
-					{collapsed && <FaChevronUp onClick={toggleCollapsed} className='interactive'/>}
+					{collapsed && <FaChevronUp onClick={toggleCollapsed} cursor={"pointer"}/>}
 				</div>
 
 				<div className="footer-right">
