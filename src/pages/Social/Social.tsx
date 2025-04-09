@@ -1,24 +1,25 @@
 import Layout from '../../components/Layout/Layout'
 import './Social.scss'
-
-import { RxHamburgerMenu } from 'react-icons/rx'
+import UpperMessagePreview from './UpperMessagePreview'
+import LowerMessagePreview from './LowerMessagePreview'
 
 const Social = () => {
 	return (
 		<Layout>
 			<div className="social-container">
-				<div className="social-left-container"></div>
-				<div className="social-right-container">
-					<div className="social-chat-top">
-						<div></div>
-						<RxHamburgerMenu
-							onClick={() => {
-								alert('chat settings to be implemented')
-							}}
-						/>
+				{/* Left Sidebar */}
+				<div className="social-left-container">
+					<div className="message-preview-container">
+						{/* Upper section: Tabs and search bar */}
+						<UpperMessagePreview />
+						{/* Lower section: Scrollable message list */}
+						<LowerMessagePreview />
 					</div>
-					<div className="social-chat-content"></div>
-					<div className="social-chat-message-bar"></div>
+				</div>
+
+				{/* Right Section */}
+				<div className="social-right-container">
+					<div className="social-right-container"></div>
 				</div>
 			</div>
 		</Layout>
