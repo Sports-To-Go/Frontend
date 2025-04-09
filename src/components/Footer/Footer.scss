@@ -1,73 +1,80 @@
 .footer {
-    background-color: #E9F5F3;
-    position: fixed; // will be replaced maybe?
-    color: var(--text-secondary);
-    bottom: 0;
-    width: 100%;
-    font-size: 13px;
+	background-color: #e9f5f3;
+	// position: fixed; // will be replaced maybe?
+	color: var(--text-secondary);
+	bottom: 0;
+	width: 100%;
+	font-size: 13px;
 
-    .footer-section {
-        border-bottom: 1px solid var(--text-secondary);
-        margin: 0 20px;
-        padding: 10px 0;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        
-        overflow: hidden;
-        transition: max-height 0.2s ease, padding 0.3s ease, opacity 0.3s ease;
-        max-height: 500px;
-        opacity: 1;
+	.footer-section {
+		border-bottom: 1px solid var(--text-secondary);
+		margin: 0 20px;
+		padding: 10px 0;
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+
+		overflow: hidden;
+		transition:
+			max-height 0.2s ease,
+			padding 0.3s ease,
+			opacity 0.3s ease;
+		max-height: 500px;
+		opacity: 1;
+
+		&.collapsed {
+			max-height: 0;
+			padding: 0;
+			opacity: 0;
+		}
+
+		> div {
+			width: 33%;
+			display: flex;
+		}
+
+		.footer-left {
+			justify-content: left;
+			text-align: left;
+		}
+
+		.footer-center {
+			justify-content: center;
+			text-align: center;
+		}
+
+		.footer-right {
+			justify-content: right;
+			text-align: right;
+		}
+
+		.footer-2-column {
+			display: grid;
+			grid-template-columns: auto auto;
+			gap: 10px;
+		}
+
+		.footer-section-links {
+			display: flex;
+			a {
+				border-right: 1px solid var(--text-secondary);
+				padding: 0 10px;
+				text-decoration: none;
+				color: var(--text-secondary);
+			}
+
+			:last-child {
+				border-right: none;
+			}
+		}
+	}
+
+	:last-child {
+		border-bottom: none;
+	}
+}
 
 
-        &.collapsed {
-            max-height: 0;
-        padding: 0;
-        opacity: 0;
-        }
-
-        > div {
-            width: 33%;
-            display: flex;
-        }
-
-        .footer-left {
-            justify-content: left;
-            text-align: left;
-        }
-
-        .footer-center {
-            justify-content: center;
-            text-align: center;
-        }
-
-        .footer-right {
-            justify-content: right;
-            text-align: right;
-        }
-
-        .footer-2-column {
-            display: grid;
-            grid-template-columns: auto auto;
-            gap: 10px;
-        }
-
-        .footer-section-links {
-            display: flex;
-            a {
-                border-right: 1px solid var(--text-secondary);
-                padding: 0 10px;
-                text-decoration: none;
-                color: var(--text-secondary);
-            }
-
-            :last-child {
-                border-right: none;
-            }
-        }
-    }
-
-    :last-child {
-        border-bottom: none;
-    }
+.interactive {
+	cursor: pointer;
 }
