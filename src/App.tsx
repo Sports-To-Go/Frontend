@@ -13,7 +13,7 @@ import Login from "./pages/Login/Login.tsx";
 
 const App: React.FC = () => {
   const isAdmin = false;
-  const isLogged = false;
+  const isLogged = true;
   const routes = isAdmin ? (<>
     <Route path="/social" element={<Social/>}/>
     <Route path="/locations" element={<Locations />} />

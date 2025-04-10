@@ -5,15 +5,16 @@ import { GrHomeRounded, GrLanguage } from "react-icons/gr";
 import { FaRegSquarePlus } from "react-icons/fa6";
 import { CiMenuBurger, CiUser, CiMap } from "react-icons/ci";
 import { NavLink } from "react-router-dom";
+
 const Navbar: React.FC = () => {
     return (
         <nav className="navbar">
             <div className="navbar-container">
                 <Logo/>
                 <div className="navbar-menu">
-                    <NavTab icon={<GrHomeRounded/>} text="Your Home" dest="/"/>
-                    <NavTab icon={<FaRegSquarePlus/>} text="Your Locations" dest="/profile#locations"/>
-                    <NavTab icon={<CiMap/>} text="Find Locations" dest="/locations"/>
+                    <NavTab icon={<GrHomeRounded/>} text="Find Locations" dest="/locations"/>
+                    <NavTab icon={<FaRegSquarePlus/>} text="Add Location" dest="/profile#locations"/>
+                    <NavTab icon={<CiMap/>} text="See Groups" dest="/social"/>
                 </div>
                 <div className="navbar-right-container">
                     {/* Language changes to be implemented */}
