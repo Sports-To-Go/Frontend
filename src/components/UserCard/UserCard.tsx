@@ -1,8 +1,10 @@
-import React from "react";
+import React, { useContext } from "react";
 import "./UserCard.scss";
 import { TiLocationArrowOutline } from "react-icons/ti";
+import { ThemeContext } from "../../context/ThemeContext";
 
 const UserCard: React.FC = () => {
+  const { theme, toggleTheme } = useContext(ThemeContext);
   return (
     <div className="user-card">
       <div className="user-card__header">
@@ -18,8 +20,8 @@ const UserCard: React.FC = () => {
 
       <div className="badge-toggle">
         <label className="switch">
-          <input type="checkbox" />
-          <span className="slider"></span>
+          <input type="checkbox" checked={theme=='dark'}/>
+          <span className="slider" onClick={toggleTheme}></span>
         </label>
         <span className="toggle-label">night theme enjoyer</span>
       </div>
