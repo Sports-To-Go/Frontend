@@ -5,8 +5,21 @@
 	--primary: #05c69d;
 	--secondary: #94f6de;
 	--accent: #d65971;
+	--text-primary: #131313;
+	--text-secondary: #898989;
+	--background: #ffffff;
+	--primary: #05c69d;
+	--secondary: #94f6de;
+	--accent: #d65971;
 }
 
+[data-theme='dark'] {
+	--text-secondary: #ffffff;
+	--text-secondary: #898989;
+	--background: #131313;
+	--primary: #05c69d;
+	--secondary: #94f6de;
+	--accent: #d65971;
 [data-theme='dark'] {
 	--text-secondary: #ffffff;
 	--text-secondary: #898989;
@@ -26,3 +39,4 @@ body {
 	margin: 0;
 	padding: 0;
 }
+
