@@ -1,5 +1,5 @@
 import React from 'react'
-import "./DisplayPhoto.scss"
+import './DisplayPhoto.scss'
 
 interface DisplayPhotoProps {
 	imagePath?: string

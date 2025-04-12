@@ -1,0 +1,64 @@
+.message-item {
+	display: flex;
+	align-items: center;
+	padding: 12px;
+	border-bottom: 1px solid var(--border-color);
+	cursor: pointer;
+
+	.group-avatar-container {
+		position: relative;
+
+		.group-avatar {
+			width: 43px;
+			height: 43px;
+			border-radius: 50%;
+			border: 1px solid var(--border-color);
+		}
+
+		.online-indicator {
+			width: 12px;
+			height: 12px;
+			border-radius: 50%;
+			background: #37ee74;
+			border: 2px solid var(--border-color);
+			position: absolute;
+			bottom: 0;
+			right: 0;
+			transform: translate(50%, 50%);
+		}
+	}
+
+	.group-info {
+		flex-grow: 1;
+		margin-left: 18px;
+
+		.group-name {
+			font-weight: bold;
+			font-size: 14px;
+			color: var(--text-primary);
+			margin-bottom: 8px;
+		}
+
+		.group-description {
+			font-size: 12px;
+			color: var(--text=secondary);
+		}
+	}
+
+	.members-info {
+		display: flex;
+		align-items: center;
+		gap: 4px;
+		color: var(--text-primary);
+
+		.members-icon {
+			width: 16px;
+			height: 16px;
+		}
+
+		.members-count {
+			font-weight: bold;
+			font-size: 12px;
+		}
+	}
+}
