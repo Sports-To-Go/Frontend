@@ -1,28 +1,40 @@
 :root {
-	--text-primary: #131313;
-	--text-secondary: #898989;
-	--background: #ffffff;
-	--primary: #05c69d;
-	--secondary: #94f6de;
-	--accent: #d65971;
+    --text-primary: #616161;
+    --text-secondary: #7E7E7E;
+    --light-text: #949494;
+    --dark-text: #202020;
+
+    --background: #ffffff;
+    --background-green: #E9F5F3;
+    --button-green: #27C4B6;
+    --accent-green: #94F6DE;
+    --new-accent-green: #27C4B6;
+    --border-color: #CDCDCD;
+    --green-border: #17A17A;
 }
 
 [data-theme='dark'] {
-	--text-secondary: #ffffff;
-	--text-secondary: #898989;
-	--background: #131313;
-	--primary: #05c69d;
-	--secondary: #94f6de;
-	--accent: #d65971;
+    --text-primary: #C7C7C7;
+    --text-secondary: #CACACA;
+    --light-text: #A2A2A2;
+    --dark-text: #F2F2F2;
+
+    --background: #131313;
+    --background-green: #191617;
+    --button-green: #27C4B6;
+    --accent-green: #94F6DE;
+    --new-accent-green: #27C4B6;
+    --border-color: #565656;
+    --green-border: #17A17A;
 }
 
 body {
-	background-color: var(--background);
-	color: var(--text);
-	transition:
-		background-color 0.3s,
-		color 0.3s;
-	font-family: 'Inter', sans-serif;
-	margin: 0;
-	padding: 0;
+    background-color: var(--background);
+    color: var(--text);
+    transition:
+        background-color 0.3s,
+        color 0.3s;
+    font-family: 'Inter', sans-serif;
+    margin: 0;
+    padding: 0;
 }

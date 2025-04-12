@@ -3,7 +3,7 @@ import Logo from '../Logo/Logo.tsx'
 import NavTab from '../NavTab/NavTab.tsx'
 import { GrHomeRounded, GrLanguage } from 'react-icons/gr'
 import { FaRegSquarePlus } from 'react-icons/fa6'
-import { CiMenuBurger, CiUser, CiMap } from 'react-icons/ci'
+import { CiUser, CiMap } from 'react-icons/ci'
 import { NavLink } from 'react-router-dom'
 
 interface NavbarProps {
@@ -34,7 +34,7 @@ const Navbar: React.FC<NavbarProps> = ({ showTabs }) => {
 
 						{/* This should actually open a modal with some option and a way to change the switch between dark and light mode*/}
 						<NavLink to="/profile" className="navbar-profile-container">
-							<CiMenuBurger style={{ fontSize: 24 }} />
+							{/* <CiMenuBurger style={{ fontSize: 24 }} /> */}
 							<CiUser style={{ fontSize: 32 }} />
 						</NavLink>
 					</div>
