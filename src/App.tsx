@@ -3,6 +3,7 @@ import Locations from './pages/Locations/Locations.tsx'
 import Profile from './pages/Profile/Profile.tsx'
 import Social from './pages/Social/Social.tsx'
 import Login from './pages/Login/Login.tsx'
+import { ThemeProvider } from './context/ThemeContext.tsx'
 
 /* 
   Locations should be split into two:
@@ -26,17 +27,19 @@ const App: React.FC = () => {
 			{isLogged && <Route path="/social" element={<Social />} />}
 			<Route path="/locations" element={<Locations />} />
 			<Route path="/profile/:id" element={<Profile />} />
-			{isLogged && <Route path="/profile#locations" element={<Profile />} />}
+			{isLogged && <Route path="/profile" element={<Profile />} />}
 			<Route path="*" element={<Navigate to="/locations" replace />} />
 		</>
 	)
 
 	return (
-		<>
+		<ThemeProvider>
 			<BrowserRouter>
-				<Routes>{routes}</Routes>
+				<Routes>
+					{routes}
+				</Routes>
 			</BrowserRouter>
-		</>
+		</ThemeProvider>
 	)
 }
 

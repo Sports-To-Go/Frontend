@@ -3,7 +3,7 @@ import './Footer.scss'
 import { FaChevronDown, FaChevronUp } from 'react-icons/fa'
 
 const Footer: React.FC = () => {
-	const [collapsed, setCollapsed] = useState(false)
+	const [collapsed, setCollapsed] = useState(true)
 
 	const toggleCollapsed = () => {
 		setCollapsed(!collapsed)
@@ -26,7 +26,7 @@ const Footer: React.FC = () => {
 				</div>
 
 				<div className="footer-center">
-					{!collapsed && <FaChevronDown onClick={toggleCollapsed} cursor={"pointer"}/>}
+					{!collapsed && <FaChevronDown onClick={toggleCollapsed} cursor={'pointer'} />}
 				</div>
 
 				<div className="footer-right">
@@ -48,7 +48,7 @@ const Footer: React.FC = () => {
 				</div>
 
 				<div className="footer-center">
-					{collapsed && <FaChevronUp onClick={toggleCollapsed} cursor={"pointer"}/>}
+					{collapsed && <FaChevronUp onClick={toggleCollapsed} cursor={'pointer'} />}
 				</div>
 
 				<div className="footer-right">

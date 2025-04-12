@@ -4,14 +4,16 @@ import './Layout.scss'
 
 interface LayoutProps {
 	children: React.ReactNode
+	showTabs?: boolean
+	showFooter?: boolean
 }
 
-const Layout: React.FC<LayoutProps> = ({ children }) => {
+const Layout: React.FC<LayoutProps> = ({ children, showTabs, showFooter }) => {
 	return (
 		<div className="layout">
-			<Navbar />
+			<Navbar showTabs={showTabs} />
 			<main className="layout-content">{children}</main>
-			<Footer />
+			{showFooter && <Footer />}
 		</div>
 	)
 }
