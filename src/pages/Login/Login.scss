@@ -1,169 +1,139 @@
-/* Login.scss */
-
 .login-page {
-    position: relative;
-    min-height: 100vh;
-    background-color: var(--background); // from global.scss
+    background: linear-gradient(90deg,#05c69d 30%,#d65971);
+    min-height: 92vh;
     display: flex;
-    flex-direction: column;
-    align-items: center;
     justify-content: center;
-    padding: 2rem;
+    align-items: center;
   }
   
-  .login-logo-wrapper {
-    position: fixed;
-    top: 20px;
-    left: 20px;
-    z-index: 10;
-  }
-  
-  .login-container {
+  .login-card {
+    background-color: #f9f9f9;
+    padding:50px;
+    border-radius: 40px;
+    box-shadow: 0 15px 25px rgba(0, 0, 0, 0.1);
     width: 100%;
-    max-width: 400px;
-    background-color: var(--background); // same global background
-    padding: 2rem;
-    border-radius: 12px;
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
-    z-index: 1;
-    display: flex;
-    flex-direction: column;
-    align-items: stretch;
-  }
-  
-  .login-title {
-    font-size: 2rem;
+    max-width:350px;
     text-align: center;
-    margin-bottom: 0.5rem;
-    color: var(--text-primary); // using global text color
   }
   
-  .login-subtitle {
-    text-align: center;
-    color: var(--text-secondary); // using global secondary text color
-    margin-bottom: 1.5rem;
+  h2 {
+    margin-bottom: 20px;
+    font-size: 28px;
+    color: #333;
+  }
+
+  h1{
+    font-size:45px
   }
   
-  .social-login-buttons {
+  input {
+    width: 80%;
+    padding: 12px;
+    margin-bottom: 15px;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+    font-size: 16px;
+  }
+  
+  button {
+    width: 87%;
+    padding: 12px;
+    background-color: #05c69d;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 20px;
+    cursor: pointer;
+    transition: background 0.3s ease;
+  }
+  
+  button:hover {
+    background-color: #28b3a3;
+  }
+  
+  .options {
+    text-align: right;
+    font-size: 14px;
+    margin-bottom: 15px;
+    padding-right: 25px;
+    a { 
+      color: #666;
+      text-decoration: none;
+    }
+  
+    a:hover {
+      text-decoration: underline;
+    }
+  }
+
+  .signup {
+    margin-top: 10px;
+    font-size: 14px;
+    a {
+      color: #2ec4b6;
+      font-weight: bold;
+      text-decoration: none;
+    }
+  
+    a:hover {
+      text-decoration: underline;
+    }
+
+  }
+
+  .password-input-wrapper {
+    position: relative;
+    width:83%;
+    padding-left:23px; 
+    input {
+      width: 100%;
+      padding-right:0px;
+    }
+    
+    .eye-icon {
+      position: absolute;
+      right: 0px;
+      top:43%;
+      transform: translateY(-50%);
+      cursor: pointer;
+      font-size: 25px;
+      color: grey;
+    }
+  }
+
+  .social-icons {
     display: flex;
-    flex-direction: column;
-    gap: 0.75rem;
-    margin-bottom: 1.5rem;
-  }
-  
-  .social-button {
-    display: flex;
-    align-items: center;
     justify-content: center;
-    padding: 0.75rem;
-    border-radius: 8px;
-    font-size: 1rem;
-    font-weight: 500;
-    border: 1px solid var(--secondary); // using global secondary
-    cursor: pointer;
-    background-color: var(--background);
-    transition: background 0.2s ease;
-  }
+    gap: 20px;
+    margin-top: 10px;
   
-  .social-button:hover {
-    background-color: var(--secondary); // hover effect from global variable
-  }
+    .icon {
+      width: 45px;
+      height: 45px;
+      border-radius: 50%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      color: white;
+      cursor: pointer;
+      font-size: 20px;
+      transition: all 0.3s ease;
   
-  .google .social-icon {
-    font-size: 1.25rem;
-    margin-right: 0.5rem;
-  }
+      &.facebook {
+        background-color: #3b5998;
+      }
   
-  .apple .social-icon {
-    font-size: 1.25rem;
-    margin-right: 0.5rem;
-    color: var(--text-primary);
-  }
+      &.twitter {
+        background-color: #1da1f2;
+      }
   
-  .divider {
-    text-align: center;
-    margin: 1rem 0;
-    color: var(--text-secondary);
-    position: relative;
-  }
+      &.google {
+        background-color: #db4437;
+      }
   
-  .divider::before,
-  .divider::after {
-    content: "";
-    height: 1px;
-    background: var(--secondary);
-    position: absolute;
-    top: 50%;
-    width: 45%;
-  }
-  
-  .divider::before {
-    left: 0;
-  }
-  
-  .divider::after {
-    right: 0;
-  }
-  
-  .login-form {
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
-  }
-  
-  .login-form label {
-    font-size: 0.9rem;
-    font-weight: 500;
-    color: var(--text-primary);
-  }
-  
-  .login-form input {
-    padding: 0.5rem 0.75rem;
-    font-size: 1rem;
-    border: 1px solid var(--secondary);
-    border-radius: 6px;
-    outline: none;
-    background-color: var(--background);
-    color: var(--text-primary);
-  }
-  
-  .password-input-container {
-    position: relative;
-  }
-  
-  .toggle-password {
-    position: absolute;
-    top: 50%;
-    right: 10px;
-    transform: translateY(-50%);
-    background: none;
-    border: none;
-    color: var(--primary);
-    cursor: pointer;
-    font-weight: 500;
-  }
-  
-  .login-button {
-    margin-top: 1rem;
-    padding: 0.75rem;
-    background-color: var(--primary);
-    color: var(--background); // using background for contrast (white)
-    border: none;
-    border-radius: 8px;
-    font-size: 1rem;
-    font-weight: bold;
-    cursor: pointer;
-    transition: background 0.2s ease;
-  }
-  
-  .login-button:hover {
-    background-color: var(--accent);
-  }
-  
-  .login-footer {
-    margin-top: 1.5rem;
-    text-align: center;
-    font-size: 0.9rem;
-    color: var(--text-secondary);
+      &:hover {
+        transform: scale(1.1);
+      }
+    }
   }
   

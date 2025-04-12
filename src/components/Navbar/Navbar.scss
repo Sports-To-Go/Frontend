@@ -1,44 +1,44 @@
-@import "../../styles/global.scss";
+@import '../../styles/global.scss';
 
 .navbar {
-    background-color: var(--background);
-    color: var(--text-secondary);
-    position: sticky;
-    top: 0;
-    border-bottom: 1px solid var(--text-secondary);
+	background-color: var(--background);
+	color: var(--text-secondary);
+	position: sticky;
+	top: 0;
+	border-bottom: 1px solid var(--text-secondary);
 
-    .navbar-container {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        height: 80px;
-        padding: 0 20px;
+	.navbar-container {
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		height: 80px;
+		padding: 0 20px;
 
-        .navbar-menu {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            border: 1px solid var(--text-secondary);
-            border-radius: 45px;
-            padding: 10px 20px;
-            box-shadow: 0px 4px 6px rgba(10, 10, 10, 0.1);
-        }
+		.navbar-menu {
+			display: flex;
+			justify-content: center;
+			align-items: center;
+			border: 1px solid var(--text-secondary);
+			border-radius: 45px;
+			padding: 10px 20px;
+			box-shadow: 0px 4px 6px rgba(10, 10, 10, 0.1);
+		}
 
-        .navbar-right-container {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 10px;
+		.navbar-right-container {
+			display: flex;
+			justify-content: center;
+			align-items: center;
+			gap: 10px;
 
-            .navbar-profile-container {
-                display: flex;
-                justify-content: center;
-                align-items: center;
-                color: var(--text-secondary);
-                border: 1px solid var(--text-secondary);
-                border-radius: 45px;
-                padding: 5px 10px;
-            }
-        }
-    }
+			.navbar-profile-container {
+				display: flex;
+				justify-content: center;
+				align-items: center;
+				color: var(--text-secondary);
+				border: 1px solid var(--text-secondary);
+				border-radius: 45px;
+				padding: 5px 10px;
+			}
+		}
+	}
 }
