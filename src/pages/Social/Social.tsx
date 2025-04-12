@@ -2,7 +2,7 @@ import DisplayPhoto from '../../components/DisplayPhoto/DisplayPhoto'
 import Layout from '../../components/Layout/Layout'
 import './Social.scss'
 
-import { RxHamburgerMenu } from 'react-icons/rx'
+import { CiSettings } from "react-icons/ci";
 
 
 class Message {
@@ -40,7 +40,8 @@ const Social: React.FC = () => {
 								)}
 							</div>
 						</div>
-						<RxHamburgerMenu
+						<CiSettings
+							cursor={"pointer"}
 							onClick={() => {
 								alert('chat settings to be implemented')
 							}}

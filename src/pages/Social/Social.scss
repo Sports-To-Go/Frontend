@@ -21,6 +21,7 @@
 		.social-chat-top {
 			height: 80px;
 			background-color: var(--background);
+			color: var(--text-primary);
 			display: flex;
 			justify-content: space-between;
 			align-items: center;
@@ -37,7 +38,7 @@
                 .chat-title {
                     margin: 10px;
                     font-size: 14px;
-                    color: #6C6C6C;
+                    color: var(--text-primary);
                     font-weight: bold;
                 }
 
