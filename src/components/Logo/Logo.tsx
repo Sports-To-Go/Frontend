@@ -1,11 +1,7 @@
 import './Logo.scss'
 
 const Logo: React.FC = () => {
-	return (
-		<div className="logo-container">
-			<div className="logo">S</div>
-		</div>
-	)
+	return <div className="logo">S</div>
 }
 
 export default Logo
