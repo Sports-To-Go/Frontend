@@ -14,7 +14,7 @@ const Profile = () => {
   return (
     <Layout>
       <div className="profile-page">
-        <UserCard />
+        {/* {!showAddLocationForm && < UserCard />} */}
 
         {showAddLocationForm && (
           <AddLocationForm onCancel={() => navigate('/profile')} />

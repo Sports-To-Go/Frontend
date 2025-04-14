@@ -1,15 +1,15 @@
 import React, { useState, useEffect } from 'react'
 import LocationMap from '../LocationMap/LocationMap'
-import { geocodeAddress, getDistanceInMeters, reverseGeocode } from '../../utils/geocode'
+import { reverseGeocode, getDistanceInMeters } from '../../utils/geocode'
 import { FaTimes } from 'react-icons/fa'
 import { useLocation, useNavigate } from 'react-router-dom'
 import './AddLocationForm.scss'
 
 type AddLocationFormProps = {
-	onCancel: () => void;
-  };
+	onCancel: () => void
+}
 
-const AddLocationForm: React.FC<AddLocationFormProps> = ({onCancel}) => {
+const AddLocationForm: React.FC<AddLocationFormProps> = ({ onCancel }) => {
 	const [courtName, setCourtName] = useState('')
 	const [sport, setSport] = useState('')
 	const [description, setDescription] = useState('')
@@ -39,35 +39,25 @@ const AddLocationForm: React.FC<AddLocationFormProps> = ({onCancel}) => {
 		setImages(files)
 	}
 
-	// when the address changes, geocode it to get lat and lng
-	const handleAddressBlur = async () => {
-		const coords = await geocodeAddress(address)
-		if (coords) {
-			setLat(coords.lat)
-			setLng(coords.lng)
-			setInitialCoords(coords)
-		}
+	const handleAddressSelect = (coords: { lat: number; lng: number }) => {
+		setLat(coords.lat)
+		setLng(coords.lng)
+		setInitialCoords(coords)
 	}
 
-	const handleCoordinatesChange = async (newCoords: { lat: number; lng: number }) => {
-		setLat(newCoords.lat)
-		setLng(newCoords.lng)
+	const handlePinMoved = async (coords: { lat: number; lng: number }) => {
+		const distance = initialCoords ? getDistanceInMeters(initialCoords, coords) : Infinity
 
-		if (initialCoords) {
-			const distance = getDistanceInMeters(
-				initialCoords.lat,
-				initialCoords.lng,
-				newCoords.lat,
-				newCoords.lng,
-			)
-
-			if (distance > 200) {
-				const newAddress = await reverseGeocode(newCoords.lat, newCoords.lng)
-				if (newAddress) {
-					setAddress(newAddress)
-				}
+		if (distance > 200) {
+			const newAddress = await reverseGeocode(coords.lat, coords.lng)
+			if (newAddress) {
+				setAddress(newAddress)
 			}
+			setInitialCoords(coords) // <- actualizează poziția de referință!
 		}
+
+		setLat(coords.lat)
+		setLng(coords.lng)
 	}
 
 	return (
@@ -150,13 +140,14 @@ const AddLocationForm: React.FC<AddLocationFormProps> = ({onCancel}) => {
 								{/* Right Column: Map and Upload Images */}
 								<div className="form-right">
 									<div className="form-group map-section">
-										{/* <label htmlFor="address">Where's your place located?</label> */}
+										<label htmlFor="address">Where's your place located?</label>
 										<LocationMap
 											address={address}
 											onAddressChange={setAddress}
-											onAddressBlur={handleAddressBlur}
-											coordinates={{ lat, lng }}
-											onCoordinatesChange={handleCoordinatesChange}
+											onAddressSelect={handleAddressSelect}
+											onPinMoved={handlePinMoved}
+											lat={lat}
+											lng={lng}
 										/>
 									</div>
 

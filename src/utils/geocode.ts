@@ -33,31 +33,39 @@
       const response = await fetch(url);
       const data = await response.json();
   
+      console.log("↩️ Google Reverse Geocode FULL Response:", data);
+  
       if (data.status === "OK" && data.results.length > 0) {
         return data.results[0].formatted_address;
       } else {
-        console.error("Reverse geocoding error:", data.status);
+        console.warn("⚠️ Reverse geocoding warning:", data.status, data.results);
         return null;
       }
     } catch (error) {
-      console.error("Reverse geocoding fetch error:", error);
+      console.error("❌ Reverse geocoding fetch error:", error);
       return null;
     }
   }
   
-  export function getDistanceInMeters(lat1: number, lng1: number, lat2: number, lng2: number): number {
-    const R = 6371e3; // Earth radius in meters
-    const φ1 = lat1 * Math.PI / 180;
-    const φ2 = lat2 * Math.PI / 180;
-    const Δφ = (lat2 - lat1) * Math.PI / 180;
-    const Δλ = (lng2 - lng1) * Math.PI / 180;
   
-    const a = Math.sin(Δφ / 2) ** 2 +
-              Math.cos(φ1) * Math.cos(φ2) *
-              Math.sin(Δλ / 2) ** 2;
+  export function getDistanceInMeters(
+    coord1: { lat: number; lng: number },
+    coord2: { lat: number; lng: number }
+  ): number {
+    const R = 6371e3; // Raza Pământului în metri
+    const φ1 = (coord1.lat * Math.PI) / 180;
+    const φ2 = (coord2.lat * Math.PI) / 180;
+    const Δφ = ((coord2.lat - coord1.lat) * Math.PI) / 180;
+    const Δλ = ((coord2.lng - coord1.lng) * Math.PI) / 180;
+  
+    const a =
+      Math.sin(Δφ / 2) * Math.sin(Δφ / 2) +
+      Math.cos(φ1) * Math.cos(φ2) *
+      Math.sin(Δλ / 2) * Math.sin(Δλ / 2);
   
     const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
   
     return R * c;
   }
+  
   
