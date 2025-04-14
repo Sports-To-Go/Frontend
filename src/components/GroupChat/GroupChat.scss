@@ -4,7 +4,7 @@ $radius:30px;
     flex: 1;
     display: flex;
     flex-direction: column;
-    background-color: var(--background);
+    background-color: var(--background); 
 
     .chat-header {
         height: 80px;
@@ -44,6 +44,39 @@ $radius:30px;
     .chat-messages {
         flex: 1;
         padding: 10px 20px;
+        overflow-y: auto;
+
+        .message-container {
+            max-width: 50%;
+            display: flex;
+            justify-content: flex-start;
+            align-items: flex-end;
+            margin: 10px 0;
+
+            .message-content {
+                display: flex;
+                flex-direction: column;
+                justify-content: flex-start;
+                margin: 0 10px;
+
+                .message-title {
+                    display: flex;
+                    justify-content: space-between;
+                    gap: 10px;
+
+                    color: var(--text-primary);
+                }
+
+                .message {
+                    border: 1px solid var(--border-color);
+                    border-radius: 15px;
+                    padding: 10px;
+                    width: fit-content;
+                    color: var(--dark-text);
+                    background-color: var(--background);
+                }
+            }
+        }
     }
 
     .chat-message-bar {
