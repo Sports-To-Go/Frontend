@@ -11,65 +11,10 @@
 		border-right: 1px solid var(--border-color);
 		display: flex;
 		flex-direction: column;
-        max-height: calc(100vh - 81px);
 		.message-preview-container {
 			height: 100%; /* Full height of the sidebar */
 			display: flex;
 			flex-direction: column;
-		}
-	}
-
-	/* Right Section */
-	.social-right-container {
-		min-width: 500px;
-		flex: 1;
-		// background-color: blue;
-		display: flex;
-		flex-direction: column;
-
-		.social-chat-top {
-			height: 80px;
-			background-color: var(--background);
-			color: var(--text-primary);
-			display: flex;
-			justify-content: space-between;
-			align-items: center;
-			padding: 0 20px;
-			font-size: 24px;
-            box-shadow: 0px 4px 6px rgba(10, 10, 10, 0.2);
-            border-bottom-left-radius: 20px;
-            border-bottom-right-radius: 20px;
-
-            .chat-title-container {
-                display: flex;
-                align-items: center;
-                
-                .chat-title {
-                    margin: 10px;
-                    font-size: 14px;
-                    color: var(--text-primary);
-                    font-weight: bold;
-                }
-
-                .active, .offline {
-                    font-size: 10px;
-                    color: #37EE74;
-                }
-
-                .offline {
-                    color: red;
-                }
-            }
-		}
-
-		.social-chat-content {
-			flex: 1;
-            padding: 10px 20px;
-		}
-
-		.social-chat-message-bar {
-			height: 50px;
-			background-color: var(--background);
 		}
 	}
 }
