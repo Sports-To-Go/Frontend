@@ -22,7 +22,7 @@ const Navbar: React.FC<NavbarProps> = ({ showTabs }) => {
 						<NavTab
 							icon={<FaRegSquarePlus />}
 							text="Add Location"
-							dest="/profile#locations"
+							dest="/profile?add=location"
 						/>
 						<NavTab icon={<CiMap />} text="See Groups" dest="/social" />
 					</div>
