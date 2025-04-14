@@ -66,9 +66,6 @@ const Social: React.FC = () => {
 						))}
 					</div>
 					<div className="social-chat-message-bar"></div>
-					<div className="social-right-container">
-						<div className="social-right-container"></div>
-					</div>
 				</div>
 			</div>
 		</Layout>
