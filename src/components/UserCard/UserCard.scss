@@ -3,19 +3,22 @@
 	flex-direction: column;
 	align-items: center;
 	gap: 1rem;
-	max-width: 320px;
+
 	padding: 2rem;
 	background: var(--background);
-	border: 1px solid #e0e0e0;
+	border: 1px solid var(--border-color);
 	border-radius: 12px;
 	box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+
+	max-width: 320px;
+	margin: 0 auto;
 
 	.badge-iconic {
 		display: flex;
 		align-items: center;
 		justify-content: center;
 		gap: 0.4rem;
-		font-size: 0.85rem;
+		font-size: 1.00rem;
 		font-weight: 500;
 		color: #00e5ff;
 		margin-top: 0.4rem;
@@ -54,6 +57,13 @@
 		flex-direction: column;
 		align-items: flex-start;
 		text-align: left;
+	
+		.user-card__rating {
+			display: flex;
+			gap: 0.5rem;
+			color: #D65971;
+			margin-top: 0.5rem;
+		}
 	}
 
 	&__usertype {
@@ -76,7 +86,7 @@
 		gap: 0.5rem;
 		padding: 0.4rem 0.7rem;
 		border-radius: 999px;
-		font-size: 0.85rem;
+		font-size: 1.00rem;
 		font-weight: 500;
 		color: #1f2d5c;
 		margin-top: 0.5rem;

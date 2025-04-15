@@ -2,6 +2,7 @@ import React, { useContext } from 'react'
 import './UserCard.scss'
 import { TiLocationArrowOutline } from 'react-icons/ti'
 import { ThemeContext } from '../../context/ThemeContext'
+import { FaStar } from 'react-icons/fa'
 
 const UserCard: React.FC = () => {
 	const { theme, toggleTheme } = useContext(ThemeContext)
@@ -15,6 +16,12 @@ const UserCard: React.FC = () => {
 				<div className="user-card__info">
 					<h2 className="user-card__usertype">UserType</h2>
 					<h1 className="user-card__name">Serban Robert-Stefan</h1>
+					<div className="user-card__rating">
+  						{[...Array(5)].map((_, i) => (
+    					<FaStar key={i} />
+  					))}
+					</div>
+
 				</div>
 			</div>
 
