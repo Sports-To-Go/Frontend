@@ -17,11 +17,10 @@ const UserCard: React.FC = () => {
 					<h2 className="user-card__usertype">UserType</h2>
 					<h1 className="user-card__name">Serban Robert-Stefan</h1>
 					<div className="user-card__rating">
-  						{[...Array(5)].map((_, i) => (
-    					<FaStar key={i} />
-  					))}
+						{[...Array(5)].map((_, i) => (
+							<FaStar key={i} />
+						))}
 					</div>
-
 				</div>
 			</div>
 
