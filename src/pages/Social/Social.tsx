@@ -1,9 +1,11 @@
+import React, { useState } from 'react'
 import DisplayPhoto from '../../components/DisplayPhoto/DisplayPhoto'
 import Layout from '../../components/Layout/Layout'
 import './Social.scss'
 import { CiSettings } from 'react-icons/ci'
 import UpperMessagePreview from './UpperMessagePreview'
 import LowerMessagePreview from './LowerMessagePreview'
+import GroupSettingsModal from './GroupSettingsModal'
 
 class Message {
 	imageURL: string = ''
@@ -11,6 +13,7 @@ class Message {
 }
 
 const Social: React.FC = () => {
+	const [isGroupSettingsOpen, setIsGroupSettingsOpen] = useState(false)
 	const groupName: string = 'Fotbal 2A3'
 	const status: string = 'online'
 	const messages: Message[] = [
@@ -23,6 +26,9 @@ const Social: React.FC = () => {
 			content: 'Brick by brick',
 		},
 	]
+
+	const groupMembers = ['Goldan David', 'Smau Robert', 'Onofrei Radu', 'Dascaliu Ianis', 'Lionel Fortnite']
+
 	return (
 		<Layout>
 			<div className="social-container">
@@ -43,7 +49,7 @@ const Social: React.FC = () => {
 							<DisplayPhoto />
 							<div className="chat-title">
 								<div>{groupName}</div>
-								{status == 'online' ? (
+								{status === 'online' ? (
 									<div className="active">active now</div>
 								) : (
 									<div className="offline">offline</div>
@@ -52,17 +58,15 @@ const Social: React.FC = () => {
 						</div>
 						<CiSettings
 							cursor={'pointer'}
-							onClick={() => {
-								alert('chat settings to be implemented')
-							}}
+							onClick={() => setIsGroupSettingsOpen(true)}
 						/>
 					</div>
 					<div className="social-chat-content">
-						{messages.map(m => (
-							<>
+						{messages.map((m, idx) => (
+							<div key={idx}>
 								<DisplayPhoto imagePath={m.imageURL} />
 								<div>{m.content}</div>
-							</>
+							</div>
 						))}
 					</div>
 					<div className="social-chat-message-bar"></div>
@@ -71,6 +75,14 @@ const Social: React.FC = () => {
 					</div>
 				</div>
 			</div>
+
+			{/* Group Settings Modal */}
+			{isGroupSettingsOpen && (
+				<GroupSettingsModal
+					groupMembers={groupMembers}
+					onClose={() => setIsGroupSettingsOpen(false)}
+				/>
+			)}
 		</Layout>
 	)
 }
