@@ -27,18 +27,16 @@ const Navbar: React.FC<NavbarProps> = ({ showTabs }) => {
 						<NavTab icon={<CiMap />} text="See Groups" dest="/social" />
 					</div>
 				)}
-				{showTabs && (
-					<div className="navbar-right-container">
-						{/* Language changes to be implemented */}
-						<GrLanguage />
+				<div className="navbar-right-container">
+					{/* Language changes to be implemented */}
+					<GrLanguage />
 
-						{/* This should actually open a modal with some option and a way to change the switch between dark and light mode*/}
-						<NavLink to="/profile" className="navbar-profile-container">
-							{/* <CiMenuBurger style={{ fontSize: 24 }} /> */}
-							<CiUser style={{ fontSize: 32 }} />
-						</NavLink>
-					</div>
-				)}
+					{/* This should actually open a modal with some option and a way to change the switch between dark and light mode*/}
+					<NavLink to="/profile" className="navbar-profile-container">
+						{/* <CiMenuBurger style={{ fontSize: 24 }} /> */}
+						<CiUser style={{ fontSize: 32 }} />
+					</NavLink>
+				</div>
 			</div>
 		</nav>
 	)

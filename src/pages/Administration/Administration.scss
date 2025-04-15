@@ -1,0 +1,29 @@
+.administration--container {
+	height: 100%;
+	width: 80%;
+	margin: 0 auto;
+	display: flex;
+	flex-direction: column;
+
+	.admin-cards--container {
+		height: 160px;
+		background-color: blue;
+	}
+
+	.manage--container {
+		display: flex;
+		flex: 1;
+
+		.admin-tabs--container {
+			background-color: green;
+			width: 250px;
+			height: 100%;
+		}
+
+		.admin-table--container {
+			background-color: pink;
+			width: 100%;
+			height: 100%;
+		}
+	}
+}

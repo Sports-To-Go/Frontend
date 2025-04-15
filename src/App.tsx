@@ -4,6 +4,7 @@ import Profile from './pages/Profile/Profile.tsx'
 import Social from './pages/Social/Social.tsx'
 import Login from './pages/Login/Login.tsx'
 import { ThemeProvider } from './context/ThemeContext.tsx'
+import { Administration } from './pages/Administration/Administration.tsx'
 
 /* 
   Locations should be split into two:
@@ -12,14 +13,12 @@ import { ThemeProvider } from './context/ThemeContext.tsx'
 */
 
 const App: React.FC = () => {
-	const isAdmin = false
+	const isAdmin = true
 	const isLogged = true
 	const routes = isAdmin ? (
 		<>
-			<Route path="/social" element={<Social />} />
-			<Route path="/locations" element={<Locations />} />
-			<Route path="/profile/:id" element={<Profile />} />
-			<Route path="*" element={<Navigate to="/locations" replace />} />
+			<Route path="/administration" element={<Administration />} />
+			<Route path="*" element={<Navigate to="/administration" replace />} />
 		</>
 	) : (
 		<>
@@ -35,9 +34,7 @@ const App: React.FC = () => {
 	return (
 		<ThemeProvider>
 			<BrowserRouter>
-				<Routes>
-					{routes}
-				</Routes>
+				<Routes>{routes}</Routes>
 			</BrowserRouter>
 		</ThemeProvider>
 	)
