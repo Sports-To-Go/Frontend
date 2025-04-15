@@ -1,5 +1,4 @@
 import { FC, useEffect, useState, useRef } from 'react'
-import axios from 'axios'
 import './GroupChat.scss'
 
 import RoundedPhoto from '../RoundedPhoto/RoundedPhoto'
@@ -25,46 +24,65 @@ const GroupChat: FC<GroupProps> = ({ groupID }) => {
 	const [newMessage, setNewMessage] = useState('')
 	const messagesEndRef = useRef<HTMLDivElement>(null)
 
+	const ws = useRef<WebSocket | null>(null);
+
 	// Scroll to bottom function
 	const scrollToBottom = () => {
 		messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
 	}
 
 	useEffect(() => {
-		// Fetch 50-80 random messages
-		const fetchMessages = async () => {
-			try {
-				const response = await axios.get('https://jsonplaceholder.typicode.com/posts')
-				// eslint-disable-next-line @typescript-eslint/no-explicit-any
-				const randomMessages = response.data.slice(0, 100).map((post: any, index: number) => ({
-					id: post.id,
-					sender: `User ${index + 1}`,
-					content: post.body,
-					timestamp: new Date().toISOString(),
-				}))
-				setMessages(randomMessages)
-			} catch (error) {
-				console.error('Error fetching mock messages:', error)
-			}
-		}
-
-		fetchMessages()
-	}, [groupID])
-
-	useEffect(() => {
-		// Scroll to bottom whenever messages change
-		scrollToBottom()
-	}, [messages])
+		let reconnectAttempts = 0;
+	
+		const connectWebSocket = () => {
+			ws.current = new WebSocket('ws://localhost:8080/chat'); // to be replaced
+	
+			ws.current.onopen = () => {
+				console.log('WebSocket connection established');
+				reconnectAttempts = 0
+			};
+	
+			ws.current.onmessage = (e) => {
+				try {
+					const incomingMessage: Message = JSON.parse(e.data);
+					setMessages((prev) => [...prev, incomingMessage]);
+					scrollToBottom();
+				} catch (error) {
+					console.error('Failed to parse WebSocket message:', error);
+				}
+			};
+			
+	
+			ws.current.onclose = () => {
+				console.log('WebSocket connection closed');
+				if (reconnectAttempts < 5) {
+					reconnectAttempts++;
+					setTimeout(connectWebSocket, 2000);
+				}
+			};
+	
+			ws.current.onerror = (e) => {
+				console.error('WebSocket error: ', e);
+			};
+		};
+	
+		connectWebSocket();
+	
+		return () => {
+			ws.current?.close();
+		};
+	}, [groupID]);
+	
 
 	const sendMessage = () => {
-		if (newMessage.trim()) {
-			const newMsg: Message = {
+		if (newMessage.trim() && ws.current?.readyState == WebSocket.OPEN) {
+			const outgoingMessage: Message = {
 				id: messages.length + 1,
 				sender: 'You',
 				content: newMessage,
 				timestamp: new Date().toISOString(),
 			}
-			setMessages(prev => [...prev, newMsg])
+			ws.current.send(JSON.stringify(outgoingMessage))
 			setNewMessage('')
 		}
 	}
