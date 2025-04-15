@@ -15,7 +15,7 @@ const Profile = () => {
 				</div>
 
 				<div className="profile-main">
-					<ActivityFeed image={''} title={''} time={''} />
+					<ActivityFeed />
 				</div>
 			</div>
 		</Layout>
