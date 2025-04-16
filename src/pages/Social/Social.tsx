@@ -5,7 +5,7 @@ import './Social.scss'
 import { CiSettings } from 'react-icons/ci'
 import UpperMessagePreview from './UpperMessagePreview'
 import LowerMessagePreview from './LowerMessagePreview'
-import GroupSettingsModal from './GroupSettingsModal'
+import GroupSettingsModal from '../../components/GroupSettings/GroupSettingsModal.tsx'
 
 class Message {
 	imageURL: string = ''
