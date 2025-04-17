@@ -5,6 +5,8 @@ import Social from './pages/Social/Social.tsx'
 import Login from './pages/Login/Login.tsx'
 import AddLocationPage from './pages/AddLocation/AddLocationPage.tsx'
 import { ThemeProvider } from './context/ThemeContext.tsx'
+import 'react-toastify/dist/ReactToastify.css'
+import { ToastContainer } from 'react-toastify'
 
 /* 
   Locations should be split into two:
@@ -22,6 +24,7 @@ const App: React.FC = () => {
 			<Route path="/profile/:id" element={<Profile />} />
 			<Route path='/add-location' element={<AddLocationPage />} />
 			<Route path="*" element={<Navigate to="/locations" replace />} />
+			
 		</>
 	) : (
 		<>
@@ -32,6 +35,7 @@ const App: React.FC = () => {
 			<Route path="/profile/:id" element={<Profile />} />
 			{isLogged && <Route path="/profile" element={<Profile />} />}
 			<Route path="*" element={<Navigate to="/locations" replace />} />
+			
 		</>
 	)
 
@@ -39,6 +43,7 @@ const App: React.FC = () => {
 		<ThemeProvider>
 			<BrowserRouter>
 				<Routes>{routes}</Routes>
+				<ToastContainer position='top-center' autoClose={3000} />
 			</BrowserRouter>
 		</ThemeProvider>
 	)

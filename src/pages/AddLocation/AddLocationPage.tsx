@@ -4,8 +4,10 @@ import SportSelect from '../../components/SportSelect/SportSelect'
 import { reverseGeocode, getDistanceInMeters } from '../../utils/geocode'
 import { FaTimes } from 'react-icons/fa'
 import { Link } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import './AddLocationPage.scss'
 import Layout from '../../components/Layout/Layout'
+import { toast } from 'react-toastify'
 
 type FormErrors = {
 	courtName?: string
@@ -32,6 +34,7 @@ const AddLocationPage: React.FC<{}> = () => {
 	const fileInputRef = useRef<HTMLInputElement>(null)
 	const [imagePreviews, setImagePreviews] = useState<string[]>([])
 	const [errors, setErrors] = useState<Record<string, string>>({})
+	const navigate = useNavigate()
 
 	const handleAddressSelect = (coords: { lat: number; lng: number }) => {
 		setLat(coords.lat)
@@ -56,42 +59,40 @@ const AddLocationPage: React.FC<{}> = () => {
 	const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		const newFiles = Array.from(e.target.files || [])
 		const totalFiles = images.length + newFiles.length
-	  
+
 		if (totalFiles > 10) {
-		  setErrors(prev => ({
-			...prev,
-			images: 'You can upload a maximum of 10 images.'
-		  }))
-	  
-		  // Șterge eroarea după 3 secunde
-		  setTimeout(() => {
-			setErrors(prev => {
-			  const newErrors = { ...prev }
-			  delete newErrors.images
-			  return newErrors
-			})
-		  }, 3000)
-	  
-		  return
+			setErrors(prev => ({
+				...prev,
+				images: 'You can upload a maximum of 10 images.',
+			}))
+
+			// Șterge eroarea după 3 secunde
+			setTimeout(() => {
+				setErrors(prev => {
+					const newErrors = { ...prev }
+					delete newErrors.images
+					return newErrors
+				})
+			}, 3000)
+
+			return
 		}
-	  
+
 		const updatedImages = [...images, ...newFiles]
 		setImages(updatedImages)
-	  
+
 		const newPreviews = newFiles.map(file => URL.createObjectURL(file))
 		setImagePreviews(prev => [...prev, ...newPreviews])
-	  
+
 		// curățăm eroarea dacă totul e ok
 		setErrors(prev => {
-		  const newErrors = { ...prev }
-		  delete newErrors.images
-		  return newErrors
+			const newErrors = { ...prev }
+			delete newErrors.images
+			return newErrors
 		})
-	  
+
 		e.target.value = ''
-	  }
-	  
-	  
+	}
 
 	const handleRemoveImage = (indexToRemove: number) => {
 		setImages(prev => prev.filter((_, index) => index !== indexToRemove))
@@ -145,14 +146,48 @@ const AddLocationPage: React.FC<{}> = () => {
 			return next
 		})
 
-	const handleSubmit = (e: React.FormEvent) => {
-		e.preventDefault()
-		if (!validate()) {
-			// opreşte submit‑ul, arată erorile
-			return
-		}
-		// aici trimite datele la backend
-	}
+		const handleSubmit = async (e: React.FormEvent) => {
+			e.preventDefault()
+			if (!validate()) return
+		  
+			const payload = {
+			  name: courtName,
+			  address,
+			  longitude: lng,
+			  latitude: lat,
+			  createdBy: 17, // hardcodat pentru test, în viitor iei din userul logat
+			  description,
+			  sport,
+			  calendarId: 'cID', // poți lăsa "" temporar
+			  hourlyRate: parseFloat(price),
+			  openingTime: startTime,
+			  closingTime: endTime
+			}
+		  
+			try {
+			  const response = await fetch('http://localhost:8081/locations', {
+				method: 'POST',
+				headers: {
+				  'Content-Type': 'application/json'
+				},
+				body: JSON.stringify(payload)
+			  })
+		  
+			  if (!response.ok) {
+				throw new Error('Failed to submit')
+			  }
+		  
+			  const result = await response.json()
+			  console.log('Form submitted successfully:', result)
+			  toast.success('Court added successfully!')
+			  setTimeout(() => {
+				navigate('/locations');
+			  }, 3000);
+			} catch (error) {
+			  console.error('Error submitting form:', error)
+			}
+		  }
+		  
 
 	return (
 		<Layout>
