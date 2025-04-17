@@ -74,122 +74,77 @@
 			list-style: none;
 			margin: 0;
 			padding: 0 20px;
-			display: flex;
-			flex-direction: column;
-			gap: 16px;
-
-			.message-item {
+			.message-preview-container {
+				height: 100%; /* Full height of the sidebar */
 				display: flex;
-				align-items: center;
-				padding: 12px;
-				border-bottom: 1px solid var(--border-color);
-				cursor: pointer;
+				flex-direction: column;
+				gap: 16px;
 
-				.group-avatar-container {
-					position: relative;
-
-					.group-avatar {
-						width: 45px;
-						height: 45px;
-						border-radius: 50%;
-						border: 1px solid var(--border-color);
-					}
-
-					.online-indicator {
-						width: 12px;
-						height: 12px;
-						border-radius: 100%;
-						background: #37ee74; 
-						border: 0;
-						position: absolute;
-						bottom: 0;
-						right: 0;
-						transform: translate(-30%, -30%);
-					}
-				}
-
-				.group-info {
-					flex-grow: 1;
-					margin-left: 20px;
-
-					.group-name {
-						font-weight: bold;
-						font-size: 14px;
-						color: var(--dark-text);
-						margin-bottom: 8px;
-					}
-
-					.group-description {
-						font-size: 12px;
-						color: #838383;
-					}
-				}
-
-				.members-info {
+				.message-item {
 					display: flex;
 					align-items: center;
-					gap: 4px;
+					padding: 12px;
+					border-bottom: 1px solid var(--border-color);
+					cursor: pointer;
 
-					.members-icon {
-						width: 16px;
-						height: 16px;
+					.group-avatar-container {
+						position: relative;
+
+						.group-avatar {
+							width: 45px;
+							height: 45px;
+							border-radius: 50%;
+							border: 1px solid var(--border-color);
+						}
+
+						.online-indicator {
+							width: 12px;
+							height: 12px;
+							border-radius: 100%;
+							background: #37ee74;
+							border: 0;
+							position: absolute;
+							bottom: 0;
+							right: 0;
+							transform: translate(-30%, -30%);
+						}
 					}
 
-					.members-count {
-						font-weight: bold;
-						font-size: 12px;
-						color: var(--text-primary);
+					.group-info {
+						flex-grow: 1;
+						margin-left: 20px;
+
+						.group-name {
+							font-weight: bold;
+							font-size: 14px;
+							color: var(--dark-text);
+							margin-bottom: 8px;
+						}
+
+						.group-description {
+							font-size: 12px;
+							color: #838383;
+						}
+					}
+
+					.members-info {
+						display: flex;
+						align-items: center;
+						gap: 4px;
+
+						.members-icon {
+							width: 16px;
+							height: 16px;
+						}
+
+						.members-count {
+							font-weight: bold;
+							font-size: 12px;
+							color: var(--text-primary);
+						}
 					}
 				}
 			}
-		}
-	}
-
-	.social-right-container {
-		min-width: 500px;
-		flex: 1;
-		display: flex;
-		flex-direction: column;
-
-		.social-chat-top {
-			height: 80px;
-			display: flex;
-			justify-content: space-between;
-			align-items: center;
-			padding: 0 20px;
-			font-size: 24px;
-			box-shadow: 0px 4px 6px rgba(10, 10, 10, 0.2);
-			border-bottom-left-radius: 20px;
-			border-bottom-right-radius: 20px;
-
-			.chat-title-container {
-				display: flex;
-				align-items: center;
-
-				.chat-title {
-					margin: 10px;
-					font-size: 14px;
-					font-weight: bold;
-				}
-
-				.active, .offline {
-					font-size: 10px;
-					color: #37EE74; 
-				}
-
-				.offline {
-					color: red; 
-				}
-			}
-		}
-
-		.social-chat-content {
-			flex: 1;
-			padding: 10px 20px;
-		}
-
-		.social-chat-message-bar {
-			height: 50px;
 		}
 	}
 }

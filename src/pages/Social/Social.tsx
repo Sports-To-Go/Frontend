@@ -1,28 +1,11 @@
-import DisplayPhoto from '../../components/DisplayPhoto/DisplayPhoto'
-import { useState } from 'react'
+import { useState, FC } from 'react'
+import './Social.scss'
 import Layout from '../../components/Layout/Layout'
 import GroupPreview from '../../components/GroupPreview/GroupPreview'
-import './Social.scss'
-import { CiSettings } from 'react-icons/ci'
 
-class Message {
-	imageURL: string = ''
-	content: string = ''
-}
+import GroupChat from '../../components/GroupChat/GroupChat'
 
-const Social: React.FC = () => {
-	const groupName: string = 'Fotbal 2A3'
-	const status: string = 'online'
-	const messages: Message[] = [
-		{
-			imageURL: '',
-			content: 'Que pasa bro?',
-		},
-		{
-			imageURL: '',
-			content: 'Brick by brick',
-		},
-	]
+const Social: FC = () => {
 	const [activeTab, setActiveTab] = useState<'myGroups' | 'lookForGroups'>('myGroups')
 	const [search, setSearch] = useState('')
 
@@ -89,37 +72,7 @@ const Social: React.FC = () => {
 					</ul>
 				</div>
 
-				{/* Right Section */}
-				<div className="social-right-container">
-					<div className="social-chat-top">
-						<div className="chat-title-container">
-							<DisplayPhoto />
-							<div className="chat-title">
-								<div>{groupName}</div>
-								{status == 'online' ? (
-									<div className="active">active now</div>
-								) : (
-									<div className="offline">offline</div>
-								)}
-							</div>
-						</div>
-						<CiSettings
-							cursor={'pointer'}
-							onClick={() => {
-								alert('chat settings to be implemented')
-							}}
-						/>
-					</div>
-					<div className="social-chat-content">
-						{messages.map(m => (
-							<>
-								<DisplayPhoto imagePath={m.imageURL} />
-								<div>{m.content}</div>
-							</>
-						))}
-					</div>
-					<div className="social-chat-message-bar"></div>
-				</div>
+				<GroupChat groupID={1} />
 			</div>
 		</Layout>
 	)
