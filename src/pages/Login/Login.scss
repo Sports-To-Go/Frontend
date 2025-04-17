@@ -15,7 +15,7 @@
 		text-align: center;
 		transition: transform 0.6s ease-in-out, height 0.8s ease, padding 0.8s ease;
 		transform-style: preserve-3d;
-		overflow:visible;
+		overflow:hidden;
 
 		&.rotate {
 			transform: rotateY(720deg);
