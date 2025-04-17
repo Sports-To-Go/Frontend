@@ -1,17 +1,18 @@
-import Layout from '../../components/Layout/Layout'
-import UserCard from '../../components/UserCard/UserCard'
+import Layout from '../../components/Layout/Layout';
+import UserCard from '../../components/UserCard/UserCard';
 
-import './Profile.scss'
+import './Profile.scss';
 
 const Profile = () => {
+
   return (
     <Layout>
       <div className="profile-page">
-        <UserCard />
+        < UserCard />
         {/* Aici vor veni ActivityFeed și ReviewList */}
       </div>
     </Layout>
-  )
-}
+  );
+};
 
-export default Profile
+export default Profile;
