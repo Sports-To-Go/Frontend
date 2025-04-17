@@ -25,6 +25,7 @@ const GroupChat: FC<GroupProps> = ({ groupID }) => {
 	const messagesEndRef = useRef<HTMLDivElement>(null)
 
 	const ws = useRef<WebSocket | null>(null);
+	const userID: string = useRef('user-' + Math.floor(Math.random() * 100000)).current; // for purely testing
 
 	// Scroll to bottom function
 	const scrollToBottom = () => {
@@ -35,7 +36,7 @@ const GroupChat: FC<GroupProps> = ({ groupID }) => {
 		let reconnectAttempts = 0;
 	
 		const connectWebSocket = () => {
-			ws.current = new WebSocket('ws://localhost:8080/chat'); // to be replaced
+			ws.current = new WebSocket('ws://localhost:8080'); // to be replaced
 	
 			ws.current.onopen = () => {
 				console.log('WebSocket connection established');
@@ -78,7 +79,7 @@ const GroupChat: FC<GroupProps> = ({ groupID }) => {
 		if (newMessage.trim() && ws.current?.readyState == WebSocket.OPEN) {
 			const outgoingMessage: Message = {
 				id: messages.length + 1,
-				sender: 'You',
+				sender: userID,
 				content: newMessage,
 				timestamp: new Date().toISOString(),
 			}
