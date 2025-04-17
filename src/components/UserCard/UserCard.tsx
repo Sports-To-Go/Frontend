@@ -25,10 +25,6 @@ const UserCard: React.FC = () => {
 			</div>
 
 			<div className="badge-toggle">
-				<label className="switch">
-					<input type="checkbox" checked={theme == 'dark'} />
-					<span className="slider" onClick={toggleTheme}></span>
-				</label>
 				<span className="toggle-label">night theme enjoyer</span>
 			</div>
 
