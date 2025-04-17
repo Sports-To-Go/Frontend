@@ -5,6 +5,7 @@ import RoundedPhoto from '../RoundedPhoto/RoundedPhoto'
 import { CiSettings } from 'react-icons/ci'
 import { MdLink } from 'react-icons/md'
 import { FiMessageCircle } from 'react-icons/fi'
+import GroupSettingsModal from '../GroupSettings/GroupSettingsModal'
 
 interface GroupProps {
 	groupID: number
@@ -24,8 +25,17 @@ const GroupChat: FC<GroupProps> = ({ groupID }) => {
 	const [newMessage, setNewMessage] = useState('')
 	const messagesEndRef = useRef<HTMLDivElement>(null)
 
-	const ws = useRef<WebSocket | null>(null);
-	const userID: string = useRef('user-' + Math.floor(Math.random() * 100000)).current; // for purely testing
+	const [isGroupSettingsOpen, setIsGroupSettingsOpen] = useState(false)
+	const groupMembers = [
+		'Goldan David',
+		'Smau Robert',
+		'Onofrei Radu',
+		'Dascaliu Ianis',
+		'Lionel Fortnite',
+	]
+
+	const ws = useRef<WebSocket | null>(null)
+	const userID: string = useRef('user-' + Math.floor(Math.random() * 100000)).current // for purely testing
 
 	// Scroll to bottom function
 	const scrollToBottom = () => {
@@ -33,49 +43,47 @@ const GroupChat: FC<GroupProps> = ({ groupID }) => {
 	}
 
 	useEffect(() => {
-		let reconnectAttempts = 0;
-	
+		let reconnectAttempts = 0
+
 		const connectWebSocket = () => {
-			if(ws.current) return;
-			ws.current = new WebSocket('ws://localhost:8080'); // to be replaced
-	
+			if (ws.current) return
+			ws.current = new WebSocket('ws://localhost:8080') // to be replaced
+
 			ws.current.onopen = () => {
-				console.log('WebSocket connection established');
+				console.log('WebSocket connection established')
 				reconnectAttempts = 0
-			};
-	
-			ws.current.onmessage = (e) => {
+			}
+
+			ws.current.onmessage = e => {
 				try {
-					const incomingMessage: Message = JSON.parse(e.data);
-					setMessages((prev) => [...prev, incomingMessage]);
-					scrollToBottom();
+					const incomingMessage: Message = JSON.parse(e.data)
+					setMessages(prev => [...prev, incomingMessage])
+					scrollToBottom()
 				} catch (error) {
-					console.error('Failed to parse WebSocket message:', error);
+					console.error('Failed to parse WebSocket message:', error)
 				}
-			};
-			
-	
+			}
+
 			ws.current.onclose = () => {
-				console.log('WebSocket connection closed');
+				console.log('WebSocket connection closed')
 				if (reconnectAttempts < 5) {
-					reconnectAttempts++;
-					setTimeout(connectWebSocket, 2000);
+					reconnectAttempts++
+					setTimeout(connectWebSocket, 2000)
 				}
-			};
-	
-			ws.current.onerror = (e) => {
-				console.error('WebSocket error: ', e);
-			};
-		};
-	
-		connectWebSocket();
-	
+			}
+
+			ws.current.onerror = e => {
+				console.error('WebSocket error: ', e)
+			}
+		}
+
+		connectWebSocket()
+
 		return () => {
-			ws.current?.close();
-			ws.current = null;
-		};
-	}, [groupID]);
-	
+			ws.current?.close()
+			ws.current = null
+		}
+	}, [groupID])
 
 	const sendMessage = () => {
 		if (newMessage.trim() && ws.current?.readyState == WebSocket.OPEN) {
@@ -102,7 +110,7 @@ const GroupChat: FC<GroupProps> = ({ groupID }) => {
 						</div>
 					</div>
 				</div>
-				<CiSettings cursor="pointer" onClick={() => alert('chat settings to be implemented')} />
+				<CiSettings cursor="pointer" onClick={() => setIsGroupSettingsOpen(true)} />
 			</div>
 			<div className="chat-messages">
 				{messages.map(msg => (
@@ -138,6 +146,14 @@ const GroupChat: FC<GroupProps> = ({ groupID }) => {
 					<FiMessageCircle onClick={sendMessage} cursor="pointer" />
 				</div>
 			</div>
+
+			{/* Group Settings Modal */}
+			{isGroupSettingsOpen && (
+				<GroupSettingsModal
+					groupMembers={groupMembers}
+					onClose={() => setIsGroupSettingsOpen(false)}
+				/>
+			)}
 		</div>
 	)
 }
