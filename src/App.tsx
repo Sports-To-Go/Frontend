@@ -5,6 +5,7 @@ import Social from './pages/Social/Social.tsx'
 import Login from './pages/Login/Login.tsx'
 import AddLocationPage from './pages/AddLocation/AddLocationPage.tsx'
 import { ThemeProvider } from './context/ThemeContext.tsx'
+import { Administration } from './pages/Administration/Administration.tsx'
 import 'react-toastify/dist/ReactToastify.css'
 import { ToastContainer } from 'react-toastify'
 
@@ -19,12 +20,8 @@ const App: React.FC = () => {
 	const isLogged = true
 	const routes = isAdmin ? (
 		<>
-			<Route path="/social" element={<Social />} />
-			<Route path="/locations" element={<Locations />} />
-			<Route path="/profile/:id" element={<Profile />} />
-			<Route path='/add-location' element={<AddLocationPage />} />
-			<Route path="*" element={<Navigate to="/locations" replace />} />
-			
+			<Route path="/administration" element={<Administration />} />
+			<Route path="*" element={<Navigate to="/administration" replace />} />
 		</>
 	) : (
 		<>
