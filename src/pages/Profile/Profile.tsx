@@ -3,7 +3,7 @@ import UserCard from '../../components/UserCard/UserCard'
 import EditProfileButton from '../../components/EditProfileButton/EditProfileButton'
 import ActivityFeed from '../../components/ActivityFeed/ActivityFeed'
 
-import './Profile.scss'
+import './Profile.scss';
 
 const Profile = () => {
 	return (
@@ -22,4 +22,4 @@ const Profile = () => {
 	)
 }
 
-export default Profile
+export default Profile;

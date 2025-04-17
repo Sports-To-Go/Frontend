@@ -40,15 +40,10 @@ const Navbar: React.FC<NavbarProps> = ({ showTabs }) => {
 				{showTabs && (
 					<div className="navbar-menu">
 						<NavTab icon={<GrHomeRounded />} text="Find Locations" dest="/locations" />
-						<NavTab
-							icon={<FaRegSquarePlus />}
-							text="Add Location"
-							dest="/profile#locations"
-						/>
+						<NavTab icon={<FaRegSquarePlus />} text="Add Location" dest="/add-location" />
 						<NavTab icon={<CiMap />} text="See Groups" dest="/social" />
 					</div>
 				)}
-				{showTabs && (
 					<div className="navbar-right-container">
 						<GrLanguage />
 
@@ -59,7 +54,6 @@ const Navbar: React.FC<NavbarProps> = ({ showTabs }) => {
 							{showMenu && <UserMenu menuRef={menuRef} />}
 						</div>
 					</div>
-				)}
 			</div>
 		</nav>
 	)

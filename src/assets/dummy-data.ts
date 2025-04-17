@@ -1,0 +1,68 @@
+import { adminTableRow } from '../components/AdminTable/AdminTable'
+
+export const tableData: adminTableRow[] = [
+	{
+		image: { url: 'https://i.pravatar.cc/100', alt: 'Imagine' },
+		name: 'Proba',
+		type: 'Mamaia',
+		status: 'Active',
+		bookings: 10,
+		rating: 0,
+	},
+	{
+		image: { url: 'https://i.pravatar.cc/100', alt: 'Imagine' },
+		name: 'Proba',
+		type: 'Mamaia',
+		status: 'Active',
+		bookings: 53,
+		rating: 0,
+	},
+	{
+		image: { url: 'https://i.pravatar.cc/100', alt: 'Imagine' },
+		name: 'Proba',
+		type: 'Mamaia',
+		status: 'Active',
+		bookings: 100,
+		rating: 0,
+	},
+	{
+		image: { url: 'https://i.pravatar.cc/100', alt: 'Imagine' },
+		name: 'Proba',
+		type: 'Mamaia',
+		status: 'Active',
+		bookings: 0,
+		rating: 0,
+	},
+	{
+		image: { url: 'https://i.pravatar.cc/100', alt: 'Imagine' },
+		name: 'Proba',
+		type: 'Mamaia',
+		status: 'Active',
+		bookings: 67,
+		rating: 0,
+	},
+	{
+		image: { url: 'https://i.pravatar.cc/100', alt: 'Imagine' },
+		name: 'Proba',
+		type: 'Mamaia',
+		status: 'Active',
+		bookings: 22,
+		rating: 0,
+	},
+	{
+		image: { url: 'https://i.pravatar.cc/100', alt: 'Imagine' },
+		name: 'Proba',
+		type: 'Mamaia',
+		status: 'Active',
+		bookings: 78,
+		rating: 0,
+	},
+	{
+		image: { url: 'https://i.pravatar.cc/100', alt: 'Imagine' },
+		name: 'Proba',
+		type: 'Mamaia',
+		status: 'Active',
+		bookings: 5,
+		rating: 0,
+	},
+]
