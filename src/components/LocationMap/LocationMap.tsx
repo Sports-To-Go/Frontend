@@ -31,7 +31,7 @@ const LocationMap = ({
 	onPinMoved,
 }: Props) => {
 	const { isLoaded } = useJsApiLoader({
-		googleMapsApiKey: 'AIzaSyCJaVZNeUe4fj0vYW0am3dN1AzauG6PBp8',
+		googleMapsApiKey: import.meta.env.VITE_GOOGLE_MAPS_API_KEY,
 		libraries,
 	})
 

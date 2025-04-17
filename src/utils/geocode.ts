@@ -5,7 +5,7 @@
 // The reverseGeocode function takes latitude and longitude and returns the formatted address.
 // The getDistanceInMeters function calculates the distance in meters between two geographical points using the Haversine formula.
  export async function geocodeAddress(address: string): Promise<{lat: number, lng: number} | null> {
-    const apiKey = "AIzaSyCJaVZNeUe4fj0vYW0am3dN1AzauG6PBp8";
+    const apiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY
     const url = `https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(address)}&key=${apiKey}`;
   
     try {
@@ -24,57 +24,33 @@
       return null;
     }
   }
-
+  
   export async function reverseGeocode(lat: number, lng: number): Promise<string | null> {
-    const apiKey = "AIzaSyCJaVZNeUe4fj0vYW0am3dN1AzauG6PBp8" // cheia frontend
-  
-    const url = `https://maps.googleapis.com/maps/api/geocode/json?latlng=${lat},${lng}&key=${apiKey}`
-  
     try {
-      const response = await fetch(url)
+      const response = await fetch(`/api/reverse-geocode?lat=${lat}&lng=${lng}`)
+  
+      const contentType = response.headers.get("content-type")
+  
+      // Check if the response is not ok or if the content type is not JSON
+      if (!response.ok || !contentType?.includes("application/json")) {
+        const text = await response.text()
+        console.error("Backend returned unexpected response:", text)
+        return null
+      }
+  
       const data = await response.json()
   
-      console.log("🧪 Google Reverse Geocode FULL Response:", data)
-  
-      if (data.status === "OK" && data.results.length > 0) {
-        return data.results[0].formatted_address
+      if (data.address) {
+        return data.address
       } else {
-        console.warn("⚠️ Reverse geocoding warning:", data.status, data.results)
+        console.warn("Address not found in backend response:", data)
         return null
       }
     } catch (error) {
-      console.error("❌ Reverse geocoding fetch error:", error)
+      console.error("Reverse geocoding via backend failed:", error)
       return null
     }
   }
-  
-  
-  // export async function reverseGeocode(lat: number, lng: number): Promise<string | null> {
-  //   try {
-  //     const response = await fetch(`/api/reverse-geocode?lat=${lat}&lng=${lng}`)
-  
-  //     const contentType = response.headers.get("content-type")
-  
-  //     // Verifică dacă răspunsul e JSON valid
-  //     if (!response.ok || !contentType?.includes("application/json")) {
-  //       const text = await response.text()
-  //       console.error("Backend returned unexpected response:", text)
-  //       return null
-  //     }
-  
-  //     const data = await response.json()
-  
-  //     if (data.address) {
-  //       return data.address
-  //     } else {
-  //       console.warn("Address not found in backend response:", data)
-  //       return null
-  //     }
-  //   } catch (error) {
-  //     console.error("Reverse geocoding via backend failed:", error)
-  //     return null
-  //   }
-  // }
   
   
   
@@ -82,7 +58,7 @@
     coord1: { lat: number; lng: number },
     coord2: { lat: number; lng: number }
   ): number {
-    const R = 6371e3; // Raza Pământului în metri
+    const R = 6371e3; // Radius of the Earth in meters
     const φ1 = (coord1.lat * Math.PI) / 180;
     const φ2 = (coord2.lat * Math.PI) / 180;
     const Δφ = ((coord2.lat - coord1.lat) * Math.PI) / 180;

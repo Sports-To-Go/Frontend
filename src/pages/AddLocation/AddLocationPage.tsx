@@ -66,7 +66,7 @@ const AddLocationPage: React.FC<{}> = () => {
 				images: 'You can upload a maximum of 10 images.',
 			}))
 
-			// Șterge eroarea după 3 secunde
+			// Clear the error after 3 seconds
 			setTimeout(() => {
 				setErrors(prev => {
 					const newErrors = { ...prev }
@@ -84,7 +84,7 @@ const AddLocationPage: React.FC<{}> = () => {
 		const newPreviews = newFiles.map(file => URL.createObjectURL(file))
 		setImagePreviews(prev => [...prev, ...newPreviews])
 
-		// curățăm eroarea dacă totul e ok
+		// Clear the error if it was set
 		setErrors(prev => {
 			const newErrors = { ...prev }
 			delete newErrors.images
@@ -126,7 +126,7 @@ const AddLocationPage: React.FC<{}> = () => {
 			newErrors.images = 'At least one photo is required'
 		}
 
-		// validare timp: <input type="time"> ne dă valori "HH:MM"
+		// Check if the time is valid
 		const [sh, sm] = startTime.split(':').map(Number)
 		const [eh, em] = endTime.split(':').map(Number)
 		const startMinutes = sh * 60 + sm
@@ -136,7 +136,7 @@ const AddLocationPage: React.FC<{}> = () => {
 		}
 
 		setErrors(newErrors)
-		// dacă nu există nicio proprietate în newErrors => OK
+		// If there are errors, return false
 		return Object.keys(newErrors).length === 0
 	}
 	const clearError = (field: keyof FormErrors) =>
@@ -155,10 +155,10 @@ const AddLocationPage: React.FC<{}> = () => {
 			  address,
 			  longitude: lng,
 			  latitude: lat,
-			  createdBy: 17, // hardcodat pentru test, în viitor iei din userul logat
+			  createdBy: 17,
 			  description,
 			  sport,
-			  calendarId: 'cID', // poți lăsa "" temporar
+			  calendarId: 'cID',
 			  hourlyRate: parseFloat(price),
 			  openingTime: startTime,
 			  closingTime: endTime
@@ -177,16 +177,18 @@ const AddLocationPage: React.FC<{}> = () => {
 				throw new Error('Failed to submit')
 			  }
 		  
-			  const result = await response.json()
+			  const result = await response.text() 
 			  console.log('Form submitted successfully:', result)
+		  
 			  toast.success('Court added successfully!')
 			  setTimeout(() => {
-				navigate('/locations');
-			  }, 3000);
+				navigate('/locations')
+			  }, 3000)
 			} catch (error) {
 			  console.error('Error submitting form:', error)
 			}
 		  }
+		  
 		  
 
 	return (
