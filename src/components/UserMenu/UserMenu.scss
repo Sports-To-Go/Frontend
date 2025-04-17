@@ -1,0 +1,118 @@
+.user-menu {
+	position: absolute;
+	top: 60px;
+	right: 20px;
+	background-color: var(--background);
+	border: 1px solid var(--border-color);
+	border-radius: 12px;
+	padding: 16px;
+	box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+	z-index: 1000;
+	width: 220px;
+	color: var(--text-secondary);
+
+	.user-menu__header {
+		display: flex;
+		align-items: center;
+		gap: 12px;
+	}
+
+	.user-menu__avatar {
+		width: 48px;
+		height: 48px;
+		border-radius: 50%;
+	}
+
+	.user-menu__name {
+		font-size: 16px;
+		font-weight: 600;
+		color: var(--text-primary);
+	}
+
+	.user-menu__divider {
+		margin: 12px 0;
+		border: none;
+		border-top: 1px solid var(--border-color);
+	}
+
+	.user-menu__item {
+		display: flex;
+		align-items: center;
+		gap: 8px;
+		padding: 8px 0;
+		cursor: pointer;
+		transition: background-color 0.2s;
+
+		&:hover {
+			background-color: var(--background-green);
+			border-radius: 6px;
+			padding-left: 8px;
+		}
+	}
+
+	.user-menu__theme-toggle {
+		display: flex;
+		align-items: center;
+		gap: 0.5rem;
+		padding: 0.4rem 0;
+		font-size: 0.95rem;
+		font-weight: 500;
+		color: var(--text-primary);
+
+		.toggle-label {
+			white-space: nowrap;
+		}
+
+		.switch {
+			position: relative;
+			display: inline-block;
+			width: 36px;
+			height: 20px;
+
+			input {
+				opacity: 0;
+				width: 0;
+				height: 0;
+			}
+
+			.slider {
+				position: absolute;
+				cursor: pointer;
+				top: 0;
+				left: 0;
+				right: 0;
+				bottom: 0;
+				background-color: white;
+				border: 2px solid #1f2d5c;
+				border-radius: 45px;
+				transition: 0.4s;
+				box-sizing: border-box;
+
+				&::before {
+					content: '';
+					position: absolute;
+					height: 12px;
+					width: 12px;
+					left: 2px;
+					top: 2px;
+					background-color: white;
+					border: 2px solid #1f2d5c;
+					border-radius: 50%;
+					transition: 0.4s;
+					box-sizing: border-box;
+				}
+			}
+
+			input:checked + .slider {
+				background-color: var(--primary);
+				border: 2px solid #1f2d5c;
+
+				&::before {
+					transform: translateX(15px);
+					background-color: #1f2d5c;
+					border: 2px solid #1f2d5c;
+				}
+			}
+		}
+	}
+}

@@ -1,17 +1,38 @@
+import React, { useState, useRef, useEffect } from 'react'
 import './Navbar.scss'
 import Logo from '../Logo/Logo.tsx'
 import NavTab from '../NavTab/NavTab.tsx'
 import { GrHomeRounded, GrLanguage } from 'react-icons/gr'
 import { FaRegSquarePlus } from 'react-icons/fa6'
 import { CiUser, CiMap } from 'react-icons/ci'
-import { NavLink } from 'react-router-dom'
+import UserMenu from '../UserMenu/UserMenu'
 
 interface NavbarProps {
 	showTabs?: boolean
 }
 
 const Navbar: React.FC<NavbarProps> = ({ showTabs }) => {
+	const [showMenu, setShowMenu] = useState(false)
+
+	const menuRef = useRef<HTMLDivElement | null>(null)
+
+	useEffect(() => {
+		const handleClickOutside = (event: MouseEvent) => {
+			if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
+				setShowMenu(false)
+			}
+		}
+
+		document.addEventListener('mousedown', handleClickOutside)
+		return () => {
+			document.removeEventListener('mousedown', handleClickOutside)
+		}
+	}, [])
+
+	const toggleMenu = () => setShowMenu(prev => !prev)
+
 	if (showTabs == null) showTabs = true
+
 	return (
 		<nav className="navbar">
 			<div className="navbar-container">
@@ -29,14 +50,14 @@ const Navbar: React.FC<NavbarProps> = ({ showTabs }) => {
 				)}
 				{showTabs && (
 					<div className="navbar-right-container">
-						{/* Language changes to be implemented */}
 						<GrLanguage />
 
-						{/* This should actually open a modal with some option and a way to change the switch between dark and light mode*/}
-						<NavLink to="/profile" className="navbar-profile-container">
-							{/* <CiMenuBurger style={{ fontSize: 24 }} /> */}
-							<CiUser style={{ fontSize: 32 }} />
-						</NavLink>
+						<div className="navbar-profile-container" style={{ position: 'relative' }}>
+							<div onClick={toggleMenu}>
+								<CiUser style={{ fontSize: 32 }} />
+							</div>
+							{showMenu && <UserMenu menuRef={menuRef} />}
+						</div>
 					</div>
 				)}
 			</div>
