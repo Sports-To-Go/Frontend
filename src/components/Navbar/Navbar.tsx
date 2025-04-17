@@ -19,11 +19,7 @@ const Navbar: React.FC<NavbarProps> = ({ showTabs }) => {
 				{showTabs && (
 					<div className="navbar-menu">
 						<NavTab icon={<GrHomeRounded />} text="Find Locations" dest="/locations" />
-						<NavTab
-							icon={<FaRegSquarePlus />}
-							text="Add Location"
-							dest="/profile?add=location"
-						/>
+						<NavTab icon={<FaRegSquarePlus />} text="Add Location" dest="/add-location" />
 						<NavTab icon={<CiMap />} text="See Groups" dest="/social" />
 					</div>
 				)}

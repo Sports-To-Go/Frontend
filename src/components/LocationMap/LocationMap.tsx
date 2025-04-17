@@ -70,7 +70,7 @@ const LocationMap = ({
 
 		const distance = getDistanceInMeters(prev, { lat: newLat, lng: newLng })
 
-		if (distance > 200) {
+		if (distance > 50) {
 			onAddressSelect({ lat: newLat, lng: newLng })
 			if (onPinMoved) {
 				onPinMoved({ lat: newLat, lng: newLng })
@@ -82,39 +82,39 @@ const LocationMap = ({
 	if (!isLoaded) return <p>Loading map...</p>
 
 	return (
-    <div className="location-map-wrapper">
-      <div className="map-controls">
-        <Autocomplete
-          onLoad={ref => (autocompleteRef.current = ref)}
-          onPlaceChanged={handlePlaceChanged}
-        >
-          <input
-            type="text"
-            className="address-input"
-            placeholder="Enter your address"
-            value={address}
-            onChange={e => onAddressChange(e.target.value)}
-          />
-        </Autocomplete>
-      </div>
-  
-      <GoogleMap
-        mapContainerStyle={containerStyle}
-        center={{ lat, lng }}
-        zoom={16}
-        onLoad={handleMapLoad}
-        onIdle={handleMapIdle}
-        options={{
-          disableDefaultUI: true,
-        }}
-      />
-  
-      <div className="map-pin-wrapper">
-        <img src={pinIcon} className="map-pin" alt="Map Pin" />
-      </div>
-    </div>
-  )
-  
+		<div className="location-map-wrapper">
+			<div className="map-controls">
+				<div className="input-wrapper">
+					<img src={pinIcon} alt="icon" className="input-icon" />
+					<Autocomplete
+						onLoad={ref => (autocompleteRef.current = ref)}
+						onPlaceChanged={handlePlaceChanged}
+					>
+						<input
+							type="text"
+							className="address-input"
+							placeholder="Enter your address"
+							value={address}
+							onChange={e => onAddressChange(e.target.value)}
+						/>
+					</Autocomplete>
+				</div>
+			</div>
+
+			<GoogleMap
+				mapContainerStyle={containerStyle}
+				center={{ lat, lng }}
+				zoom={18}
+				onLoad={handleMapLoad}
+				onIdle={handleMapIdle}
+				options={{ disableDefaultUI: true }}
+			/>
+
+			<div className="map-pin-wrapper">
+				<img src={pinIcon} className="map-pin" alt="Map Pin" />
+			</div>
+		</div>
+	)
 }
 
 export default LocationMap

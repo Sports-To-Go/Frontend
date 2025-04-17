@@ -24,28 +24,58 @@
       return null;
     }
   }
-  
+
   export async function reverseGeocode(lat: number, lng: number): Promise<string | null> {
-    const apiKey = "AIzaSyCJaVZNeUe4fj0vYW0am3dN1AzauG6PBp8";
-    const url = `https://maps.googleapis.com/maps/api/geocode/json?latlng=${lat},${lng}&key=${apiKey}`;
+    const apiKey = "AIzaSyCJaVZNeUe4fj0vYW0am3dN1AzauG6PBp8" // cheia frontend
+  
+    const url = `https://maps.googleapis.com/maps/api/geocode/json?latlng=${lat},${lng}&key=${apiKey}`
   
     try {
-      const response = await fetch(url);
-      const data = await response.json();
+      const response = await fetch(url)
+      const data = await response.json()
   
-      console.log("↩️ Google Reverse Geocode FULL Response:", data);
+      console.log("🧪 Google Reverse Geocode FULL Response:", data)
   
       if (data.status === "OK" && data.results.length > 0) {
-        return data.results[0].formatted_address;
+        return data.results[0].formatted_address
       } else {
-        console.warn("⚠️ Reverse geocoding warning:", data.status, data.results);
-        return null;
+        console.warn("⚠️ Reverse geocoding warning:", data.status, data.results)
+        return null
       }
     } catch (error) {
-      console.error("❌ Reverse geocoding fetch error:", error);
-      return null;
+      console.error("❌ Reverse geocoding fetch error:", error)
+      return null
     }
   }
+  
+  
+  // export async function reverseGeocode(lat: number, lng: number): Promise<string | null> {
+  //   try {
+  //     const response = await fetch(`/api/reverse-geocode?lat=${lat}&lng=${lng}`)
+  
+  //     const contentType = response.headers.get("content-type")
+  
+  //     // Verifică dacă răspunsul e JSON valid
+  //     if (!response.ok || !contentType?.includes("application/json")) {
+  //       const text = await response.text()
+  //       console.error("Backend returned unexpected response:", text)
+  //       return null
+  //     }
+  
+  //     const data = await response.json()
+  
+  //     if (data.address) {
+  //       return data.address
+  //     } else {
+  //       console.warn("Address not found in backend response:", data)
+  //       return null
+  //     }
+  //   } catch (error) {
+  //     console.error("Reverse geocoding via backend failed:", error)
+  //     return null
+  //   }
+  // }
+  
   
   
   export function getDistanceInMeters(

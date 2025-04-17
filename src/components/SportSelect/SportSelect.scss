@@ -1,0 +1,72 @@
+.sport-select {
+	width: 100%;
+
+	.select-button {
+		.select-button-content {
+			display: flex;
+			align-items: center;
+			width: 100%;
+            gap: 12px;
+
+			img {
+				width: 20px;
+				height: 20px;
+			}
+
+			span {
+				font-size: 16px;
+			}
+
+			svg {
+				margin-left: auto;
+			}
+		}
+	}
+
+	.options {
+		position: absolute;
+		z-index: 10;
+		margin-top: 8px;
+		width: 100%;
+		background-color: #fff;
+		border: 1px solid #d9d9d9;
+		border-radius: 8px;
+		box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+		max-height: 240px;
+		overflow-y: auto;
+	}
+
+	.option {
+		padding: 10px 16px;
+		cursor: pointer;
+
+		&:hover {
+			background-color: #e9f5f3;
+		}
+
+		.option-content {
+			display: flex;
+			align-items: center;
+			gap: 12px;
+
+			img {
+				width: 20px;
+				height: 20px;
+			}
+
+			span {
+				font-size: 16px;
+				color: #333;
+			}
+		}
+        .option[aria-selected='true'] {
+            background-color: #e6f7f5;
+            font-weight: 500;
+        
+            span {
+                color: #27c4b6;
+            }
+        }
+        
+	}
+}
