@@ -3,6 +3,7 @@ import Layout from '../../components/Layout/Layout'
 import './Administration.scss'
 import AdminTable from '../../components/AdminTable/AdminTable'
 import { tableData } from '../../assets/dummy-data'
+import StatCards from '../../components/StatCards/StatCards'
 
 export const Administration: React.FC = () => {
 	const headerTable = ['Venue', 'Name', 'Type', 'Status', 'Bookings', 'Ratings']
@@ -12,7 +13,9 @@ export const Administration: React.FC = () => {
 		<Layout showTabs={false} showFooter={true}>
 			<div className="administration--container">
 				<h2>Admin dashboard</h2>
-				<div className="admin-cards--container">To be implemented</div>
+				<div className="admin-cards--container">
+					<StatCards />
+				</div>
 				<div className="manage--container">
 					<div className="admin-tabs--container">To be implemented</div>
 					<div className="admin-table--container">
