@@ -12,12 +12,36 @@ const Login = () => {
 	const [isRegister, setIsRegister] = useState(false)
 	const [registerUsername, setRegisterUsername] = useState('')
 	const [rePassword, setRePassword] = useState('')
+	const [error, setError] = useState('')
+
 
 	const handleSubmit = (e: React.FormEvent) => {
 		e.preventDefault()
-		console.log('Username:', username)
-		console.log('Password:', password)
+		setError('') 
+		if (isRegister) {
+			if (!registerUsername || !username || !password || !rePassword) {
+				setError('Te rugăm să completezi toate câmpurile.')
+				return
+			}
+			if (password !== rePassword) {
+				setError('Parolele nu se potrivesc!')
+				return
+			}
+			console.log('Înregistrare:')
+			console.log('Username:', registerUsername)
+			console.log('Email:', username)
+			console.log('Parola:', password)
+		} else {
+			if (!username || !password) {
+				setError('Introdu emailul și parola.')
+				return
+			}
+			console.log('Autentificare:')
+			console.log('Email:', username)
+			console.log('Parola:', password)
+		}
 	}
+
 
 	const togglePassword = () => {
 		setShowPassword(prev => !prev)
@@ -32,6 +56,7 @@ const Login = () => {
 			setPassword('')
 			setRePassword('')
 			setRegisterUsername('')
+			setError('')
 		}, 300)
 	}
 
@@ -44,6 +69,7 @@ const Login = () => {
 			setPassword('')
 			setRePassword('')
 			setRegisterUsername('')
+			setError('')
 		}, 300)
 	}
 
@@ -98,6 +124,7 @@ const Login = () => {
 							</div>
 						)}
 						<button type="submit">{isRegister ? 'Register' : 'Log in'}</button>
+						{error && <p className="error-message">{error}</p>}
 						<div className="signup">
 							{isRegister ? (
 								<>
