@@ -1,11 +1,9 @@
-import React, { useContext } from 'react'
+import React from 'react'
 import './UserCard.scss'
 import { TiLocationArrowOutline } from 'react-icons/ti'
-import { ThemeContext } from '../../context/ThemeContext'
 import { FaStar } from 'react-icons/fa'
 
 const UserCard: React.FC = () => {
-	const { theme, toggleTheme } = useContext(ThemeContext)
 	return (
 		<div className="user-card">
 			<div className="user-card__header">
