@@ -1,0 +1,220 @@
+#title {
+	text-align: center;
+	font-size: 32px;
+	font-weight: bold;
+	color: #7d7d7d;
+}
+
+.add-location-form {
+	background-color: #e9f5f3;
+	border-radius: 10px;
+	max-width: 960px;
+	width: 100%;
+	padding: 20px;
+	border: 1px solid #a0a0a0;
+	margin: 0 auto;
+	position: relative;
+
+	h2 {
+		text-align: center;
+		font-size: 25px;
+		font-weight: semibold;
+		color: #7d7d7d;
+		margin-bottom: 20px;
+	}
+
+	// Style for Cancel Button (top right)
+	.cancel-btn {
+		position: absolute;
+		top: 15px;
+		right: 15px;
+		border-radius: 8px;
+		border: none;
+		padding: 5px;
+		cursor: pointer;
+		background-color: #ccd3d1;
+		color: #6c6c6c;
+	}
+
+	form {
+		.form-columns {
+			display: flex;
+			gap: 32px; // Space between left and right columns
+
+			// Left and right column styling
+			.form-left,
+			.form-right {
+				flex: 1;
+				min-width: 0; // Prevent flex items from overflowing their container
+			}
+
+			.form-left .form-group > * {
+				// Target all children of form-group in the left column
+				width: 100%;
+				box-sizing: border-box;
+			}
+		}
+
+		.form-group {
+			position: relative;
+			margin-bottom: 24px;
+
+			label {
+				display: block;
+				font-size: 16px;
+				font-weight: 600px;
+				color: #7d7d7d;
+				margin-bottom: 8px;
+			}
+
+			input[type='text'],
+			textarea,
+			.form-select-sport .select-button {
+				width: 100%;
+				padding: 12px 16px;
+				font-size: 16px;
+				font-weight: 400;
+				gap: 12px;
+				color: #000000;
+				border: 1px solid #d9d9d9;
+				border-radius: 8px;
+				background-color: #fff;
+
+				&::placeholder {
+					color: #b0b0b0;
+				}
+			}
+
+			textarea {
+				min-height: 100px;
+				resize: none;
+				padding: 12px 16px;
+				font-size: 16px;
+				font-weight: 400;
+				color: #000000;
+				border: 1px solid #d9d9d9;
+				border-radius: 8px;
+				background-color: #fff;
+
+				&::placeholder {
+					color: #b0b0b0;
+				}
+			}
+
+			.time-selection {
+				display: flex;
+				align-items: center;
+				gap: 10px;
+			}
+
+			.image-upload-box {
+				width: 100%;
+				height: 140px;
+				background-color: #ffffff;
+				border: 1px dashed #a0a0a0;
+				border-radius: 8px;
+				cursor: pointer;
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				transition: border-color 0.2s;
+
+				&:hover {
+					border-color: #27c4b6;
+				}
+
+				.plus-sign {
+					font-size: 32px;
+					color: #a0a0a0;
+				}
+			}
+		}
+		.form-row {
+			display: flex;
+			gap: 24px;
+
+			.form-group {
+				flex: 1;
+			}
+		}
+
+		.form-buttons {
+			text-align: center;
+			margin-top: 20px;
+
+			.publish-btn {
+				background-color: #27c4b6;
+				color: white;
+				padding: 15px 25px;
+				font-size: 18px;
+				border: none;
+				border-radius: 5px;
+				cursor: pointer;
+				transition: background-color 0.3s;
+
+				&:hover {
+					background-color: #218838;
+				}
+			}
+		}
+		.image-preview-container {
+			display: flex;
+			flex-wrap: wrap;
+			gap: 8px;
+			margin-top: 10px;
+		}
+
+		.image-preview-wrapper {
+			position: relative;
+			width: 80px;
+			height: 80px;
+
+			.image-preview {
+				width: 100%;
+				height: 100%;
+				object-fit: cover;
+				border-radius: 6px;
+				border: 1px solid #ccc;
+				animation: fadeIn 0.3s ease-in-out;
+			}
+
+			.remove-button {
+				position: absolute;
+				top: -6px;
+				right: -6px;
+				background-color: #ff4d4d;
+				color: white;
+				border: none;
+				border-radius: 50%;
+				width: 20px;
+				height: 20px;
+				font-size: 14px;
+				cursor: pointer;
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				transition: background-color 0.2s;
+
+				&:hover {
+					background-color: #d93636;
+				}
+			}
+		}
+	}
+}
+@keyframes fadeIn {
+	from {
+		opacity: 0;
+		transform: scale(0.95);
+	}
+	to {
+		opacity: 1;
+		transform: scale(1);
+	}
+}
+.error {
+	color: #e74c3c;
+	font-size: 14px;
+	margin-top: 4px;
+  }
+  
