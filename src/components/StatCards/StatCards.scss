@@ -40,15 +40,15 @@
   .stat-value {
     font-size: 1.5rem;
     font-weight: 600;
-    color: #00d3e0;
+    color: var(--admin-text-green);
   }
 
 
   &:nth-child(4) .stat-value {
-    color: #f5a623; 
+    color: var(--admin-text-orange); 
   }
 
   &:nth-child(5) .stat-value {
-    color: #e91e63;
+    color: var(--admin-text-red);
   }
 }
