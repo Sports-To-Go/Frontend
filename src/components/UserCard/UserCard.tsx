@@ -1,14 +1,26 @@
-import React from 'react'
+import React, {useState} from 'react'
 import './UserCard.scss'
 import { TiLocationArrowOutline } from 'react-icons/ti'
 import { FaStar } from 'react-icons/fa'
+import { RiMoonLine } from 'react-icons/ri'
+import { MdOutlineOnlinePrediction } from 'react-icons/md'
 
 const UserCard: React.FC = () => {
+	const [isOnline, setIsOnline] = useState(false)
+	const toggleStatus = () => {
+		setIsOnline(prev=> !prev)
+	}
 	return (
 		<div className="user-card">
 			<div className="user-card__header">
-				<div className="user-card__avatar">
+				<div className="user-card__avatar-container">
+					<div className="user-card__avatar">
 					<img src="https://i.pravatar.cc/100" alt="User avatar" />
+					</div>
+					<div className={`user-card__status ${isOnline ? 'user-card__online' : 'user-card__offline'}`}>
+						{isOnline ? <MdOutlineOnlinePrediction /> : <RiMoonLine />}
+					</div>
+
 				</div>
 
 				<div className="user-card__info">
@@ -30,6 +42,10 @@ const UserCard: React.FC = () => {
 				<TiLocationArrowOutline className="icon" />
 				<span className="badge-text">top 5% of event planners</span>
 			</div>
+			<button className="status-toggle-button" onClick={toggleStatus}>
+				{isOnline ? 'Stay hidden' : 'Go online'}
+			</button>
+
 		</div>
 	)
 }
