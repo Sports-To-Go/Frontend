@@ -115,4 +115,46 @@
 			}
 		}
 	}
+	.status-toggle-button {
+		margin-top: 0.5rem;
+		background-color: var(--button-green, #00b894);
+		color: white;
+		border: none;
+		padding: 0.4rem 1rem;
+		border-radius: 20px;
+		font-weight: 500;
+		cursor: pointer;
+		transition: background-color 0.3s;
+		align-self: center;
+
+		&:hover {
+			background-color: #20b3a8;
+		}
+	}
+	.user-menu__avatar-container {
+		position: relative;
+		width: 48px;
+		height: 48px;
+	}
+	.user-menu__status {
+		position: absolute;
+		right: 0;
+		bottom: 0;
+		background: white;
+		border-radius: 50%;
+		padding: 4px;
+		font-size: 0.9rem;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		box-shadow: 0 0 4px rgba(0, 0, 0, 0.1);
+
+	}
+	.user-menu__online {
+		color: #00e676;
+	}
+
+	.user-menu__offline {
+		color: #5c07ad;
+	}
 }

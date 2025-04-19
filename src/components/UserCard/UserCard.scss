@@ -13,6 +13,48 @@
 	max-width: 320px;
 	margin: 0 auto;
 
+	.user-card__avatar-container {
+		position: relative;
+		width: 100px;
+		height: 100px;
+	}
+
+	.user-card__status {
+		position: absolute;
+		right: 0px;
+		bottom: -3px;
+		background: white;
+		border-radius: 50%;
+		padding: 4px;
+		font-size: 1.4rem;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		box-shadow: 0 0 4px rgba(0, 0, 0, 0.1);
+	}
+	.user-card__online {
+		color: #00e676;
+	}
+
+	.user-card__offline {
+		color: #5c07ad;
+	}
+	.status-toggle-button {
+		margin-top: 0.5rem;
+		background-color: var(--button-green, #00b894);
+		color: white;
+		border: none;
+		padding: 0.4rem 1rem;
+		border-radius: 20px;
+		font-weight: 500;
+		cursor: pointer;
+		transition: background-color 0.3s;
+
+		&:hover {
+			background-color: #20b3a8;
+		}
+	}
+
 	.badge-iconic {
 		display: flex;
 		align-items: center;
