@@ -5,9 +5,24 @@ import AdminTable from '../../components/AdminTable/AdminTable'
 import { tableData } from '../../assets/dummy-data'
 import '../../components/StatCards/StatCards.scss'
 import StatCard from '../../components/StatCards/StatCards'
+import AdminTab from '../../components/AdminTabs/AdminTab'
 
 export const Administration: React.FC = () => {
-	const headerTable = ['Venue', 'Name', 'Type', 'Status', 'Bookings', 'Ratings']
+	const tableHeadersMap: { [key: string]: string[] } = {
+		Venues: ['Venue', 'Name', 'Type', 'Status', 'Bookings', 'Ratings'],
+		Users: ['Name', 'Email', 'Account Creation Date'],
+		Groups: ['Group Name', 'Members', 'Created'],
+		Analytics: ['I', 'do_not', 'know'],
+		Bugs: ['Issue', 'Status', 'Reported By', 'Number of reports'],
+	}
+	
+	const tableDataMap: { [key: string]: any[] } = {
+		Venues: tableData,
+		Users: [],
+		Groups: [],
+		Analytics: [],
+		Bugs: []
+	}	
 	const [manageTitle, setManageTitle] = useState('Venues')
 	const cards = [
 		{ id: 'bookings', title: 'Total', subtitle: 'Bookings', value: '367' },
@@ -34,12 +49,25 @@ export const Administration: React.FC = () => {
           			</div>
 				</div>
 				<div className="manage--container">
-					<div className="admin-tabs--container">To be implemented</div>
+				<div className="admin-tabs--container">
+					{['Venues', 'Users', 'Groups', 'Analytics', 'Bugs'].map((tab) => (
+						<AdminTab
+							key={tab}
+							label={`Manage ${tab}`}
+							active={manageTitle === tab}
+							onClick={() => setManageTitle(tab)}
+						/>
+					))}
+				</div>
+
 					<div className="admin-table--container">
 						<div style={{ width: '90%' }}>
 							<h2>Manage {manageTitle}</h2>
 						</div>
-						<AdminTable header={headerTable} rows={tableData} />
+						<AdminTable
+							header={tableHeadersMap[manageTitle]}
+							rows={tableDataMap[manageTitle]}
+						/>
 					</div>
 				</div>
 			</div>
