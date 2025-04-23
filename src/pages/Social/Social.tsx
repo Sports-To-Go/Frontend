@@ -11,6 +11,7 @@ const Social: FC = () => {
 	const [selectedGroup, setSelectedGroup] = useState<any | null>(null) // State for selected group
 
 	const myGroups = Array.from({ length: 20 }, (_, index) => ({
+		groupID: index + 1, 
 		name: `MyGroup ${index + 1}`,
 		description: `Description for group ${index + 1}`,
 		image: 'https://dashboard.codeparrot.ai/api/image/Z_T76IDi91IKZZrg/image.png',

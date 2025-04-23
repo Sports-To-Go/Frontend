@@ -187,3 +187,30 @@ ul {
 		color: var(--button-green);
 	}
 }
+
+.theme-buttons {
+	display: flex;
+	flex-direction: column;
+	gap: 15px;
+	padding: 10px 0;
+}
+
+.theme-button {
+	display: inline-block;
+	color: var(--text-secondary);
+	cursor: pointer;
+	padding: 12px 18px;
+	border-radius: 8px;
+	font-size: 16px;
+	font-weight: 500;
+	transition: background 0.2s ease;
+	border: none;
+	background-color: var(--background);
+	box-shadow: 0px 2px 8px rgba(0, 0, 0, 0.1);
+	width: 100%;
+
+	&:hover {
+		color: var(--button-green);
+		background-color: rgba(0, 128, 0, 0.05);
+	}
+}

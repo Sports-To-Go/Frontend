@@ -4,17 +4,25 @@ import './GroupSettingsModal.scss'
 interface GroupSettingsModalProps {
 	groupMembers: string[]
 	onClose: () => void
+	onThemeChange: (theme: string) => void 
 }
 
-const GroupSettingsModal: React.FC<GroupSettingsModalProps> = ({ groupMembers, onClose }) => {
+const GroupSettingsModal: React.FC<GroupSettingsModalProps> = ({ groupMembers, onClose, onThemeChange }) => {
 	const [isMembersModalOpen, setIsMembersModalOpen] = useState(false)
+	const [isThemeModalOpen, setIsThemeModalOpen] = useState(false) 
 	const [activeModal, setActiveModal] = useState<string | null>(null)
 	const [searchQuery, setSearchQuery] = useState('') 
 
 	const closeModal = () => {
 		setActiveModal(null)
 		setIsMembersModalOpen(false)
+		setIsThemeModalOpen(false)
 		setSearchQuery('') 
+	}
+
+	// Handle theme selection
+	const handleThemeChange = (theme: string) => {
+		onThemeChange(theme)
 	}
 
 	return (
@@ -27,11 +35,10 @@ const GroupSettingsModal: React.FC<GroupSettingsModalProps> = ({ groupMembers, o
 					<div className="section">
 						<h4>Chat Info</h4>
 						<div className="action-buttons">
-						<span className="modal-button" onClick={() => setIsMembersModalOpen(true)}>
-						See Members
-					</span>
-				</div>
-
+							<span className="modal-button" onClick={() => setIsMembersModalOpen(true)}>
+								See Members
+							</span>
+						</div>
 					</div>
 
 					{/* Customization Section */}
@@ -40,7 +47,7 @@ const GroupSettingsModal: React.FC<GroupSettingsModalProps> = ({ groupMembers, o
 						<div className="customization-buttons">
 							<span
 								className="modal-button"
-								onClick={() => setActiveModal('Theme')}
+								onClick={() => setIsThemeModalOpen(true)} 
 							>
 								Theme
 							</span>
@@ -124,8 +131,77 @@ const GroupSettingsModal: React.FC<GroupSettingsModalProps> = ({ groupMembers, o
 				</div>
 			)}
 
+			{/* Theme Modal */}
+			{isThemeModalOpen && (
+				<div className="members-modal" onClick={closeModal}>
+					<div className="modal fade-in" onClick={(e) => e.stopPropagation()}>
+						<h3>Select a Theme</h3>
+						<div className="theme-buttons">
+							{/* Add theme buttons */}
+							<button
+								className="theme-button"
+								onClick={() => handleThemeChange('linear-gradient(to right,var(--background),var(--background))')}
+							>
+								Default
+							</button>
+							<button
+								className="theme-button"
+								onClick={() => handleThemeChange('linear-gradient(to right,rgb(215, 84, 101),rgb(233, 125, 86))')}
+							>
+								Orange
+							</button>
+							<button
+								className="theme-button"
+								onClick={() => handleThemeChange('linear-gradient(to right,rgb(113, 245, 205), #6dd5ed)')}
+							>
+								Blue
+							</button>
+							<button
+								className="theme-button"
+								onClick={() => handleThemeChange('linear-gradient(to right,rgb(101, 48, 198),rgb(229, 97, 198))')}
+							>
+								Purple
+							</button>
+							<button
+								className="theme-button"
+								onClick={() => handleThemeChange('linear-gradient(to right,rgb(32, 225, 126), var(--background))')}
+							>
+								Mint
+							</button>
+							<button
+								className="theme-button"
+								onClick={() => handleThemeChange('linear-gradient(to right,rgb(203, 70, 112),rgb(127, 221, 210))')}
+							>
+								Sakura
+							</button>
+							<button
+								className="theme-button"
+								onClick={() => handleThemeChange('url(https://i.pinimg.com/736x/ed/de/89/edde897bf47591b076ebea01ca370bc8.jpg)')}
+							>
+								Lebrawnm Jamezz 
+							</button>
+							<button
+								className="theme-button"
+								onClick={() => handleThemeChange('url(https://cdn.thingiverse.com/assets/10/1e/80/c8/85/large_display_ab67616d00001e026267a426d1ca9c22b813835a1.jpg)')}
+							>
+								Tralalero Tralala 
+							</button>
+							<button
+								className="theme-button"
+								onClick={() => handleThemeChange('url(https://cdn-0001.qstv.on.epicgames.com/DeWFZjGciBtKpknWZf/image/landscape_comp.jpeg)')}
+							>
+								Bombardillo Crocodilo 
+							</button>
+						</div>
+						<span className="close-members-modal" onClick={closeModal}>
+							Close
+						</span>
+					</div>
+				</div>
+			)}
+
 			{/* Dynamic Modals */}
-			{activeModal && (
+			{activeModal && !isThemeModalOpen && !isMembersModalOpen && (
 				<div className="members-modal" onClick={closeModal}>
 					<div className="modal fade-in" onClick={e => e.stopPropagation()}>
 						<h3>{activeModal}</h3>

@@ -37,6 +37,9 @@ const GroupChat: FC<GroupProps> = ({ groupID }) => {
 	const ws = useRef<WebSocket | null>(null)
 	const userID: string = useRef('user-' + Math.floor(Math.random() * 100000)).current // for purely testing
 
+	// State for the chat background gradient or image
+	const [themeGradient, setThemeGradient] = useState<string>('linear-gradient(to right, #ffffff, #ffffff)')
+
 	// Scroll to bottom function
 	const scrollToBottom = () => {
 		messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
@@ -99,7 +102,14 @@ const GroupChat: FC<GroupProps> = ({ groupID }) => {
 	}
 
 	return (
-		<div className="chat-container">
+		<div
+			className="chat-container"
+			style={{
+				background: themeGradient, 
+				backgroundSize: themeGradient.includes('url(') ? 'cover' : 'initial', 
+				backgroundPosition: themeGradient.includes('url(') ? 'center' : 'initial', 
+			}}
+		>
 			<div className="chat-header">
 				<div className="header-title">
 					<RoundedPhoto size={40} imagePath={`https://i.pravatar.cc/40`} />
@@ -152,6 +162,7 @@ const GroupChat: FC<GroupProps> = ({ groupID }) => {
 				<GroupSettingsModal
 					groupMembers={groupMembers}
 					onClose={() => setIsGroupSettingsOpen(false)}
+					onThemeChange={setThemeGradient} 
 				/>
 			)}
 		</div>
