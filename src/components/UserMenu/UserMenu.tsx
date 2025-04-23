@@ -2,6 +2,8 @@ import React, { useContext } from 'react'
 import './UserMenu.scss'
 import { ThemeContext } from '../../context/ThemeContext'
 import { useNavigate } from 'react-router-dom'
+import { signOut } from 'firebase/auth'
+import { auth } from '../../firebase/firebase'
 import { FiUser } from 'react-icons/fi'
 import { FiLogOut } from 'react-icons/fi'
 
@@ -12,6 +14,16 @@ interface UserMenuProps {
 const UserMenu: React.FC<UserMenuProps> = ({ menuRef }) => {
 	const { theme, toggleTheme } = useContext(ThemeContext)
 	const navigate = useNavigate()
+
+	const handleLogout = async () => {
+		try {
+			await signOut(auth);
+			localStorage.removeItem('authToken'); // sau sessionStorage.removeItem(...)
+			navigate('/login');
+		} catch (error) {
+			console.error('Eroare la deconectare:', error);
+		}
+	};
 
 	return (
 		<div className="user-menu" ref={menuRef}>
@@ -36,7 +48,7 @@ const UserMenu: React.FC<UserMenuProps> = ({ menuRef }) => {
 				<FiUser style={{ marginRight: '8px' }} />
 				Profile
 			</div>
-			<div className="user-menu__item">
+			<div className="user-menu__item" onClick={handleLogout}>
 				<FiLogOut style={{ marginRight: '8px' }} />
 				Disconnect
 			</div>

@@ -2,9 +2,13 @@ import Layout from '../../components/Layout/Layout'
 import { useState } from 'react'
 import { CiLocationOn } from 'react-icons/ci'
 import { RiEyeCloseFill, RiEyeFill } from 'react-icons/ri'
+import { auth } from '../../firebase/firebase.ts';
+import { useNavigate } from 'react-router-dom';
+import { signInWithEmailAndPassword } from "firebase/auth"
 import './Login.scss'
 
 const Login = () => {
+	const navigate = useNavigate();
 	const [username, setUsername] = useState('')
 	const [password, setPassword] = useState('')
 	const [showPassword, setShowPassword] = useState(false)
@@ -14,38 +18,49 @@ const Login = () => {
 	const [rePassword, setRePassword] = useState('')
 	const [error, setError] = useState('')
 
+	const handleSubmit = async (e: React.FormEvent) => {
+		e.preventDefault();
+		setError('');
 
-	const handleSubmit = (e: React.FormEvent) => {
-		e.preventDefault()
-		setError('') 
 		if (isRegister) {
 			if (!registerUsername || !username || !password || !rePassword) {
-				setError('Te rugăm să completezi toate câmpurile.')
-				return
+				setError('Te rugăm să completezi toate câmpurile.');
+				return;
 			}
 			if (password !== rePassword) {
-				setError('Parolele nu se potrivesc!')
-				return
+				setError('Parolele nu se potrivesc!');
+				return;
 			}
-			console.log('Înregistrare:')
-			console.log('Username:', registerUsername)
-			console.log('Email:', username)
-			console.log('Parola:', password)
+			console.log('Register user logic here (not implemented yet)');
 		} else {
 			if (!username || !password) {
-				setError('Introdu emailul și parola.')
-				return
+				setError('Introdu emailul și parola.');
+				return;
 			}
-			console.log('Autentificare:')
-			console.log('Email:', username)
-			console.log('Parola:', password)
+
+			try {
+				const userCredential = await signInWithEmailAndPassword(auth, username, password);
+				const user = userCredential.user;
+		  
+				// Obține token-ul de autentificare
+				const idToken = await user.getIdToken();
+		  
+				// Salvează token-ul în LocalStorage (sau sessionStorage)
+				localStorage.setItem('authToken', idToken);
+		  
+				console.log('User logged in:', user);
+				console.log('ID Token:', idToken);
+		  
+				// După ce utilizatorul se autentifică cu succes, redirecționează-l
+				navigate('/home'); // Redirecționarea utilizatorului către pagina principală
+			  } catch (err) {
+				setError('Autentificarea a eșuat. Verifică email-ul și parola.');
+				console.error(err);
+			  }
 		}
 	}
 
-
-	const togglePassword = () => {
-		setShowPassword(prev => !prev)
-	}
+	const togglePassword = () => setShowPassword(prev => !prev)
 
 	const handleRotateToRegister = () => {
 		setRotated(true)
@@ -76,7 +91,7 @@ const Login = () => {
 	return (
 		<Layout showFooter={true} showTabs={false}>
 			<div className="login-page">
-			<div className={`login-card ${rotated ? 'rotate' : ''} ${isRegister ? 'register-mode' : 'login-mode'}`}>
+				<div className={`login-card ${rotated ? 'rotate' : ''} ${isRegister ? 'register-mode' : 'login-mode'}`}>
 					<CiLocationOn size={60} color="#05c69d" style={{ marginBottom: '-30px' }} />
 					<h1>{isRegister ? 'Register' : 'Log in'}</h1>
 					<form onSubmit={handleSubmit}>
