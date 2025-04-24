@@ -66,6 +66,35 @@
 					background-color: #9ceddc;
 				}
 			}
+
+			.action-buttons {
+				position: absolute;
+				top: 100%;
+				border-radius: 10px;
+				left: 0;
+				background: var(--background);
+				border: 1px solid #ccc;
+				padding: 0.5rem;
+				display: flex;
+				flex-direction: column;
+				gap: 0.5rem;
+				box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+				z-index: 10;
+			}
+
+			.action-btn {
+				padding: 0.3rem 0.6rem;
+				border: none;
+				background-color: var(--accent-green);
+				color: white;
+				border-radius: 4px;
+				cursor: pointer;
+				transition: background-color 0.2s;
+
+				&:hover {
+					background-color: #51efcd;
+				}
+			}
 		}
 	}
 }

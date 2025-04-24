@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 import './AdminTable.scss'
 import { FaChevronDown } from 'react-icons/fa'
 
@@ -24,6 +24,11 @@ const AdminTable: React.FC<adminTableProps> = ({ header, rows }) => {
 		const red = Math.round(255 * (1 - ratio))
 		const green = Math.round(200 * ratio)
 		return `rgb(${red}, ${green}, 100)`
+	}
+
+	const [openActions, setOpenActions] = useState<number | null>(null)
+	const toggleActions = (index: number) => {
+		setOpenActions(openActions === index ? null : index)
 	}
 
 	return (
@@ -54,7 +59,18 @@ const AdminTable: React.FC<adminTableProps> = ({ header, rows }) => {
 							<td style={{ color: getBookingColor(bookings) }}>{bookings}</td>
 							<td>{rating}/5</td>
 							<td>
-								<FaChevronDown style={{ cursor: 'pointer' }} />
+								<div style={{ position: 'relative' }}>
+									<FaChevronDown
+										style={{ cursor: 'pointer' }}
+										onClick={() => toggleActions(index)}
+									/>
+									{openActions === index && (
+										<div className="action-buttons">
+											<button className="action-btn">Suspend</button>
+											<button className="action-btn">Reject</button>
+										</div>
+									)}
+								</div>
 							</td>
 						</tr>
 					))}

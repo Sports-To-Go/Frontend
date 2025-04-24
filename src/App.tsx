@@ -16,7 +16,7 @@ import { ToastContainer } from 'react-toastify'
 */
 
 const App: React.FC = () => {
-	const isAdmin = false
+	const isAdmin = true
 	const isLogged = true
 	const routes = isAdmin ? (
 		<>
@@ -32,7 +32,6 @@ const App: React.FC = () => {
 			<Route path="/profile/:id" element={<Profile />} />
 			{isLogged && <Route path="/profile" element={<Profile />} />}
 			<Route path="*" element={<Navigate to="/locations" replace />} />
-			
 		</>
 	)
 
@@ -40,7 +39,7 @@ const App: React.FC = () => {
 		<ThemeProvider>
 			<BrowserRouter>
 				<Routes>{routes}</Routes>
-				<ToastContainer position='top-center' autoClose={3000} />
+				<ToastContainer position="top-center" autoClose={3000} />
 			</BrowserRouter>
 		</ThemeProvider>
 	)
