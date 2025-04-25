@@ -42,17 +42,14 @@ const Login = () => {
 				const userCredential = await signInWithEmailAndPassword(auth, username, password);
 				const user = userCredential.user;
 		  
-				// Obține token-ul de autentificare
 				const idToken = await user.getIdToken();
 		  
-				// Salvează token-ul în LocalStorage (sau sessionStorage)
 				localStorage.setItem('authToken', idToken);
 		  
 				console.log('User logged in:', user);
 				console.log('ID Token:', idToken);
 		  
-				// După ce utilizatorul se autentifică cu succes, redirecționează-l
-				navigate('/home'); // Redirecționarea utilizatorului către pagina principală
+				navigate('/home');
 			  } catch (err) {
 				setError('Autentificarea a eșuat. Verifică email-ul și parola.');
 				console.error(err);
