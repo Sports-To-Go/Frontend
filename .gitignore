@@ -30,3 +30,6 @@ dist-ssr
 *.sw?
 # Vite cache
 .vite
+
+#Firebase
+src/firebase/firebase.ts
