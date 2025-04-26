@@ -9,4 +9,8 @@
 	font-weight: bold;
 	width: 42px;
 	height: 42px;
+
+	&:hover {
+		cursor: pointer;
+	}
 }

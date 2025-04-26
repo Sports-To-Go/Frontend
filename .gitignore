@@ -32,4 +32,4 @@ dist-ssr
 .vite
 
 #Firebase
-src/firebase/firebase.ts
+src/firebase/*

@@ -5,7 +5,7 @@ import AdminTable from '../../components/AdminTable/AdminTable'
 import { tableData } from '../../assets/dummy-data'
 import StatCards from '../../components/StatCards/StatCards'
 
-export const Administration: React.FC = () => {
+const Administration: React.FC = () => {
 	const headerTable = ['Venue', 'Name', 'Type', 'Status', 'Bookings', 'Ratings']
 	const [manageTitle, setManageTitle] = useState('Venues')
 
@@ -29,3 +29,5 @@ export const Administration: React.FC = () => {
 		</Layout>
 	)
 }
+
+export default Administration;
