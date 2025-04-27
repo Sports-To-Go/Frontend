@@ -7,6 +7,8 @@ import { useNavigate } from 'react-router'
 import { useAuth } from '../../context/UserContext'
 import axios from 'axios'
 
+import { BACKEND_URL } from "../../../integration-config.ts"
+
 const RegisterForm = () => {
 	const [username, setUsername] = useState('')
 	const [email, setEmail] = useState('')
@@ -51,7 +53,7 @@ const RegisterForm = () => {
 
 			const token = await currentUser?.getIdToken()
 			await axios.post(
-				'http://localhost:8081/users/private',
+				`${BACKEND_URL}/users/profile`,
 				{}, // Pass an empty object for the request body if no data needs to be sent
 				{
 					headers: {

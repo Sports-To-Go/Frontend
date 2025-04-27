@@ -9,6 +9,8 @@ import placeholder from '../../assets/profilePhotoPlaceholder.png'
 import axios from 'axios'
 import { auth } from '../../firebase/firebase'
 
+import { BACKEND_URL } from '../../../integration-config'
+
 const UserCard: FC = () => {
 	const { user } = useAuth()
 
@@ -20,7 +22,7 @@ const UserCard: FC = () => {
 				const currentUser = auth.currentUser
 				const token = await currentUser?.getIdToken()
 
-				const response = await axios.get('http://localhost:8081/users/private', {
+				const response = await axios.get(`${BACKEND_URL}/users/profile`, {
 					headers: {
 						Authorization: `Bearer ${token}`,
 					},
