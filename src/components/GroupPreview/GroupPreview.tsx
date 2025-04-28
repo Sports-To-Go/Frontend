@@ -2,23 +2,25 @@ import React from 'react'
 import { CiUser } from 'react-icons/ci'
 import './GroupPreview.scss'
 
-interface groupPreviewProps {
+interface GroupPreviewProps {
 	image: string
 	isOnline: boolean
 	name: string
 	description: string
 	members: number
+	onClick?: () => void 
 }
 
-const GroupPreview: React.FC<groupPreviewProps> = ({
+const GroupPreview: React.FC<GroupPreviewProps> = ({
 	image,
 	isOnline,
 	name,
 	description,
 	members,
+	onClick,
 }) => {
 	return (
-		<li className="message-item">
+		<li className="message-item" onClick={onClick}> 
 			<div className="group-avatar-container">
 				<img src={image} alt={`${name}'s avatar`} className="group-avatar" />
 				<div className={`online-indicator ${isOnline ? 'online' : ''}`} />
