@@ -16,7 +16,7 @@ import { ToastContainer } from 'react-toastify'
 */
 
 const App: React.FC = () => {
-	const isAdmin = true
+	const isAdmin = false
 	const isLogged = true
 	const routes = isAdmin ? (
 		<>

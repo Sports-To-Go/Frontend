@@ -51,8 +51,8 @@ const AdminTable: React.FC<adminTableProps> = ({ header, rows }) => {
 							<td>{name}</td>
 							<td>{type}</td>
 							<td>
-								<div className="status-adm">
-									<div className="circle-status"></div>
+								<div className={`status-adm ${status}`}>
+									<div className={`circle-status ${status}`}></div>
 									{status}
 								</div>
 							</td>

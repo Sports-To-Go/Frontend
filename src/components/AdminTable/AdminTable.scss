@@ -50,7 +50,7 @@
 			.status-adm {
 				width: 68px;
 				height: 26px;
-				background-color: var(--table-status);
+
 				padding: 2px;
 				border-radius: 8px;
 				display: flex;
@@ -58,12 +58,29 @@
 				align-items: center;
 				gap: 5px;
 
+				&.Active {
+					background-color: var(--table-status);
+				}
+
+				&.Inactive {
+					background-color: var(--admin-text-red);
+					font-size: 15px;
+				}
+
 				.circle-status {
 					width: 8px;
 					height: 8px;
 					border-radius: 100%;
-					border: 2px solid white;
-					background-color: #9ceddc;
+
+					&.Active {
+						border: 2px solid white;
+						background-color: #9ceddc;
+					}
+
+					&.Inactive {
+						border: 2px solid white;
+						background-color: red;
+					}
 				}
 			}
 
