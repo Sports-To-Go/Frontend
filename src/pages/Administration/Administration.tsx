@@ -74,3 +74,5 @@ export const Administration: React.FC = () => {
 		</Layout>
 	)
 }
+
+export default Administration;

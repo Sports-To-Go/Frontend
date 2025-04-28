@@ -1,7 +1,15 @@
+import { useNavigate } from 'react-router'
+
 import './Logo.scss'
 
 const Logo: React.FC = () => {
-	return <div className="logo">S</div>
+	const navigate = useNavigate()
+
+	return (
+		<div className="logo" onClick={() => navigate('/')}>
+			S
+		</div>
+	)
 }
 
 export default Logo

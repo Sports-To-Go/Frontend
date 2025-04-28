@@ -12,7 +12,7 @@ interface NavbarProps {
 }
 
 const Navbar: React.FC<NavbarProps> = ({ showTabs }) => {
-	const [showMenu, setShowMenu] = useState(false)
+	const [showMenu, setShowMenu] = useState<boolean>(false)
 
 	const menuRef = useRef<HTMLDivElement | null>(null)
 
@@ -49,7 +49,7 @@ const Navbar: React.FC<NavbarProps> = ({ showTabs }) => {
 
 						<div className="navbar-profile-container" style={{ position: 'relative' }}>
 							<div onClick={toggleMenu}>
-								<CiUser style={{ fontSize: 32 }} />
+								<CiUser style={{ fontSize: 32 }} cursor={"pointer"} />
 							</div>
 							{showMenu && <UserMenu menuRef={menuRef} />}
 						</div>
