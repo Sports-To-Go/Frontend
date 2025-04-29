@@ -1,0 +1,55 @@
+input {
+	background-color: var(--background);
+	color: var(--text-primary);
+	width: 80%;
+	padding: 12px;
+	margin-bottom: 15px;
+	border-radius: 8px;
+	border: 1px solid #ccc;
+	font-size: 16px;
+}
+
+.password-input-wrapper {
+	position: relative;
+	width: 83%;
+	padding-left: 23px;
+	overflow: visible;
+
+	input {
+		width: 100%;
+		padding-right: 0px;
+	}
+
+	.eye-icon {
+		position: absolute;
+		right: 0px;
+		top: 43%;
+		transform: translateY(-50%);
+		cursor: pointer;
+		font-size: 25px;
+		color: grey;
+	}
+}
+
+.signup {
+	margin-top: 10px;
+	font-size: 14px;
+	color: var(--text-primary);
+
+	a {
+		color: var(--button-green);
+		font-weight: bold;
+		text-decoration: none;
+
+		&:hover {
+			text-decoration: underline;
+			cursor: pointer;
+		}
+	}
+}
+
+.error-message {
+	color: red;
+	text-align: center;
+	margin-top: 10px;
+}

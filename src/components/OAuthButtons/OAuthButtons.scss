@@ -1,0 +1,35 @@
+.social-icons {
+	display: flex;
+	justify-content: center;
+	gap: 20px;
+	margin-top: 10px;
+
+	.icon {
+		width: 45px;
+		height: 45px;
+		border-radius: 50%;
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		color: white;
+		cursor: pointer;
+		font-size: 20px;
+		transition: all 0.3s ease;
+
+		&.facebook {
+			background-color: #3b5998;
+		}
+
+		&.twitter {
+			background-color: #1da1f2;
+		}
+
+		&.google {
+			background-color: #db4437;
+		}
+
+		&:hover {
+			transform: scale(1.1);
+		}
+	}
+}
