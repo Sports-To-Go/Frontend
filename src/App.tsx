@@ -7,6 +7,7 @@ import { AuthProvider } from './context/UserContext.tsx'
 import AppRoutes from './components/AppRoutes/AppRoutes.tsx'
 
 const App: React.FC = () => {
+
 	return (
 		<AuthProvider>
 			<ThemeProvider>
@@ -16,6 +17,7 @@ const App: React.FC = () => {
 				</BrowserRouter>
 			</ThemeProvider>
 		</AuthProvider>
+
 	)
 }
 
