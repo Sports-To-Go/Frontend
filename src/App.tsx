@@ -8,6 +8,7 @@ import { ThemeProvider } from './context/ThemeContext.tsx'
 import { Administration } from './pages/Administration/Administration.tsx'
 import 'react-toastify/dist/ReactToastify.css'
 import { ToastContainer } from 'react-toastify'
+import AdminError from './pages/Admin-Error/AdminError.tsx'
 
 /* 
   Locations should be split into two:
@@ -18,11 +19,17 @@ import { ToastContainer } from 'react-toastify'
 const App: React.FC = () => {
 	const isAdmin = true
 	const isLogged = true
-	const routes = isAdmin ? (
+	const isMobile = true 
+	const routes = isAdmin ? ( isMobile ? (
 		<>
+			<Route path="/administration-error" element={<AdminError />} />
+			<Route path="*" element={<Navigate to="/administration-error" replace />} />
+		</>
+	) :
+		(<>
 			<Route path="/administration" element={<Administration />} />
 			<Route path="*" element={<Navigate to="/administration" replace />} />
-		</>
+		</>)
 	) : (
 		<>
 			<Route path="/login" element={<Login />} />

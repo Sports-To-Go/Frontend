@@ -1,0 +1,29 @@
+.admin-error {
+    padding: 20px;
+    max-width: 500px;
+    margin: 50px auto;
+    font-family: inherit;
+    line-height: 1.5;
+    color: var(--dark-text);
+  
+    h1 {
+      color: var(--admin-text-red);
+      font-size: 1.5rem;
+      margin-bottom: 1rem;
+    }
+  
+    h2 {
+      font-size: 1.2rem;
+      margin: 1.5rem 0 0.5rem 0;
+    }
+  
+    ul {
+
+      padding-left: 20px;
+      margin: 0.5rem 0;
+    }
+  
+    p {
+      margin: 1rem 0;
+    }
+  }
