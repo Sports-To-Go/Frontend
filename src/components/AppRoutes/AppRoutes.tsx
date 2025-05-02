@@ -7,6 +7,7 @@ import Locations from '../../pages/Locations/Locations'
 import Profile from '../../pages/Profile/Profile'
 import Social from '../../pages/Social/Social'
 import Login from '../../pages/Login/Login'
+import ForgotPass from '../../pages/ForgotPass/ForgotPass';
 
 const AppRoutes: React.FC = () => {
 	const { user } = useAuth()
@@ -32,7 +33,8 @@ const AppRoutes: React.FC = () => {
 			/>
 
 			{!isLogged && <Route path="/login" element={<Login />} />}
-
+			{!isLogged && <Route path="/forgot-password" element={<ForgotPass />} />}
+			
 			<Route path="/locations" element={<Locations />} />
 			<Route path="*" element={<Navigate to="/locations" replace />} />
 		</>
