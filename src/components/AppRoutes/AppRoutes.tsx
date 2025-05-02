@@ -7,18 +7,28 @@ import Locations from '../../pages/Locations/Locations'
 import Profile from '../../pages/Profile/Profile'
 import Social from '../../pages/Social/Social'
 import Login from '../../pages/Login/Login'
+import AdminError from '../../pages/AdminError/AdminError'
 
 const AppRoutes: React.FC = () => {
 	const { user } = useAuth()
 
+	const isMobile = () => { return window.innerWidth < 800; }
 	const isAdmin: boolean = false
 	const isLogged: boolean = !!user
 
-	const routes = isAdmin ? (
+	const routes = isAdmin ? ( 
+		isMobile() ? (
+		<>
+			<Route path="/administration-error" element={<AdminError />} />
+			<Route path="*" element={<Navigate to="/administration-error" replace />} />
+		</>
+
+		) : (
 		<>
 			<Route path="/administration" element={<Administration />} />
 			<Route path="*" element={<Navigate to="/administration" replace />} />
 		</>
+		)
 	) : (
 		<>
 			<Route path="/social" element={isLogged ? <Social /> : <Navigate to="/login" replace />} />
