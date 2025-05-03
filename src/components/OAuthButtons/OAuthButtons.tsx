@@ -32,6 +32,7 @@ const OAuthButtons = () => {
 				photoURL: user.photoURL,
 				createdAt: user.metadata.creationTime || '',
 				lastLoginAt: user.metadata.lastSignInTime || '',
+				emailVerified: user.emailVerified,
 			})
 
 			navigate('/')

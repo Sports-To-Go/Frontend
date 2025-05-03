@@ -5,6 +5,8 @@ import { auth } from '../../firebase/firebase'
 import { UserData } from '../../context/UserContext'
 import { useNavigate } from 'react-router'
 import { useAuth } from '../../context/UserContext'
+import { sendEmailVerification } from 'firebase/auth';
+import { useEmailVerification } from '../../context/EmailVerificationContext';
 import axios from 'axios'
 
 import { BACKEND_URL } from "../../../integration-config.ts"
@@ -19,6 +21,7 @@ const RegisterForm = () => {
 	const navigate = useNavigate()
 
 	const { setUser } = useAuth()
+	const { setShowVerifyPage } = useEmailVerification();
 
 	const handleSubmit = async (e: React.FormEvent) => {
 		e.preventDefault()
@@ -40,6 +43,10 @@ const RegisterForm = () => {
 				displayName: username,
 			})
 
+			await sendEmailVerification(userCredential.user);
+			setShowVerifyPage(true);
+			navigate('/verify-email');
+
 			const user: UserData = {
 				uid: userCredential.user.uid,
 				email: userCredential.user.email,
@@ -47,6 +54,7 @@ const RegisterForm = () => {
 				photoURL: null,
 				createdAt: userCredential.user.metadata.creationTime || '',
 				lastLoginAt: userCredential.user.metadata.lastSignInTime || '',
+				emailVerified: userCredential.user.emailVerified,
 			}
 
 			const currentUser = auth.currentUser
@@ -63,7 +71,7 @@ const RegisterForm = () => {
 			)
 
 			setUser(user)
-			navigate('/')
+			navigate('/verify-email')
 		} catch (err: any) {
 			if (err.code === 'auth/email-already-in-use') {
 				setError('This email is already in use. Please try another one.')

@@ -3,6 +3,7 @@ import { auth } from '../../firebase/firebase';
 import { useNavigate } from 'react-router-dom';
 import { signInWithEmailAndPassword } from 'firebase/auth';
 import { RiEyeCloseFill, RiEyeFill } from 'react-icons/ri';
+import { useResetPassword } from '../../context/ResetPasswordContext';
 import { Link } from 'react-router-dom';
 import './LoginForm.scss';
 
@@ -10,7 +11,7 @@ import { UserData, useAuth } from '../../context/UserContext';
 
 const LoginForm = () => {
   const { setUser } = useAuth();
-
+  const { allowAccess } = useResetPassword();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
@@ -31,6 +32,14 @@ const LoginForm = () => {
 
     try {
       const userCredential = await signInWithEmailAndPassword(auth, email, password);
+      const firebaseUser = userCredential.user;
+
+		  if (!firebaseUser.emailVerified) {
+        await auth.signOut();
+        setError('Adresa de email nu este verificată. Verifică-ți emailul înainte de a te autentifica.');
+        return;
+      }
+
       const user: UserData = {
         uid: userCredential.user.uid,
         email: userCredential.user.email,
@@ -38,6 +47,7 @@ const LoginForm = () => {
         photoURL: userCredential.user.photoURL,
         createdAt: userCredential.user.metadata.creationTime || '',
         lastLoginAt: userCredential.user.metadata.lastSignInTime || '',
+        emailVerified: userCredential.user.emailVerified,
       };
 
       setUser(user);
@@ -69,7 +79,7 @@ const LoginForm = () => {
       </div>
 
       <div className="options">
-        <Link to="/forgot-password">Forgot password?</Link>
+          <Link to="/forgot-password" onClick={allowAccess}>Forgot password?</Link>
       </div>
 
       <button type="submit">Log in</button>

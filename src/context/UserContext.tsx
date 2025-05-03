@@ -9,6 +9,7 @@ export interface UserData {
 	photoURL: string | null
 	createdAt: string
 	lastLoginAt: string
+	emailVerified: boolean
 }
 
 interface AuthContextType {
@@ -37,6 +38,7 @@ export const AuthProvider: FC<{ children: ReactNode }> = ({ children }) => {
 					photoURL: firebaseUser.photoURL || null,
 					createdAt: firebaseUser.metadata.creationTime || '',
 					lastLoginAt: firebaseUser.metadata.lastSignInTime || '',
+					emailVerified: firebaseUser.emailVerified,
 				}
 				setUser(restoredUser)
 			} else {
