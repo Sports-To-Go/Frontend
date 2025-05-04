@@ -65,9 +65,8 @@
 					margin-bottom: 0;
 					color: var(--text-secondary);
 					height: 100%;
-					line-height: 40px; 
+					line-height: 40px;
 				}
-				
 			}
 		}
 
@@ -166,12 +165,12 @@
 		flex-direction: column;
 	}
 
-	.social-left-container {
+	.social-container .social-left-container {
 		width: 100%;
 		border-right: none;
 	}
 
-	.social-right-container {
+	.social-container .social-right-container {
 		width: 100%;
 	}
 }
