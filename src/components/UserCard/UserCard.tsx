@@ -1,8 +1,9 @@
 import { useState, useEffect, FC } from 'react'
 import './UserCard.scss'
-import { TiLocationArrowOutline } from 'react-icons/ti'
 import { FaStar } from 'react-icons/fa'
 import { useAuth } from '../../context/UserContext'
+import { FiAlertTriangle } from 'react-icons/fi'
+import ReportModal from '../ReportModal/ReportModal'
 
 import placeholder from '../../assets/profilePhotoPlaceholder.png'
 
@@ -13,8 +14,8 @@ import { BACKEND_URL } from '../../../integration-config'
 
 const UserCard: FC = () => {
 	const { user } = useAuth()
-
 	const [description, setDescription] = useState<string>('')
+	const [showReportModal, setShowReportModal] = useState(false)
 
 	useEffect(() => {
 		const fetchUserData = async () => {
@@ -39,13 +40,20 @@ const UserCard: FC = () => {
 
 	return (
 		<div className="user-card">
+			<button
+				className="report-button"
+				title="Report User"
+				onClick={() => setShowReportModal(true)}
+			>
+				<FiAlertTriangle />
+			</button>
+
 			<div className="user-card__header">
 				<div className="user-card__avatar">
 					<img src={user?.photoURL ? user.photoURL : placeholder} alt="User avatar" />
 				</div>
 
 				<div className="user-card__info">
-					{/* <h2 className="user-card__usertype">UserType</h2> */}
 					<h1 className="user-card__name">{user?.displayName}</h1>
 					<div className="user-card__rating">
 						{[...Array(5)].map((_, i) => (
@@ -59,10 +67,14 @@ const UserCard: FC = () => {
 				<span className="toggle-label">{description}</span>
 			</div>
 
-			<div className="badge-iconic">
-				<TiLocationArrowOutline className="icon" />
-				<span className="badge-text">top 5% of event planners</span>
-			</div>
+			{showReportModal && (
+				<ReportModal
+					onClose={() => setShowReportModal(false)}
+					onSubmit={reason => {
+						console.log('Reported with reason:', reason)
+					}}
+				/>
+			)}
 		</div>
 	)
 }
