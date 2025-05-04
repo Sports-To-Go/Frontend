@@ -50,12 +50,14 @@ const LoginForm = () => {
 
 	return (
 		<form onSubmit={handleSubmit}>
-			<input
-				type="email"
-				placeholder="Email address"
-				value={email}
-				onChange={e => setEmail(e.target.value)}
-			/>
+			<div className="email-input-wrapper">
+				<input
+					type="email"
+					placeholder="Email address"
+					value={email}
+					onChange={e => setEmail(e.target.value)}
+				/>
+			</div>
 			<div className="password-input-wrapper">
 				<input
 					type={showPassword ? 'text' : 'password'}

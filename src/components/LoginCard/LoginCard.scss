@@ -18,7 +18,7 @@
 	}
 
 	&.login-mode {
-		height: 450px;
+		height: 470px;
 	}
 
 	&.register-mode {
@@ -37,7 +37,7 @@
 	}
 
 	button {
-		width: 87%;
+		width: 80%;
 		padding: 12px;
 		background-color: var(--button-green);
 		color: white;
@@ -66,5 +66,37 @@
 				text-decoration: underline;
 			}
 		}
+	}
+}
+@media (max-width: 600px) {
+	.login-card {
+		width: 90%;
+		margin: 0 auto;
+		border-radius: 0px;
+		height: 100%;
+		padding-top: 70%;
+		padding-bottom: 70%;
+	}
+	.login-card button {
+			width: 100%;
+	}
+	.register-mode {
+		width: 100%;
+		padding-top: 59%;
+	}
+}
+@media (min-width:600px) {
+	.register-mode {
+		padding: 10px;
+		padding-bottom: 40px;
+		padding-left: 40px;
+		padding-right: 40px;
+	}
+}
+@media (max-height:700px)
+{
+	.register-mode {
+		width: 100%;
+		padding-top: 68%;
 	}
 }

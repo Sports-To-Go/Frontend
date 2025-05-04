@@ -3,34 +3,53 @@ input {
 	color: var(--text-primary);
 	width: 80%;
 	padding: 12px;
+	padding-right: 40px;
 	margin-bottom: 15px;
 	border-radius: 8px;
 	border: 1px solid #ccc;
 	font-size: 16px;
+	display: block;
+	margin-left: auto;
+	margin-right: auto;
+	box-sizing: border-box;
 }
-
+.email-input-wrapper {
+	position: relative;
+	overflow: visible;
+	margin: 0 auto;
+	box-sizing: border-box;
+	width: 80%;
+	
+	input {
+		width: 100%;
+		padding-right: 40px;
+		box-sizing: border-box;
+		border: 1px solid #ccc;	
+	}
+}
 .password-input-wrapper {
 	position: relative;
-	width: 83%;
-	padding-left: 23px;
 	overflow: visible;
+	margin: 0 auto;
+	box-sizing: border-box;
+	width: 80%;
 
 	input {
 		width: 100%;
-		padding-right: 0px;
+		padding-right: 40px;
+		box-sizing: border-box;
 	}
 
 	.eye-icon {
 		position: absolute;
-		right: 0px;
-		top: 43%;
+		right: 10px;
+		top: 57%;
 		transform: translateY(-50%);
 		cursor: pointer;
 		font-size: 25px;
 		color: grey;
 	}
 }
-
 .signup {
 	margin-top: 10px;
 	font-size: 14px;
@@ -47,9 +66,19 @@ input {
 		}
 	}
 }
-
 .error-message {
 	color: red;
 	text-align: center;
 	margin-top: 10px;
 }
+@media (max-width: 600px) {
+		input {
+			width: 100%;
+		}
+		.email-input-wrapper {
+			width: 100%;
+		}
+		.password-input-wrapper {
+			width: 100%;
+		}
+	}
