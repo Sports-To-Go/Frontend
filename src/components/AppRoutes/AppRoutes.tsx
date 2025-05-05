@@ -7,12 +7,47 @@ import Locations from '../../pages/Locations/Locations'
 import Profile from '../../pages/Profile/Profile'
 import Social from '../../pages/Social/Social'
 import Login from '../../pages/Login/Login'
+import { useEffect, useState } from 'react'
+import { auth } from '../../firebase/firebase'
+import { BACKEND_URL } from '../../../integration-config'
+import axios from 'axios'
 
 const AppRoutes: React.FC = () => {
 	const { user } = useAuth()
 
-	const isAdmin: boolean = false
-	const isLogged: boolean = !!user
+	const [isAdmin, setIsAdmin] = useState(false)
+	const [userDescription, setUserDescription] = useState('')
+	const isLogged = !!user
+
+	useEffect(() => {
+		const fetchUserData = async () => {
+			if (user === null) {
+				setIsAdmin(false)
+				setUserDescription('')
+				return
+			}
+
+			try {
+				const currentUser = auth.currentUser
+				const token = await currentUser?.getIdToken()
+
+				const response = await axios.get(`${BACKEND_URL}/users/profile`, {
+					headers: {
+						Authorization: `Bearer ${token}`,
+					},
+				})
+				// console.log(response)
+
+				setIsAdmin(response.data.admin)
+				setUserDescription(response.data.description)
+			} catch (error) {
+				console.error('Error fetching user data:', error)
+				setIsAdmin(false)
+			}
+		}
+
+		fetchUserData()
+	}, [user])
 
 	const routes = isAdmin ? (
 		<>
@@ -24,7 +59,13 @@ const AppRoutes: React.FC = () => {
 			<Route path="/social" element={isLogged ? <Social /> : <Navigate to="/login" replace />} />
 			<Route
 				path="/profile"
-				element={isLogged ? <Profile /> : <Navigate to="/login" replace />}
+				element={
+					isLogged ? (
+						<Profile description={userDescription} />
+					) : (
+						<Navigate to="/login" replace />
+					)
+				}
 			/>
 			<Route
 				path="/add-location"
