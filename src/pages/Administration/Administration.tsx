@@ -1,4 +1,5 @@
 import React, { useState } from 'react'
+import { useNavigate } from 'react-router-dom';
 import Layout from '../../components/Layout/Layout'
 import './Administration.scss'
 import AdminTable from '../../components/AdminTable/AdminTable'
@@ -9,6 +10,9 @@ import AdminTab from '../../components/AdminTabs/AdminTab'
 import { LineChart } from '@mui/x-charts/LineChart'
 
 export const Administration: React.FC = () => {
+	const navigate = useNavigate();
+	const isMobile = window.innerWidth < 1000;
+
 	const tableHeadersMap: { [key: string]: string[] } = {
 		Venues: ['Venue', 'Name', 'Type', 'Status', 'Bookings', 'Ratings'],
 		Users: ['User', 'Name', 'Type', 'Status', 'Reports', 'Rating'],
@@ -32,6 +36,17 @@ export const Administration: React.FC = () => {
 		{ id: 'total-users', title: 'Total', subtitle: 'Users', value: '1.340' },
 		{ id: 'revenue', title: 'Revenue', subtitle: 'This Month', value: '$2.786' },
 	]
+
+	if (isMobile) {
+		navigate('/admin-error', {
+		  replace: true,
+		  state: {
+			title: 'Desktop Required',
+			message: 'Admin dashboard requires a desktop or tablet in landscape mode'
+		  }
+		});
+		return null;
+	  }
 
 	return (
 		<Layout showTabs={false} showFooter={true}>
