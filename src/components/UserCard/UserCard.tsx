@@ -1,4 +1,4 @@
-import { useState, useEffect, FC } from 'react'
+import { FC } from 'react'
 import './UserCard.scss'
 import { TiLocationArrowOutline } from 'react-icons/ti'
 import { FaStar } from 'react-icons/fa'
@@ -6,37 +6,12 @@ import { useAuth } from '../../context/UserContext'
 
 import placeholder from '../../assets/profilePhotoPlaceholder.png'
 
-import axios from 'axios'
-import { auth } from '../../firebase/firebase'
+interface UserCardProps {
+	description: string
+}
 
-import { BACKEND_URL } from '../../../integration-config'
-
-const UserCard: FC = () => {
+const UserCard: FC<UserCardProps> = ({ description }) => {
 	const { user } = useAuth()
-
-	const [description, setDescription] = useState<string>('')
-
-	useEffect(() => {
-		const fetchUserData = async () => {
-			try {
-				const currentUser = auth.currentUser
-				const token = await currentUser?.getIdToken()
-
-				const response = await axios.get(`${BACKEND_URL}/users/profile`, {
-					headers: {
-						Authorization: `Bearer ${token}`,
-					},
-				})
-
-				setDescription(response.data.description)
-			} catch (error) {
-				console.error('Error fetching user description:', error)
-			}
-		}
-
-		fetchUserData()
-	}, [user])
-
 	return (
 		<div className="user-card">
 			<div className="user-card__header">
