@@ -9,6 +9,7 @@ import GroupSettingsModal from '../GroupSettings/GroupSettingsModal'
 
 interface GroupProps {
 	groupID: number
+	onBack: () => void
 }
 
 interface Message {
@@ -18,7 +19,7 @@ interface Message {
 	timestamp: string
 }
 
-const GroupChat: FC<GroupProps> = ({ groupID }) => {
+const GroupChat: FC<GroupProps> = ({ groupID, onBack }) => {
 	const groupName = 'Example Group #' + groupID //const [groupName, setGroupName] = useState(`Mock Group #${groupID}`);
 	const status = 'online' //const [status, setStatus] = useState('online');
 	const [messages, setMessages] = useState<Message[]>([])
@@ -107,11 +108,12 @@ const GroupChat: FC<GroupProps> = ({ groupID }) => {
 			style={{
 				background: themeGradient, 
 				backgroundSize: themeGradient.includes('url(') ? 'cover' : 'initial', 
-				backgroundPosition: themeGradient.includes('url(') ? 'center' : 'initial', 
+				backgroundPosition: themeGradient.includes('url(') ? 'center' : 'initial',
 			}}
 		>
 			<div className="chat-header">
 				<div className="header-title">
+					<span className="back-arrow" onClick={onBack}>{'<'}</span>
 					<RoundedPhoto size={40} imagePath={`https://i.pravatar.cc/40`} />
 					<div className="title">
 						<div>{groupName}</div>
@@ -122,6 +124,7 @@ const GroupChat: FC<GroupProps> = ({ groupID }) => {
 				</div>
 				<CiSettings cursor="pointer" onClick={() => setIsGroupSettingsOpen(true)} />
 			</div>
+
 			<div className="chat-messages">
 				{messages.map(msg => (
 					<div key={msg.id} className="message-container">
@@ -140,6 +143,7 @@ const GroupChat: FC<GroupProps> = ({ groupID }) => {
 				{/* This is the invisible div we scroll to */}
 				<div ref={messagesEndRef} />
 			</div>
+
 			<div className="chat-message-bar">
 				<MdLink onClick={() => alert('links to be added')} cursor="pointer" />
 				<div className="message-bar-container">
@@ -162,7 +166,7 @@ const GroupChat: FC<GroupProps> = ({ groupID }) => {
 				<GroupSettingsModal
 					groupMembers={groupMembers}
 					onClose={() => setIsGroupSettingsOpen(false)}
-					onThemeChange={setThemeGradient} 
+					onThemeChange={setThemeGradient}
 				/>
 			)}
 		</div>

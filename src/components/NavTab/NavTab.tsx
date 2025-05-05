@@ -16,7 +16,7 @@ const NavTab: React.FC<NavTabProps> = ({ icon, text, dest }) => {
 			}
 		>
 			<div className="navtab-icon">{icon}</div>
-			{text}
+			<div className="navtab-text">{text}</div>
 		</NavLink>
 	)
 }
