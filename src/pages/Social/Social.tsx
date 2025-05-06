@@ -4,11 +4,13 @@ import Layout from '../../components/Layout/Layout'
 import GroupPreview from '../../components/GroupPreview/GroupPreview'
 import GroupDetails from '../../components/GroupDetails/GroupDetails'
 import GroupChat from '../../components/GroupChat/GroupChat'
+import GroupForm from '../../components/GroupForm/GroupForm' // Import the form
 
 const Social: FC = () => {
 	const [activeTab, setActiveTab] = useState<'myGroups' | 'lookForGroups'>('myGroups')
 	const [search, setSearch] = useState('')
 	const [selectedGroup, setSelectedGroup] = useState<any | null>(null)
+	const [showGroupForm, setShowGroupForm] = useState(false)
 	const [isMobile, setIsMobile] = useState(window.innerWidth <= 768)
 
 	useEffect(() => {
@@ -20,20 +22,20 @@ const Social: FC = () => {
 	}, [])
 
 	const myGroups = Array.from({ length: 20 }, (_, index) => ({
-		groupID: index + 1, 
+		groupID: index + 1,
 		name: `MyGroup ${index + 1}`,
 		description: `Description for group ${index + 1}`,
 		image: 'https://dashboard.codeparrot.ai/api/image/Z_T76IDi91IKZZrg/image.png',
-		isOnline: true, 
-		members: 8, 
+		isOnline: true,
+		members: 8,
 	}))
 
 	const lookForGroupsPreviews = Array.from({ length: 10 }, (_, index) => ({
 		name: `LookForGroup ${index + 1}`,
 		description: `Description for group ${index + 1}`,
 		image: 'https://dashboard.codeparrot.ai/api/image/Z_T76IDi91IKZZrg/image.png',
-		isOnline: true, 
-		members: 8, 
+		isOnline: true,
+		members: 8,
 	}))
 
 	const groupPreviews = activeTab === 'myGroups' ? myGroups : lookForGroupsPreviews
@@ -41,7 +43,7 @@ const Social: FC = () => {
 	const filteredGroupPreviews = groupPreviews.filter(
 		preview =>
 			preview.name.toLowerCase().includes(search.toLowerCase()) ||
-			preview.description.toLowerCase().includes(search.toLowerCase()),
+			preview.description.toLowerCase().includes(search.toLowerCase())
 	)
 
 	const handleGroupClick = (group: any) => {
@@ -50,13 +52,18 @@ const Social: FC = () => {
 
 	const handleBack = () => {
 		setSelectedGroup(null)
+		setShowGroupForm(false)
+	}
+
+	const handleCreateGroup = () => {
+		setShowGroupForm(true)
 	}
 
 	return (
 		<Layout>
 			<div className="social-container">
 				{/* Show group list only on mobile when no group selected, or always on desktop */}
-				{(!isMobile || (isMobile && !selectedGroup)) && (
+				{(!isMobile || (isMobile && !selectedGroup && !showGroupForm)) && (
 					<div className="social-left-container">
 						<div className="upper-message-preview">
 							<div className="tabs">
@@ -106,10 +113,10 @@ const Social: FC = () => {
 					</div>
 				)}
 
-				{/* Show chat/details only when a group is selected */}
-				{selectedGroup && (
-					<div className="social-right-container">
-						{activeTab === 'myGroups' ? (
+				{/* Right-side container logic */}
+				<div className="social-right-container">
+					{selectedGroup ? (
+						activeTab === 'myGroups' ? (
 							<GroupChat groupID={selectedGroup.groupID} onBack={handleBack} />
 						) : (
 							<GroupDetails
@@ -120,7 +127,22 @@ const Social: FC = () => {
 								isOnline={selectedGroup.isOnline}
 								onBack={handleBack}
 							/>
-						)}
+						)
+					) : showGroupForm ? (
+						<GroupForm onClose={handleBack} />
+					) : (
+						<div className="add-group-placeholder">
+							<div className="add-group-button" onClick={handleCreateGroup}>
+								+
+							</div>
+						</div>
+					)}
+				</div>
+
+				{/* Floating + button for mobile */}
+				{isMobile && !selectedGroup && !showGroupForm && (
+					<div className="add-group-floating-button" onClick={handleCreateGroup}>
+						+
 					</div>
 				)}
 			</div>
