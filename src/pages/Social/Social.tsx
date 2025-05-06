@@ -1,9 +1,50 @@
-import { useState, FC, useEffect } from 'react'
+import { useState, FC, useEffect, SetStateAction } from 'react'
 import './Social.scss'
 import Layout from '../../components/Layout/Layout'
 import GroupPreview from '../../components/GroupPreview/GroupPreview'
 import GroupDetails from '../../components/GroupDetails/GroupDetails'
 import GroupChat from '../../components/GroupChat/GroupChat'
+import axios from 'axios'
+import { BACKEND_URL } from '../../../integration-config'
+import { auth } from '../../firebase/firebase'
+
+interface GroupPreview {
+	groupID: number
+	name: string
+	description: string
+	image: string
+	isOnline: boolean
+	members: number
+}
+
+const fetchChatPreviews = async (setChatPreviews: {
+	(value: SetStateAction<GroupPreview[]>): void
+	(arg0: any): void
+}) => {
+	try {
+		const currentUser = auth?.currentUser
+		const token = await currentUser?.getIdToken()
+
+		const response = await axios.get(`${BACKEND_URL}/social/chat-previews`, {
+			headers: {
+				Authorization: `Bearer ${token}`,
+			},
+		})
+
+		const previews = response.data.map((item: any) => ({
+			groupID: item.id,
+			name: item.name,
+			description: item.lastMessageContent ?? '',
+			image: 'https://dashboard.codeparrot.ai/api/image/Z_T76IDi91IKZZrg/image.png',
+			isOnline: true,
+			members: item.memberCount,
+		}))
+
+		setChatPreviews(previews)
+	} catch (err) {
+		console.error('Error fetching chat previews: ' + err)
+	}
+}
 
 const Social: FC = () => {
 	const [activeTab, setActiveTab] = useState<'myGroups' | 'lookForGroups'>('myGroups')
@@ -11,32 +52,67 @@ const Social: FC = () => {
 	const [selectedGroup, setSelectedGroup] = useState<any | null>(null)
 	const [isMobile, setIsMobile] = useState(window.innerWidth <= 768)
 
+	const [chatPreviews, setChatPreviews] = useState<GroupPreview[]>([])
+
+	const [newGroupName, setNewGroupName] = useState('')
+	const [newGroupImage, setNewGroupImage] = useState('')
+
+	const handleCreateGroup = async () => {
+		if (!newGroupName.trim()) {
+			alert('Group name is required')
+			return
+		}
+
+		try {
+			const currentUser = auth?.currentUser
+			const token = await currentUser?.getIdToken()
+
+			const response = await axios.post(
+				`${BACKEND_URL}/social/create`,
+				{ name: newGroupName}, //image: newGroupImage },
+				{ headers: { Authorization: `Bearer ${token}` } },
+			)
+
+			console.log(response)
+			const newPreview: GroupPreview = {
+				groupID: response.data.id,
+				name: response.data.name,
+				description: '',
+				image: 'https://dashboard.codeparrot.ai/api/image/Z_T76IDi91IKZZrg/image.png',
+				isOnline: true,
+				members: 1
+			}
+
+			setChatPreviews([...chatPreviews, newPreview])
+
+			setNewGroupName('')
+			setNewGroupImage('')
+		} catch (err) {
+			console.error('Error creating group:', err)
+			alert('Failed to create group')
+		}
+	}
+
 	useEffect(() => {
 		const handleResize = () => {
 			setIsMobile(window.innerWidth <= 768)
 		}
 		window.addEventListener('resize', handleResize)
+		fetchChatPreviews(setChatPreviews)
+
 		return () => window.removeEventListener('resize', handleResize)
 	}, [])
 
-	const myGroups = Array.from({ length: 20 }, (_, index) => ({
-		groupID: index + 1, 
-		name: `MyGroup ${index + 1}`,
-		description: `Description for group ${index + 1}`,
-		image: 'https://dashboard.codeparrot.ai/api/image/Z_T76IDi91IKZZrg/image.png',
-		isOnline: true, 
-		members: 8, 
-	}))
-
 	const lookForGroupsPreviews = Array.from({ length: 10 }, (_, index) => ({
+		groupID: 0,
 		name: `LookForGroup ${index + 1}`,
 		description: `Description for group ${index + 1}`,
 		image: 'https://dashboard.codeparrot.ai/api/image/Z_T76IDi91IKZZrg/image.png',
-		isOnline: true, 
-		members: 8, 
+		isOnline: true,
+		members: 8,
 	}))
 
-	const groupPreviews = activeTab === 'myGroups' ? myGroups : lookForGroupsPreviews
+	const groupPreviews = activeTab === 'myGroups' ? chatPreviews : lookForGroupsPreviews
 
 	const filteredGroupPreviews = groupPreviews.filter(
 		preview =>
@@ -44,7 +120,7 @@ const Social: FC = () => {
 			preview.description.toLowerCase().includes(search.toLowerCase()),
 	)
 
-	const handleGroupClick = (group: any) => {
+	const handleGroupClick = (group: GroupPreview) => {
 		setSelectedGroup(group)
 	}
 
@@ -107,9 +183,9 @@ const Social: FC = () => {
 				)}
 
 				{/* Show chat/details only when a group is selected */}
-				{selectedGroup && (
-					<div className="social-right-container">
-						{activeTab === 'myGroups' ? (
+				<div className="social-right-container">
+					{selectedGroup ? (
+						activeTab === 'myGroups' ? (
 							<GroupChat groupID={selectedGroup.groupID} onBack={handleBack} />
 						) : (
 							<GroupDetails
@@ -120,9 +196,26 @@ const Social: FC = () => {
 								isOnline={selectedGroup.isOnline}
 								onBack={handleBack}
 							/>
-						)}
-					</div>
-				)}
+						)
+					) : (
+						<div className="create-group-form">
+							<h2>Create New Group</h2>
+							<input
+								type="text"
+								placeholder="Group Name (required)"
+								value={newGroupName}
+								onChange={e => setNewGroupName(e.target.value)}
+							/>
+							<input
+								type="text"
+								placeholder="Image URL (optional)"
+								value={newGroupImage}
+								onChange={e => setNewGroupImage(e.target.value)}
+							/>
+							<button onClick={handleCreateGroup}>Create Group</button>
+						</div>
+					)}
+				</div>
 			</div>
 		</Layout>
 	)
