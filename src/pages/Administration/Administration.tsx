@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import Layout from '../../components/Layout/Layout'
 import './Administration.scss'
 import AdminTable from '../../components/AdminTable/AdminTable'
@@ -7,8 +7,20 @@ import '../../components/StatCards/StatCards.scss'
 import StatCard from '../../components/StatCards/StatCards'
 import AdminTab from '../../components/AdminTabs/AdminTab'
 import { LineChart } from '@mui/x-charts/LineChart'
+import AdminError from '../AdminError/AdminError'
 
 export const Administration: React.FC = () => {
+	const [isMobile, setIsMobile] = useState(window.innerWidth < 1000)
+
+	useEffect(() => {
+		const handleResize = () => {
+			setIsMobile(window.innerWidth < 1000)
+		}
+
+		window.addEventListener('resize', handleResize)
+		return () => window.removeEventListener('resize', handleResize)
+	}, [])
+
 	const tableHeadersMap: { [key: string]: string[] } = {
 		Venues: ['Venue', 'Name', 'Type', 'Status', 'Bookings', 'Ratings'],
 		Users: ['User', 'Name', 'Type', 'Status', 'Reports', 'Rating'],
@@ -32,6 +44,10 @@ export const Administration: React.FC = () => {
 		{ id: 'total-users', title: 'Total', subtitle: 'Users', value: '1.340' },
 		{ id: 'revenue', title: 'Revenue', subtitle: 'This Month', value: '$2.786' },
 	]
+
+	if (isMobile) {
+		return <AdminError />
+	}
 
 	return (
 		<Layout showTabs={false} showFooter={true}>
@@ -111,4 +127,4 @@ export const Administration: React.FC = () => {
 	)
 }
 
-export default Administration;
+export default Administration

@@ -7,6 +7,7 @@ import GroupChat from '../../components/GroupChat/GroupChat'
 import axios from 'axios'
 import { BACKEND_URL } from '../../../integration-config'
 import { auth } from '../../firebase/firebase'
+import GroupForm from '../../components/GroupForm/GroupForm'
 
 interface GroupPreview {
 	groupID: number
@@ -50,15 +51,13 @@ const Social: FC = () => {
 	const [activeTab, setActiveTab] = useState<'myGroups' | 'lookForGroups'>('myGroups')
 	const [search, setSearch] = useState('')
 	const [selectedGroup, setSelectedGroup] = useState<any | null>(null)
+	const [showGroupForm, setShowGroupForm] = useState(false)
 	const [isMobile, setIsMobile] = useState(window.innerWidth <= 768)
 
 	const [chatPreviews, setChatPreviews] = useState<GroupPreview[]>([])
 
-	const [newGroupName, setNewGroupName] = useState('')
-	const [newGroupImage, setNewGroupImage] = useState('')
-
-	const handleCreateGroup = async () => {
-		if (!newGroupName.trim()) {
+	const handleCreateGroup = async (name : string, description: string, photo: File | null) => {
+		if (!name.trim()) {
 			alert('Group name is required')
 			return
 		}
@@ -69,7 +68,7 @@ const Social: FC = () => {
 
 			const response = await axios.post(
 				`http://${BACKEND_URL}/social/group`,
-				{ name: newGroupName}, //image: newGroupImage },
+				{ name: name}, //image: newGroupImage },
 				{ headers: { Authorization: `Bearer ${token}` } },
 			)
 
@@ -84,12 +83,8 @@ const Social: FC = () => {
 			}
 
 			setChatPreviews([...chatPreviews, newPreview])
-
-			setNewGroupName('')
-			setNewGroupImage('')
 		} catch (err) {
 			console.error('Error creating group:', err)
-			alert('Failed to create group')
 		}
 	}
 
@@ -142,7 +137,7 @@ const Social: FC = () => {
 	const filteredGroupPreviews = groupPreviews.filter(
 		preview =>
 			preview.name.toLowerCase().includes(search.toLowerCase()) ||
-			preview.description.toLowerCase().includes(search.toLowerCase()),
+			preview.description.toLowerCase().includes(search.toLowerCase())
 	)
 
 	const handleGroupClick = (group: GroupPreview) => {
@@ -151,13 +146,14 @@ const Social: FC = () => {
 
 	const handleBack = () => {
 		setSelectedGroup(null)
+		setShowGroupForm(false)
 	}
 
 	return (
 		<Layout>
 			<div className="social-container">
 				{/* Show group list only on mobile when no group selected, or always on desktop */}
-				{(!isMobile || (isMobile && !selectedGroup)) && (
+				{(!isMobile || (isMobile && !selectedGroup && !showGroupForm)) && (
 					<div className="social-left-container">
 						<div className="upper-message-preview">
 							<div className="tabs">
@@ -226,25 +222,23 @@ const Social: FC = () => {
 								onBack={handleBack}
 							/>
 						)
+					) : showGroupForm ? (
+						<GroupForm onClose={handleBack} createGroup={handleCreateGroup}/>
 					) : (
-						<div className="create-group-form">
-							<h2>Create New Group</h2>
-							<input
-								type="text"
-								placeholder="Group Name (required)"
-								value={newGroupName}
-								onChange={e => setNewGroupName(e.target.value)}
-							/>
-							<input
-								type="text"
-								placeholder="Image URL (optional)"
-								value={newGroupImage}
-								onChange={e => setNewGroupImage(e.target.value)}
-							/>
-							<button onClick={handleCreateGroup}>Create Group</button>
+						<div className="add-group-placeholder">
+							<div className="add-group-button" onClick={() => setShowGroupForm(true)}>
+								+
+							</div>
 						</div>
 					)}
 				</div>
+
+				{/* Floating + button for mobile */}
+				{isMobile && !selectedGroup && !showGroupForm && (
+					<div className="add-group-floating-button" onClick={() => setShowGroupForm(true)}>
+						+
+					</div>
+				)}
 			</div>
 		</Layout>
 	)

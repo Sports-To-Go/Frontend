@@ -15,6 +15,7 @@ import axios from 'axios'
 const AppRoutes: React.FC = () => {
 	const { user } = useAuth()
 
+
 	const [isAdmin, setIsAdmin] = useState(false)
 	const [userDescription, setUserDescription] = useState('')
 	const isLogged = !!user
