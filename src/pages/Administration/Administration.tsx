@@ -1,5 +1,4 @@
-import React, { useState } from 'react'
-import { useNavigate } from 'react-router-dom';
+import React, { useEffect, useState } from 'react'
 import Layout from '../../components/Layout/Layout'
 import './Administration.scss'
 import AdminTable from '../../components/AdminTable/AdminTable'
@@ -8,10 +7,19 @@ import '../../components/StatCards/StatCards.scss'
 import StatCard from '../../components/StatCards/StatCards'
 import AdminTab from '../../components/AdminTabs/AdminTab'
 import { LineChart } from '@mui/x-charts/LineChart'
+import AdminError from '../AdminError/AdminError'
 
 export const Administration: React.FC = () => {
-	const navigate = useNavigate();
-	const isMobile = window.innerWidth < 1000;
+	const [isMobile, setIsMobile] = useState(window.innerWidth < 1000)
+
+	useEffect(() => {
+		const handleResize = () => {
+			setIsMobile(window.innerWidth < 1000)
+		}
+
+		window.addEventListener('resize', handleResize)
+		return () => window.removeEventListener('resize', handleResize)
+	}, [])
 
 	const tableHeadersMap: { [key: string]: string[] } = {
 		Venues: ['Venue', 'Name', 'Type', 'Status', 'Bookings', 'Ratings'],
@@ -38,15 +46,8 @@ export const Administration: React.FC = () => {
 	]
 
 	if (isMobile) {
-		navigate('/admin-error', {
-		  replace: true,
-		  state: {
-			title: 'Desktop Required',
-			message: 'Admin dashboard requires a desktop or tablet in landscape mode'
-		  }
-		});
-		return null;
-	  }
+		return <AdminError />
+	}
 
 	return (
 		<Layout showTabs={false} showFooter={true}>
@@ -126,4 +127,4 @@ export const Administration: React.FC = () => {
 	)
 }
 
-export default Administration;
+export default Administration
