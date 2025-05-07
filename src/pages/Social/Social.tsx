@@ -25,7 +25,7 @@ const fetchChatPreviews = async (setChatPreviews: {
 		const currentUser = auth?.currentUser
 		const token = await currentUser?.getIdToken()
 
-		const response = await axios.get(`${BACKEND_URL}/social/chat-previews`, {
+		const response = await axios.get(`http://${BACKEND_URL}/social/chat-previews`, {
 			headers: {
 				Authorization: `Bearer ${token}`,
 			},
@@ -68,7 +68,7 @@ const Social: FC = () => {
 			const token = await currentUser?.getIdToken()
 
 			const response = await axios.post(
-				`${BACKEND_URL}/social/create`,
+				`http://${BACKEND_URL}/social/create`,
 				{ name: newGroupName}, //image: newGroupImage },
 				{ headers: { Authorization: `Bearer ${token}` } },
 			)

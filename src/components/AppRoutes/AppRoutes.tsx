@@ -31,7 +31,7 @@ const AppRoutes: React.FC = () => {
 				const currentUser = auth.currentUser
 				const token = await currentUser?.getIdToken()
 
-				const response = await axios.get(`${BACKEND_URL}/users/profile`, {
+				const response = await axios.get(`http://${BACKEND_URL}/users/profile`, {
 					headers: {
 						Authorization: `Bearer ${token}`,
 					},
