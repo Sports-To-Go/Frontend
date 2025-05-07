@@ -4,7 +4,8 @@ import Logo from '../Logo/Logo.tsx'
 import NavTab from '../NavTab/NavTab.tsx'
 import { GrHomeRounded, GrLanguage } from 'react-icons/gr'
 import { FaRegSquarePlus } from 'react-icons/fa6'
-import { CiUser, CiMap } from 'react-icons/ci'
+import { CiUser } from 'react-icons/ci'
+import { FaUsers } from 'react-icons/fa';
 import UserMenu from '../UserMenu/UserMenu'
 
 interface NavbarProps {
@@ -36,24 +37,25 @@ const Navbar: React.FC<NavbarProps> = ({ showTabs }) => {
 	return (
 		<nav className="navbar">
 			<div className="navbar-container">
-				<Logo />
+				<div className="navbar-logo">
+					<Logo />
+				</div>
 				{showTabs && (
 					<div className="navbar-menu">
 						<NavTab icon={<GrHomeRounded />} text="Find Locations" dest="/locations" />
 						<NavTab icon={<FaRegSquarePlus />} text="Add Location" dest="/add-location" />
-						<NavTab icon={<CiMap />} text="See Groups" dest="/social" />
+						<NavTab icon={<FaUsers />} text="See Groups" dest="/social" />
 					</div>
 				)}
-					<div className="navbar-right-container">
-						<GrLanguage />
-
-						<div className="navbar-profile-container" style={{ position: 'relative' }}>
-							<div onClick={toggleMenu}>
-								<CiUser style={{ fontSize: 32 }} cursor={"pointer"} />
-							</div>
-							{showMenu && <UserMenu menuRef={menuRef} />}
+				<div className="navbar-right-container">
+					<GrLanguage />
+					<div className="navbar-profile-container" style={{ position: 'relative' }}>
+						<div onClick={toggleMenu}>
+							<CiUser style={{ fontSize: 32 }} cursor={'pointer'} />
 						</div>
+						{showMenu && <UserMenu menuRef={menuRef} />}
 					</div>
+				</div>
 			</div>
 		</nav>
 	)

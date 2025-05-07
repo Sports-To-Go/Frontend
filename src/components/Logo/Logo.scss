@@ -9,6 +9,9 @@
 	font-weight: bold;
 	width: 42px;
 	height: 42px;
+	display: flex;
+	justify-content: center;
+	align-items: center;
 
 	&:hover {
 		cursor: pointer;

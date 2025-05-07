@@ -8,8 +8,7 @@
 	background-color: var(--background);
 	border-radius: 10px;
 	font-family: Arial, sans-serif;
-	height: 100%;
-	padding-bottom: 80px; 
+	height: 100%;  // Make sure it fills the container
 
 	.back-button {
 		align-self: flex-start;
@@ -90,12 +89,17 @@
 		}
 	}
 
+	// This ensures the content section fills the available space
+	.content-section {
+		flex-grow: 1;  // Make content take all available space
+	}
+
 	.modal-button-container {
 		width: 100%;
 		display: flex;
 		justify-content: center;
 		margin-top: auto;
-		padding: 20px 0 40px 0; 
+		padding: 80px 0 10px 0;  // Adjust bottom padding to ensure button is at the bottom
 	}
 
 	.modal-button {
