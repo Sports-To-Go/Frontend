@@ -9,6 +9,7 @@ import GroupSettingsModal from '../GroupSettings/GroupSettingsModal'
 import { BACKEND_URL } from '../../../integration-config'
 import { auth } from '../../firebase/firebase'
 import { useAuth } from '../../context/UserContext'
+import axios from 'axios'
 
 interface GroupProps {
 	groupID: number
@@ -17,9 +18,28 @@ interface GroupProps {
 
 interface Message {
 	id: number
-	sender: string
+	senderID: string
 	content: string
 	timestamp: string
+}
+
+const fetchGroupData = async (groupID: number) => {
+	try {
+		const currentUser = auth.currentUser
+		const token = await currentUser?.getIdToken(true);
+
+		const response = await axios.get(`http://${BACKEND_URL}/social/group/${groupID}`,
+			{
+				headers: {
+					Authorization: `Bearer ${token}`
+				}
+			}
+		)
+
+		console.log(response.data);
+	} catch(error) {
+		console.log("Error fetching group data: " + error);
+	}
 }
 
 const GroupChat: FC<GroupProps> = ({ groupID, onBack }) => {
@@ -64,7 +84,7 @@ const GroupChat: FC<GroupProps> = ({ groupID, onBack }) => {
 
 			try {
 				const currentUser = auth?.currentUser
-				const token = await currentUser?.getIdToken()
+				const token = await currentUser?.getIdToken(true)
 
 				// Only proceed if the component is still mounted
 				if (!isComponentMounted) return
@@ -103,6 +123,7 @@ const GroupChat: FC<GroupProps> = ({ groupID, onBack }) => {
 			}
 		}
 
+		fetchGroupData(groupID)
 		connectWebSocket()
 
 		// Cleanup function to prevent duplicate connections
@@ -120,7 +141,7 @@ const GroupChat: FC<GroupProps> = ({ groupID, onBack }) => {
 		if (newMessage.trim() && ws.current?.readyState == WebSocket.OPEN) {
 			const outgoingMessage: Message = {
 				id: messages.length + 1,
-				sender: user?.displayName || '',
+				senderID: user?.uid || '',
 				content: newMessage,
 				timestamp: new Date().toISOString(),
 			}
@@ -160,7 +181,7 @@ const GroupChat: FC<GroupProps> = ({ groupID, onBack }) => {
 						<RoundedPhoto size={40} />
 						<div className="message-content">
 							<div className="message-title">
-								<strong className="message-sender">{msg.sender}</strong>
+								<strong className="message-sender">{msg.senderID}</strong>
 								<small className="message-timestamp">
 									{new Date(msg.timestamp).toLocaleTimeString()}
 								</small>
