@@ -1,226 +1,188 @@
-import { FC, useEffect, useState, useRef } from 'react'
-import './GroupChat.scss'
+// /src/components/GroupChat/GroupChat.tsx
 
-import RoundedPhoto from '../RoundedPhoto/RoundedPhoto'
-import { CiSettings } from 'react-icons/ci'
-import { MdLink } from 'react-icons/md'
-import { FiMessageCircle } from 'react-icons/fi'
+import { FC, useEffect, useRef, useState } from 'react'
+import ChatHeader from '../ChatHeader/ChatHeader'
+import ChatMessages from '../ChatMessages/ChatMessages'
+import ChatMessageBar from '../ChatMessageBar/ChatMessageBar'
 import GroupSettingsModal from '../GroupSettings/GroupSettingsModal'
 import { BACKEND_URL } from '../../../integration-config'
 import { auth } from '../../firebase/firebase'
 import { useAuth } from '../../context/UserContext'
 import axios from 'axios'
+import './GroupChat.scss'
 
 interface GroupProps {
-	groupID: number
-	onBack: () => void
+    groupID: number
+    onBack: () => void
+    onLeave: () => void
 }
 
 interface Message {
-	id: number
+    id: number
+    senderName: string
 	senderID: string
-	content: string
-	timestamp: string
+    content: string
+    timestamp: string
 }
 
-const fetchGroupData = async (groupID: number) => {
-	try {
-		const currentUser = auth.currentUser
-		const token = await currentUser?.getIdToken(true);
-
-		const response = await axios.get(`http://${BACKEND_URL}/social/group/${groupID}`,
-			{
-				headers: {
-					Authorization: `Bearer ${token}`
-				}
-			}
-		)
-
-		console.log(response.data);
-	} catch(error) {
-		console.log("Error fetching group data: " + error);
-	}
+interface GroupMember {
+    id: string
+    displayName: string
 }
 
-const GroupChat: FC<GroupProps> = ({ groupID, onBack }) => {
-	const { user } = useAuth()
-	const groupName = 'Example Group #' + groupID //const [groupName, setGroupName] = useState(`Mock Group #${groupID}`);
-	const status = 'online' //const [status, setStatus] = useState('online');
-	const [messages, setMessages] = useState<Message[]>([])
-	const [newMessage, setNewMessage] = useState('')
-	const messagesEndRef = useRef<HTMLDivElement>(null)
+const GroupChat: FC<GroupProps> = ({ groupID, onBack, onLeave }) => {
+    const { user } = useAuth()
 
-	const [isGroupSettingsOpen, setIsGroupSettingsOpen] = useState(false)
-	const groupMembers = [
-		'Goldan David',
-		'Smau Robert',
-		'Onofrei Radu',
-		'Dascaliu Ianis',
-		'Lionel Fortnite',
-	]
+    const [groupName, setGroupName] = useState<string>('Loading...')
+    const [groupMembers, setGroupMembers] = useState<Map<string, string>>(new Map())
 
-	const ws = useRef<WebSocket | null>(null)
+    const [messages, setMessages] = useState<Message[]>([])
+    const [newMessage, setNewMessage] = useState('')
+    const [isGroupSettingsOpen, setIsGroupSettingsOpen] = useState(false)
+    const ws = useRef<WebSocket | null>(null)
+    const [themeGradient, setThemeGradient] = useState<string>(
+        'linear-gradient(to right, #ffffff, #ffffff)',
+    )
 
-	// State for the chat background gradient or image
-	const [themeGradient, setThemeGradient] = useState<string>(
-		'linear-gradient(to right, #ffffff, #ffffff)',
-	)
+    const fetchGroupData = async (groupID: number) => {
+        try {
+            const currentUser = auth.currentUser
+            const token = await currentUser?.getIdToken(true)
 
-	// Scroll to bottom function
-	const scrollToBottom = () => {
-		messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
-	}
+            const response = await axios.get(`http://${BACKEND_URL}/social/group/${groupID}`, {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            })
 
-	useEffect(() => {
-		let reconnectAttempts = 0
-		let isComponentMounted = true
+            console.log(response.data)
 
-		const connectWebSocket = async () => {
-			// Close any existing connection before creating a new one
-			if (ws.current) {
-				ws.current.close()
-				ws.current = null
-			}
+            setGroupName(response.data.name)
+            setGroupMembers(response.data.groupMembers)
+			setGroupMembers(new Map(response.data.groupMembers.map((member: GroupMember) => [member.id, member.displayName])))
+        } catch (error) {
+            console.log('Error fetching group data: ' + error)
+        }
+    }
 
-			try {
-				const currentUser = auth?.currentUser
-				const token = await currentUser?.getIdToken(true)
+    useEffect(() => {
+        let reconnectAttempts = 0
+        let isComponentMounted = true
+        let hasFetchedData = false
 
-				// Only proceed if the component is still mounted
-				if (!isComponentMounted) return
+        const connectWebSocket = async () => {
+            if (ws.current) {
+                ws.current.close()
+                ws.current = null
+            }
 
-				ws.current = new WebSocket(`ws://${BACKEND_URL}/social/chat/${groupID}`, [token || ''])
+            try {
+                const currentUser = auth?.currentUser
+                const token = await currentUser?.getIdToken(true)
 
-				ws.current.onopen = () => {
-					console.log('WebSocket connection established')
-					setMessages([])
-					reconnectAttempts = 0
-				}
+                if (!isComponentMounted) return
 
-				ws.current.onmessage = e => {
-					try {
-						const incomingMessage: Message = JSON.parse(e.data)
-						setMessages(prev => [...prev, incomingMessage])
-						scrollToBottom()
-					} catch (error) {
-						console.error('Failed to parse WebSocket message:', error)
-					}
-				}
+                ws.current = new WebSocket(`ws://${BACKEND_URL}/social/chat/${groupID}`, [token || ''])
 
-				ws.current.onclose = () => {
-					console.log('WebSocket connection closed')
-					if (reconnectAttempts < 5) {
-						reconnectAttempts++
-						setTimeout(connectWebSocket, 2000)
-					}
-				}
+                ws.current.onopen = () => {
+                    console.log('WebSocket connection established')
+                    setMessages([])
+                    reconnectAttempts = 0
+                    if (!hasFetchedData) {
+                        fetchGroupData(groupID)
+                        hasFetchedData = true
+                    }
+                }
 
-				ws.current.onerror = e => {
-					console.error('WebSocket error: ', e)
-				}
-			} catch (err) {
-				console.error('Failed to fetch token for WebSocket:', err)
-			}
-		}
+                ws.current.onmessage = e => {
+                    try {
+                        const incomingMessage: Message = JSON.parse(e.data)
 
-		fetchGroupData(groupID)
-		connectWebSocket()
+                        const senderName = groupMembers.get(incomingMessage.senderID) || 'Unknown'
 
-		// Cleanup function to prevent duplicate connections
-		return () => {
-			isComponentMounted = false
-			if (ws.current) {
-				console.log('Closing WebSocket connection on unmount')
-				ws.current.close()
-				ws.current = null
-			}
-		}
-	}, [groupID])
+                        const messageWithSenderName = {
+                            ...incomingMessage,
+                            senderName,
+                        }
 
-	const sendMessage = () => {
-		if (newMessage.trim() && ws.current?.readyState == WebSocket.OPEN) {
-			const outgoingMessage: Message = {
-				id: messages.length + 1,
-				senderID: user?.uid || '',
-				content: newMessage,
-				timestamp: new Date().toISOString(),
-			}
-			ws.current.send(JSON.stringify(outgoingMessage))
-			setNewMessage('')
-		}
-	}
+                        setMessages(prev => [...prev, messageWithSenderName])
+                    } catch (error) {
+                        console.error('Failed to parse WebSocket message:', error)
+                    }
+                }
 
-	return (
-		<div
-			className="chat-container"
-			style={{
-				background: themeGradient,
-				backgroundSize: themeGradient.includes('url(') ? 'cover' : 'initial',
-				backgroundPosition: themeGradient.includes('url(') ? 'center' : 'initial',
-			}}
-		>
-			<div className="chat-header">
-				<div className="header-title">
-					<span className="back-arrow" onClick={onBack}>
-						{'<'}
-					</span>
-					<RoundedPhoto size={40} imagePath={`https://i.pravatar.cc/40`} />
-					<div className="title">
-						<div>{groupName}</div>
-						<div className={status === 'online' ? 'active' : 'offline'}>
-							{status === 'online' ? 'active now' : 'offline'}
-						</div>
-					</div>
-				</div>
-				<CiSettings cursor="pointer" onClick={() => setIsGroupSettingsOpen(true)} />
-			</div>
+                ws.current.onclose = () => {
+                    console.log('WebSocket connection closed')
+                    if (reconnectAttempts < 5) {
+                        reconnectAttempts++
+                        setTimeout(connectWebSocket, 2000)
+                    }
+                }
 
-			<div className="chat-messages">
-				{messages.map(msg => (
-					<div key={msg.id} className="message-container">
-						<RoundedPhoto size={40} />
-						<div className="message-content">
-							<div className="message-title">
-								<strong className="message-sender">{msg.senderID}</strong>
-								<small className="message-timestamp">
-									{new Date(msg.timestamp).toLocaleTimeString()}
-								</small>
-							</div>
-							<div className="message">{msg.content}</div>
-						</div>
-					</div>
-				))}
-				{/* This is the invisible div we scroll to */}
-				<div ref={messagesEndRef} />
-			</div>
+                ws.current.onerror = e => {
+                    console.error('WebSocket error: ', e)
+                }
+            } catch (err) {
+                console.error('Failed to fetch token for WebSocket:', err)
+            }
+        }
 
-			<div className="chat-message-bar">
-				<MdLink onClick={() => alert('links to be added')} cursor="pointer" />
-				<div className="message-bar-container">
-					<input
-						type="text"
-						className="message-input"
-						placeholder="Aa"
-						value={newMessage}
-						onChange={e => setNewMessage(e.target.value)}
-						onKeyDown={e => {
-							if (e.key === 'Enter') sendMessage()
-						}}
-					/>
-					<FiMessageCircle onClick={sendMessage} cursor="pointer" />
-				</div>
-			</div>
+        connectWebSocket()
 
-			{/* Group Settings Modal */}
-			{isGroupSettingsOpen && (
-				<GroupSettingsModal
-					groupMembers={groupMembers}
-					onClose={() => setIsGroupSettingsOpen(false)}
-					onThemeChange={setThemeGradient}
-				/>
-			)}
-		</div>
-	)
+        return () => {
+            isComponentMounted = false
+            if (ws.current) {
+                console.log('Closing WebSocket connection on unmount')
+                ws.current.close()
+                ws.current = null
+            }
+        }
+    }, [groupID])
+
+    const sendMessage = () => {
+        if (newMessage.trim() && ws.current?.readyState == WebSocket.OPEN) {
+            const outgoingMessage: any = {
+                id: messages.length + 1,
+                senderID: user?.uid || '',
+                content: newMessage,
+                timestamp: new Date().toISOString(),
+            }
+            ws.current.send(JSON.stringify(outgoingMessage))
+            setNewMessage('')
+        }
+    }
+
+    return (
+        <div
+            className="chat-container"
+            style={{
+                background: themeGradient,
+                backgroundSize: themeGradient.includes('url(') ? 'cover' : 'initial',
+                backgroundPosition: themeGradient.includes('url(') ? 'center' : 'initial',
+            }}
+        >
+            <ChatHeader
+                groupName={groupName}
+                status="online"
+                onBack={onBack}
+                onOpenSettings={() => setIsGroupSettingsOpen(true)}
+            />
+            <ChatMessages messages={messages} />
+            <ChatMessageBar
+                newMessage={newMessage}
+                onMessageChange={setNewMessage}
+                onSendMessage={sendMessage}
+            />
+            {isGroupSettingsOpen && (
+                <GroupSettingsModal
+                    groupMembers={[...groupMembers.values()]}
+                    onClose={() => setIsGroupSettingsOpen(false)}
+                    onThemeChange={setThemeGradient}
+                    onLeave={onLeave}
+                />
+            )}
+        </div>
+    )
 }
 
 export default GroupChat

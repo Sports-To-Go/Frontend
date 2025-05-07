@@ -68,7 +68,7 @@ const Social: FC = () => {
 			const token = await currentUser?.getIdToken()
 
 			const response = await axios.post(
-				`http://${BACKEND_URL}/social/create`,
+				`http://${BACKEND_URL}/social/group`,
 				{ name: newGroupName}, //image: newGroupImage },
 				{ headers: { Authorization: `Bearer ${token}` } },
 			)
@@ -92,6 +92,31 @@ const Social: FC = () => {
 			alert('Failed to create group')
 		}
 	}
+
+	const handleLeaveGroup = async (groupID: number) => {	
+		try {
+			const currentUser = auth?.currentUser
+			const token = await currentUser?.getIdToken()
+	
+			await axios.delete(`http://${BACKEND_URL}/social/group/${groupID}`, {
+				headers: {
+					Authorization: `Bearer ${token}`,
+				},
+			})
+	
+			// Remove the group from the chatPreviews list
+			setChatPreviews(prev => prev.filter(group => group.groupID !== groupID))
+			
+			// Close the chat view
+			setSelectedGroup(null)
+			
+			alert('You have left the group.')
+		} catch (err) {
+			console.error('Error leaving the group:', err)
+			alert('Failed to leave the group')
+		}
+	}
+	
 
 	useEffect(() => {
 		const handleResize = () => {
@@ -186,7 +211,11 @@ const Social: FC = () => {
 				<div className="social-right-container">
 					{selectedGroup ? (
 						activeTab === 'myGroups' ? (
-							<GroupChat groupID={selectedGroup.groupID} onBack={handleBack} />
+							<GroupChat 
+								groupID={selectedGroup.groupID} 
+								onBack={handleBack} 
+								onLeave={() => handleLeaveGroup(selectedGroup.groupID)}
+							/>
 						) : (
 							<GroupDetails
 								image={selectedGroup.image}
