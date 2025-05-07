@@ -46,12 +46,18 @@ const AddLocationPage: React.FC<{}> = () => {
 		const distance = initialCoords ? getDistanceInMeters(initialCoords, coords) : Infinity
 
 		if (distance > 50) {
-			const newAddress = await reverseGeocode(coords.lat, coords.lng)
-			if (newAddress) {
+			try {
+			  const newAddress = await reverseGeocode(coords.lat, coords.lng)
+			  if (newAddress) {
 				setAddress(newAddress)
+			  }
+			} catch (err) {
+			  console.error("reverseGeocode failed:", err)
 			}
-			setInitialCoords(coords) // Update initial coordinates to the new pin position
-		}
+		  
+			setInitialCoords(coords)
+		  }
+		  
 
 		setLat(coords.lat)
 		setLng(coords.lng)
@@ -148,6 +154,9 @@ const AddLocationPage: React.FC<{}> = () => {
 
 		const handleSubmit = async (e: React.FormEvent) => {
 			e.preventDefault()
+
+			console.log("current address", address)
+			
 			if (!validate()) return
 		  
 			const payload = {
@@ -176,9 +185,6 @@ const AddLocationPage: React.FC<{}> = () => {
 			  if (!response.ok) {
 				throw new Error('Failed to submit')
 			  }
-		  
-			  const result = await response.text() 
-			  console.log('Form submitted successfully:', result)
 		  
 			  toast.success('Court added successfully!')
 			  setTimeout(() => {

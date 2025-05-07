@@ -27,7 +27,7 @@
   
   export async function reverseGeocode(lat: number, lng: number): Promise<string | null> {
     try {
-      const response = await fetch(`/api/reverse-geocode?lat=${lat}&lng=${lng}`)
+      const response = await fetch(`/api/geocode/reverse?lat=${lat}&lng=${lng}`)
   
       const contentType = response.headers.get("content-type")
   
