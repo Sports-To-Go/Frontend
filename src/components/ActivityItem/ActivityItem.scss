@@ -79,4 +79,45 @@
 			}
 		}
 	}
+	@media (max-width: 768px) {
+		flex-direction: column;  // Schimbă direcția pe mobil
+		padding: 15px 0;
+
+		&__left {
+			flex-direction: column;
+			align-items: center;
+			justify-content: center;
+		}
+
+		&__image-container {
+			width: 120px;  // Micșorează imaginea pe mobil
+			height: 60px;
+		}
+
+		&__review {
+			width: 100%;
+			max-width: none;
+			align-items: center;
+		}
+
+		&__divider {
+			display: none;
+		}
+		
+		.activity-item__text {
+			font-size: 0.85rem;  // Crește ușor fontul pe mobil
+		}
+	}
+
+	@media (max-width: 480px) {
+		&__review {
+			width: 100%;
+			max-width: none;
+		}
+
+		.activity-item__text {
+			font-size: 0.85rem;  // Crește și mai mult fontul pe mobil
+		}
+	}
 }
+

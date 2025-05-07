@@ -1,7 +1,7 @@
 import Layout from '../../components/Layout/Layout'
 import UserCard from '../../components/UserCard/UserCard'
 import EditProfileButton from '../../components/EditProfileButton/EditProfileButton'
-import ActivityFeed from '../../components/ActivityFeed/ActivityFeed'
+import ActivityFeedWrapper from '../../components/ActivityFeed/ActivityFeedWrapper';
 
 import './Profile.scss';
 
@@ -15,7 +15,7 @@ const Profile = () => {
 				</div>
 
 				<div className="profile-main">
-					<ActivityFeed />
+					<ActivityFeedWrapper />
 				</div>
 			</div>
 		</Layout>

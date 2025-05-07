@@ -26,4 +26,11 @@
 		box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 		transform: translateY(-1px);
 	}
+
+	@media (max-width: 768px) {
+		padding: 0.6rem 1.5rem; /* Reducem padding-ul pe mobil */
+		font-size: 0.85rem; /* Micșorăm fontul pentru a se potrivi mai bine pe ecrane mici */
+		max-width: 200px; /* Reducem lățimea maximă pe mobil */
+		width: auto; /* Permite lățimii butonului să fie adaptată în funcție de conținut */
+	}
 }

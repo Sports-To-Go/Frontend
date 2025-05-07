@@ -25,3 +25,29 @@
 	display: flex;
 	flex-direction: column;
 }
+
+@media (max-width: 768px) {
+	.profile-page {
+		flex-direction: column;  /* Schimbă layout-ul în coloană pe mobil */
+		padding: 1rem;  /* Reduce padding-ul pe mobil */
+	}
+
+	.profile-sidebar {
+		display: flex;
+		flex-direction: column;
+		align-items: center;  /* Centrează elementele orizontal */
+		gap: 1rem;
+	  }
+	  
+	  .profile-main {
+		/* Asigurăm că totul se aliniează corespunzător pe ambele axe */
+		max-width: 100%;
+		display: flex;
+		flex-direction: column;
+		align-items: center;  /* Centrează elementele pe axa verticală */
+		justify-content: center;  /* Centrează elementele pe axa orizontală */
+		height: 100vh;  /* Asigură că zona are înălțimea completă a ecranului pentru aliniere verticală */
+	}
+
+}
+

@@ -41,5 +41,10 @@
 				padding: 5px 10px;
 			}
 		}
+		@media (max-width: 768px) {
+			.navbar-menu {
+			  display: none;
+			}
+		  }
 	}
 }

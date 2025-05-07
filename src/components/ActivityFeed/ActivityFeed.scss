@@ -64,4 +64,66 @@
 		font-size: 0.9rem;
 		font-style: italic;
 	}
+
+	@media (max-width: 768px) {
+		padding: 0.5rem;
+
+		&__card {
+			padding: 0.8rem;
+			width: 80%;
+			margin: 0.5rem 0;
+			min-height: 200px;
+			max-width: 400px;
+			margin: 0.3rem auto;
+			
+		}
+
+		&__title {
+			font-size: 1.2rem;
+			display: flex;
+			justify-content: center; 
+		}
+
+		&__last-online {
+			font-size: 0.8rem;
+		}
+	}
+}
+
+.toggle-button {
+	width: 100%;
+	padding: 0.6rem 2rem;
+	box-sizing: border-box;
+
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	gap: 0.5rem;
+
+	background: var(--background);
+	color: var(--text-primary);
+	border: 1px solid var(--border-color);
+	border-radius: 12px;
+	cursor: pointer;
+	transition: all 0.3s ease;
+	font-size: 0.95rem;
+	font-weight: 500;
+	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+	margin: 1rem auto;
+
+	.icon {
+		font-size: 1.2rem;
+	}
+
+	&:hover {
+		box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+		transform: translateY(-1px);
+	}
+
+	@media (max-width: 768px) {
+		padding: 0.6rem 1.5rem;
+		font-size: 0.85rem;
+		max-width: 200px;
+		width: auto;
+	}
 }
