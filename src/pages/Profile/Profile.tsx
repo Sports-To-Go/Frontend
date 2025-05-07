@@ -15,8 +15,8 @@ const Profile = () => {
 			<div className="profile-page">
 				<div className="profile-sidebar">
 					<UserCard />
-					{/* <ProfileActions /> */}
-					<ProfileActionsExternal />
+					<ProfileActions />
+					{/* <ProfileActionsExternal */}
 					<UserInterests />
 					<UserBio />
 				</div>

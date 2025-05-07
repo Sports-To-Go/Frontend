@@ -1,4 +1,4 @@
-.report-modal-overlay {
+.delete-profile-modal-overlay {
 	position: fixed;
 	top: 0;
 	left: 0;
@@ -12,14 +12,13 @@
 	z-index: 100;
 }
 
-.report-modal {
+.delete-profile-modal {
 	background-color: var(--background);
 	padding: 1.5rem;
 	border-radius: 12px;
 	box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
 	width: 400px;
 	max-width: 90%;
-	height: auto;
 	text-align: center;
 	display: flex;
 	flex-direction: column;
@@ -29,22 +28,23 @@
 	&__title {
 		font-size: 1.2rem;
 		font-weight: 600;
-		color: var(--text-primary);
+		color: var(--admin-text-red);
 	}
 
-	&__textarea {
+	&__message {
+		color: var(--text-secondary);
+		font-size: 0.95rem;
+	}
+
+	&__input {
 		width: 100%;
-		min-height: 120px;
-		padding: 12px 16px;
+		box-sizing: border-box;
+		padding: 0.5rem 0.75rem;
 		border: 1px solid var(--border-color);
 		border-radius: 8px;
-		font-size: 0.95rem;
-		font-family: inherit;
-		resize: none;
-		box-sizing: border-box;
-
 		background-color: var(--background);
 		color: var(--text-primary);
+		font-size: 0.95rem;
 
 		&:focus {
 			outline: none;
@@ -60,10 +60,10 @@
 
 	&__button {
 		padding: 0.5rem 1rem;
-		border: none;
 		border-radius: 8px;
 		font-weight: 500;
 		cursor: pointer;
+		border: none;
 		transition: background-color 0.3s ease;
 
 		&.cancel {
@@ -76,12 +76,12 @@
 			}
 		}
 
-		&.send {
-			background-color: var(--button-green);
+		&.delete {
+			background-color: var(--admin-text-red);
 			color: white;
 
 			&:hover {
-				background-color: #138994;
+				background-color: #c0392b;
 			}
 		}
 	}
