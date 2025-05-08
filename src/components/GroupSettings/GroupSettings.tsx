@@ -1,18 +1,37 @@
 import React, { useState } from 'react'
-import './GroupSettingsModal.scss'
+import './GroupSettings.scss'
 import ThemeButtons from './ThemeButtons'
+import { useAuth } from '../../context/UserContext'
 
-interface GroupSettingsModalProps {
-	groupMembers: string[]
+interface GroupMember {
+	displayName: string
+	id: string
+	role: string
+}
+
+interface JoinRequest {
+	id: string
+	displayName: string
+	motivation: string
+}
+
+interface GroupSettingsProps {
+	groupMembers: GroupMember[]
+	joinRequests: JoinRequest[]
+	handleJoinRequest: (id: string, accepted: boolean) => void
 	onClose: () => void
 	onThemeChange: (theme: string) => void
 	onLeave: () => void
 }
 
-const GroupSettingsModal: React.FC<GroupSettingsModalProps> = ({
+
+
+const GroupSettings: React.FC<GroupSettingsProps> = ({
 	groupMembers,
 	onClose,
 	onThemeChange,
+	joinRequests,
+	handleJoinRequest,
 	onLeave,
 }) => {
 	const [isMembersModalOpen, setIsMembersModalOpen] = useState(false)
@@ -20,6 +39,7 @@ const GroupSettingsModal: React.FC<GroupSettingsModalProps> = ({
 	const [activeModal, setActiveModal] = useState<string | null>(null)
 	const [searchQuery, setSearchQuery] = useState('')
 	const [isConfirmingLeave, setIsConfirmingLeave] = useState(false)
+
 	const closeModal = () => {
 		setActiveModal(null)
 		setIsMembersModalOpen(false)
@@ -29,11 +49,23 @@ const GroupSettingsModal: React.FC<GroupSettingsModalProps> = ({
 
 	const handleLeaveChat = async () => {
 		if (!isConfirmingLeave) {
-			setIsConfirmingLeave(true) // First click: show confirmation
+			setIsConfirmingLeave(true)
 		} else {
 			onLeave()
 		}
 	}
+
+	const sortedMembers = [...groupMembers].sort((a, b) => {
+		const roleOrder: Record<string, number> = {
+			admin: 0,
+			co_admin: 1,
+			member: 2,
+		}
+		return roleOrder[a.role] - roleOrder[b.role]
+	})
+
+	const {user} = useAuth();
+	const isMember = groupMembers.find((member: GroupMember) => {return member.id == user?.uid || ''})
 
 	return (
 		<div className="modal-overlay" onClick={onClose}>
@@ -50,6 +82,16 @@ const GroupSettingsModal: React.FC<GroupSettingsModalProps> = ({
 							</span>
 						</div>
 					</div>
+
+					{/* Join Requests Section */}
+					{!isMember && <div className="section">
+						<h4>Requests</h4>
+						<div className="action-buttons">
+							<span className="modal-button" onClick={() => setActiveModal('Join Requests')}>
+								See Join Requests
+							</span>
+						</div>
+					</div>}
 
 					{/* Customization Section */}
 					<div className="section">
@@ -115,23 +157,13 @@ const GroupSettingsModal: React.FC<GroupSettingsModalProps> = ({
 					<div className="modal fade-in" onClick={e => e.stopPropagation()}>
 						<h3>Group Members</h3>
 						<ul>
-							{groupMembers.map((member, index) => (
-								<li key={index}>{member}</li>
+							{sortedMembers.map((member, index) => (
+								<li key={index} className={`${member.role}`}>
+									{member.displayName}{' '}
+									{member.role !== 'member' && <span>({member.role})</span>}
+								</li>
 							))}
 						</ul>
-						<span className="close-members-modal" onClick={closeModal}>
-							Close
-						</span>
-					</div>
-				</div>
-			)}
-
-			{/* Theme Modal */}
-			{isThemeModalOpen && (
-				<div className="members-modal" onClick={closeModal}>
-					<div className="modal fade-in" onClick={e => e.stopPropagation()}>
-						<h3>Select a Theme</h3>
-						<ThemeButtons onThemeChange={onThemeChange} />
 						<span className="close-members-modal" onClick={closeModal}>
 							Close
 						</span>
@@ -155,9 +187,53 @@ const GroupSettingsModal: React.FC<GroupSettingsModalProps> = ({
 								/>
 								<p>Search results for "{searchQuery}" to be added.</p>
 							</div>
+						) : activeModal === 'Join Requests' ? (
+							joinRequests.length > 0 ? (
+								<ul>
+									{joinRequests.map((request, index) => (
+										<li key={index} className="join-request">
+											<strong>{request.displayName}</strong>
+											{request.motivation && <p>Motivation: {request.motivation}</p>}
+											<div className="action-buttons">
+												<button
+													className="accept-button"
+													onClick={() =>
+														handleJoinRequest(request.id, true)
+													}
+												>
+													Accept
+												</button>
+												<button
+													className="decline-button"
+													onClick={() =>
+														handleJoinRequest(request.id, false)
+													}
+												>
+													Decline
+												</button>
+											</div>
+										</li>
+									))}
+								</ul>
+							) : (
+								<p>No join requests at the moment.</p>
+							)
 						) : (
 							<p>Content for "{activeModal}" to be added.</p>
 						)}
+						<span className="close-members-modal" onClick={closeModal}>
+							Close
+						</span>
+					</div>
+				</div>
+			)}
+
+			{/* Theme Modal */}
+			{isThemeModalOpen && (
+				<div className="members-modal" onClick={closeModal}>
+					<div className="modal fade-in" onClick={e => e.stopPropagation()}>
+						<h3>Select a Theme</h3>
+						<ThemeButtons onThemeChange={onThemeChange} />
 						<span className="close-members-modal" onClick={closeModal}>
 							Close
 						</span>
@@ -168,4 +244,4 @@ const GroupSettingsModal: React.FC<GroupSettingsModalProps> = ({
 	)
 }
 
-export default GroupSettingsModal
+export default GroupSettings

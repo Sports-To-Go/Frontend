@@ -1,4 +1,4 @@
-import { useState, FC, useEffect, SetStateAction } from 'react'
+import { useState, FC, useEffect, SetStateAction, useRef } from 'react'
 import './Social.scss'
 import Layout from '../../components/Layout/Layout'
 import GroupPreview from '../../components/GroupPreview/GroupPreview'
@@ -18,30 +18,35 @@ interface GroupPreview {
 	members: number
 }
 
-const fetchChatPreviews = async (setChatPreviews: {
-	(value: SetStateAction<GroupPreview[]>): void
-	(arg0: any): void
-}) => {
+const fetchGroupPreviews = async (
+	setGroupPreviews: {
+		(value: SetStateAction<GroupPreview[]>): void
+		(arg0: any): void
+	},
+	RequestURL: string,
+) => {
 	try {
 		const currentUser = auth?.currentUser
 		const token = await currentUser?.getIdToken()
 
-		const response = await axios.get(`http://${BACKEND_URL}/social/chat-previews`, {
+		const response = await axios.get(RequestURL, {
 			headers: {
 				Authorization: `Bearer ${token}`,
 			},
 		})
 
+		console.log(response.data)
+
 		const previews = response.data.map((item: any) => ({
 			groupID: item.id,
 			name: item.name,
-			description: item.lastMessageContent ?? '',
+			description: item.description ?? '',
 			image: 'https://dashboard.codeparrot.ai/api/image/Z_T76IDi91IKZZrg/image.png',
 			isOnline: true,
 			members: item.memberCount,
 		}))
 
-		setChatPreviews(previews)
+		setGroupPreviews(previews)
 	} catch (err) {
 		console.error('Error fetching chat previews: ' + err)
 	}
@@ -55,8 +60,9 @@ const Social: FC = () => {
 	const [isMobile, setIsMobile] = useState(window.innerWidth <= 768)
 
 	const [chatPreviews, setChatPreviews] = useState<GroupPreview[]>([])
+	const [recommendations, setRecommendations] = useState<GroupPreview[]>([])
 
-	const handleCreateGroup = async (name : string, description: string, photo: File | null) => {
+	const handleCreateGroup = async (name: string, description: string, photo: File | null) => {
 		if (!name.trim()) {
 			alert('Group name is required')
 			return
@@ -68,7 +74,7 @@ const Social: FC = () => {
 
 			const response = await axios.post(
 				`http://${BACKEND_URL}/social/group`,
-				{ name: name}, //image: newGroupImage },
+				{ name: name, description: description }, //image: photo },
 				{ headers: { Authorization: `Bearer ${token}` } },
 			)
 
@@ -79,7 +85,7 @@ const Social: FC = () => {
 				description: '',
 				image: 'https://dashboard.codeparrot.ai/api/image/Z_T76IDi91IKZZrg/image.png',
 				isOnline: true,
-				members: 1
+				members: 1,
 			}
 
 			setChatPreviews([...chatPreviews, newPreview])
@@ -88,56 +94,50 @@ const Social: FC = () => {
 		}
 	}
 
-	const handleLeaveGroup = async (groupID: number) => {	
+	const handleLeaveGroup = async (groupID: number) => {
 		try {
 			const currentUser = auth?.currentUser
 			const token = await currentUser?.getIdToken()
-	
+
 			await axios.delete(`http://${BACKEND_URL}/social/group/${groupID}`, {
 				headers: {
 					Authorization: `Bearer ${token}`,
 				},
 			})
-	
+
 			// Remove the group from the chatPreviews list
 			setChatPreviews(prev => prev.filter(group => group.groupID !== groupID))
-			
+
 			// Close the chat view
 			setSelectedGroup(null)
-			
-			alert('You have left the group.')
 		} catch (err) {
 			console.error('Error leaving the group:', err)
-			alert('Failed to leave the group')
 		}
 	}
-	
+
+	const hasFetched = useRef(false)
 
 	useEffect(() => {
 		const handleResize = () => {
 			setIsMobile(window.innerWidth <= 768)
 		}
 		window.addEventListener('resize', handleResize)
-		fetchChatPreviews(setChatPreviews)
+
+		if (!hasFetched.current) {
+			fetchGroupPreviews(setChatPreviews, `http://${BACKEND_URL}/social/chat-previews`)
+			fetchGroupPreviews(setRecommendations, `http://${BACKEND_URL}/social/recommended-groups`)
+			hasFetched.current = true
+		}
 
 		return () => window.removeEventListener('resize', handleResize)
 	}, [])
 
-	const lookForGroupsPreviews = Array.from({ length: 10 }, (_, index) => ({
-		groupID: 0,
-		name: `LookForGroup ${index + 1}`,
-		description: `Description for group ${index + 1}`,
-		image: 'https://dashboard.codeparrot.ai/api/image/Z_T76IDi91IKZZrg/image.png',
-		isOnline: true,
-		members: 8,
-	}))
-
-	const groupPreviews = activeTab === 'myGroups' ? chatPreviews : lookForGroupsPreviews
+	const groupPreviews = activeTab === 'myGroups' ? chatPreviews : recommendations
 
 	const filteredGroupPreviews = groupPreviews.filter(
 		preview =>
 			preview.name.toLowerCase().includes(search.toLowerCase()) ||
-			preview.description.toLowerCase().includes(search.toLowerCase())
+			preview.description.toLowerCase().includes(search.toLowerCase()),
 	)
 
 	const handleGroupClick = (group: GroupPreview) => {
@@ -207,9 +207,9 @@ const Social: FC = () => {
 				<div className="social-right-container">
 					{selectedGroup ? (
 						activeTab === 'myGroups' ? (
-							<GroupChat 
-								groupID={selectedGroup.groupID} 
-								onBack={handleBack} 
+							<GroupChat
+								groupID={selectedGroup.groupID}
+								onBack={handleBack}
 								onLeave={() => handleLeaveGroup(selectedGroup.groupID)}
 							/>
 						) : (
@@ -220,10 +220,11 @@ const Social: FC = () => {
 								members={selectedGroup.members}
 								isOnline={selectedGroup.isOnline}
 								onBack={handleBack}
+								groupID={selectedGroup.groupID}
 							/>
 						)
 					) : showGroupForm ? (
-						<GroupForm onClose={handleBack} createGroup={handleCreateGroup}/>
+						<GroupForm onClose={handleBack} createGroup={handleCreateGroup} />
 					) : (
 						<div className="add-group-placeholder">
 							<div className="add-group-button" onClick={() => setShowGroupForm(true)}>
