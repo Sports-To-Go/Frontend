@@ -47,17 +47,16 @@ const AddLocationPage: React.FC<{}> = () => {
 
 		if (distance > 50) {
 			try {
-			  const newAddress = await reverseGeocode(coords.lat, coords.lng)
-			  if (newAddress) {
-				setAddress(newAddress)
-			  }
+				const newAddress = await reverseGeocode(coords.lat, coords.lng)
+				if (newAddress) {
+					setAddress(newAddress)
+				}
 			} catch (err) {
-			  console.error("reverseGeocode failed:", err)
+				console.error('reverseGeocode failed:', err)
 			}
-		  
+
 			setInitialCoords(coords)
-		  }
-		  
+		}
 
 		setLat(coords.lat)
 		setLng(coords.lng)
@@ -132,15 +131,6 @@ const AddLocationPage: React.FC<{}> = () => {
 			newErrors.images = 'At least one photo is required'
 		}
 
-		// Check if the time is valid
-		const [sh, sm] = startTime.split(':').map(Number)
-		const [eh, em] = endTime.split(':').map(Number)
-		const startMinutes = sh * 60 + sm
-		const endMinutes = eh * 60 + em
-		if (endMinutes <= startMinutes) {
-			newErrors.time = 'End time must be after start time'
-		}
-
 		setErrors(newErrors)
 		// If there are errors, return false
 		return Object.keys(newErrors).length === 0
@@ -152,50 +142,47 @@ const AddLocationPage: React.FC<{}> = () => {
 			return next
 		})
 
-		const handleSubmit = async (e: React.FormEvent) => {
-			e.preventDefault()
+	const handleSubmit = async (e: React.FormEvent) => {
+		e.preventDefault()
 
-			console.log("current address", address)
-			
-			if (!validate()) return
-		  
-			const payload = {
-			  name: courtName,
-			  address,
-			  longitude: lng,
-			  latitude: lat,
-			  createdBy: 17,
-			  description,
-			  sport,
-			  calendarId: 'cID',
-			  hourlyRate: parseFloat(price),
-			  openingTime: startTime,
-			  closingTime: endTime
-			}
-		  
-			try {
-			  const response = await fetch('http://localhost:8081/locations', {
+		if (!validate()) return
+
+		const payload = {
+			name: courtName,
+			address,
+			longitude: lng,
+			latitude: lat,
+			createdBy: "17",
+			description,
+			sport,
+			calendarId: 'cID',
+			hourlyRate: parseFloat(price),
+			openingTime: startTime,
+			closingTime: endTime,
+		}
+
+		try {
+			console.log('payload', payload);
+			const response = await fetch('http://localhost:8081/locations', {
 				method: 'POST',
 				headers: {
-				  'Content-Type': 'application/json'
+					'Content-Type': 'application/json',
 				},
-				body: JSON.stringify(payload)
-			  })
-		  
-			  if (!response.ok) {
+				body: JSON.stringify(payload),
+			})
+
+			if (!response.ok) {
 				throw new Error('Failed to submit')
-			  }
-		  
-			  toast.success('Court added successfully!')
-			  setTimeout(() => {
-				navigate('/locations')
-			  }, 3000)
-			} catch (error) {
-			  console.error('Error submitting form:', error)
 			}
-		  }
-		  
-		  
+
+			toast.success('Court added successfully!')
+			setTimeout(() => {
+				navigate('/locations')
+			}, 3000)
+		} catch (error) {
+			console.error('Error submitting form:', error)
+		}
+	}
 
 	return (
 		<Layout>

@@ -1,0 +1,145 @@
+.filter-bar-container {
+	position: relative;
+	background-color: #ffffff;
+	z-index: 0; /* În fundal */
+	overflow: visible; /* Permite bordurilor să fie vizibile */
+}
+
+.filter-bar {
+	display: flex;
+	z-index: 0;
+	align-items: center;
+	justify-content: center; /* Centrează iconițele și butoanele */
+	gap: 2rem; /* Spațiu între elemente */
+	margin: 0 auto;
+
+	.arrow-button {
+		background: none;
+		border: none;
+		font-size: 2rem; /* Dimensiune mai mare pentru vizibilitate */
+		cursor: pointer;
+		color: #05c69d;
+		transition: color 0.2s ease-in-out;
+		display: flex;
+		align-items: center; /* Aliniere verticală pentru săgeți */
+		justify-content: center;
+
+		&:hover {
+			color: #038f72;
+		}
+	}
+
+	.sports-icons {
+		display: flex;
+		gap: 2.5rem; /* Spațiu între iconițe */
+		overflow-x: auto;
+		scrollbar-width: none;
+		-ms-overflow-style: none;
+
+		&::-webkit-scrollbar {
+			display: none;
+		}
+
+		.sport-icon {
+			position: relative;
+			background: none;
+			border: 4px solid transparent; /* Fără bordură implicită, dar rezervăm spațiu */
+			border-radius: 50%; /* Asigură un cerc perfect */
+			width: 70px; /* Dimensiune fixă a iconiței */
+			height: 70px;
+			font-size: 2rem;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			cursor: pointer;
+			transition:
+				border-color 0.3s ease-in-out,
+				box-shadow 0.3s ease-in-out;
+			box-sizing: border-box; /* Include bordura în dimensiunea totală */
+
+			/* Bordura apare doar la hover */
+			&:hover {
+				border-color: #05c69d; /* Bordură verde la hover */
+				box-shadow: 0 0 8px rgba(5, 198, 157, 0.5); /* Efect subtil de strălucire */
+			}
+
+			&.active {
+				border-color: #038f72; /* Bordură verde pentru iconița activă */
+				background-color: rgba(5, 198, 157, 0.15); /* Fundal verde deschis */
+				box-shadow: 0 0 16px rgba(5, 198, 157, 0.8); /* Strălucire mai intensă */
+			}
+		}
+	}
+
+	.filters-button {
+		background-color: #05c69d;
+		color: white;
+		border: none;
+		border-radius: 999px; /* Buton rotund */
+		padding: 0.8rem 2rem; /* Dimensiune ajustată pentru echilibru */
+		font-size: 1.2rem; /* Text ușor mai mare */
+		cursor: pointer;
+		transition: background-color 0.2s ease-in-out;
+
+		&:hover {
+			background-color: #038f72;
+		}
+	}
+}
+
+.filters-menu {
+	position: fixed;
+	top: 10%;
+	right: 2%;
+	width: 300px;
+	background: white;
+	border-radius: 1rem;
+	box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+	padding: 1rem;
+	z-index: 10; /* Meniul apare deasupra barei */
+
+	.close-button {
+		background: none;
+		border: none;
+		font-size: 1.5rem;
+		font-weight: bold;
+		color: #333;
+		position: absolute;
+		top: 0.5rem;
+		right: 0.5rem;
+		cursor: pointer;
+		transition: color 0.2s ease-in-out;
+
+		&:hover {
+			color: #ff5e5e;
+		}
+	}
+
+	h3 {
+		margin-bottom: 1rem;
+		color: #333;
+	}
+
+	.filters-options {
+		display: flex;
+		flex-direction: column;
+		gap: 1rem;
+
+		div {
+			p {
+				margin-bottom: 0.5rem;
+				font-size: 0.9rem;
+				color: #555;
+			}
+
+			select,
+			input {
+				width: 100%;
+				padding: 0.5rem;
+				border: 1px solid #ccc;
+				border-radius: 0.5rem;
+				font-size: 1rem;
+			}
+		}
+	}
+}

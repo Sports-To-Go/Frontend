@@ -32,21 +32,21 @@ type SportOption = {
 
 const sports: SportOption[] = [
 	{ label: 'Select a sport', value: '', icon: <></> },
-	{ label: 'Football', value: 'football', icon: <img src={footballIcon} alt="football" /> },
+	{ label: 'Football', value: 'Football', icon: <img src={footballIcon} alt="football" /> },
 	{
 		label: 'Basketball',
-		value: 'basketball',
+		value: 'Basketball',
 		icon: <img src={basketballIcon} alt="basketball" />,
 	},
 	{
 		label: 'Volleyball',
-		value: 'volleyball',
+		value: 'Volleyball',
 		icon: <img src={volleyballIcon} alt="volleyball" />,
 	},
-	{ label: 'Tennis', value: 'tennis', icon: <img src={tennisIcon} alt="tennis" /> },
+	{ label: 'Tennis', value: 'Tennis', icon: <img src={tennisIcon} alt="tennis" /> },
 	{
 		label: 'Table Tennis',
-		value: 'table-tennis',
+		value: 'Table_Tennis',
 		icon: <img src={tableTennisIcon} alt="table tennis" />,
 	},
 ]
