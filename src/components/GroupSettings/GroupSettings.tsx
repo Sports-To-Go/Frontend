@@ -65,7 +65,7 @@ const GroupSettings: React.FC<GroupSettingsProps> = ({
 	})
 
 	const {user} = useAuth();
-	const isMember = groupMembers.find((member: GroupMember) => {return member.id == user?.uid || ''})
+	const isMember = groupMembers.find((member: GroupMember) => {return member.id == user?.uid || ''})?.role == 'member'
 
 	return (
 		<div className="modal-overlay" onClick={onClose}>
