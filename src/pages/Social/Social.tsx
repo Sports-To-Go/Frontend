@@ -158,13 +158,19 @@ const Social: FC = () => {
 						<div className="upper-message-preview">
 							<div className="tabs">
 								<div
-									onClick={() => setActiveTab('myGroups')}
+									onClick={() => {
+										setActiveTab('myGroups')
+										setSelectedGroup(null)
+									}}
 									className={`tab ${activeTab === 'myGroups' ? 'active' : ''}`}
 								>
 									My Groups
 								</div>
 								<div
-									onClick={() => setActiveTab('lookForGroups')}
+									onClick={() => {
+										setActiveTab('lookForGroups')
+										setSelectedGroup(null)
+									}}
 									className={`tab ${activeTab === 'lookForGroups' ? 'active' : ''}`}
 								>
 									Look for Groups
