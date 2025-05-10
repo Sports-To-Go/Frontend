@@ -1,5 +1,8 @@
 import React from 'react'
 import './GroupDetails.scss'
+import { auth } from '../../firebase/firebase'
+import axios from 'axios'
+import { BACKEND_URL } from '../../../integration-config'
 
 interface GroupDetailsProps {
 	image: string
@@ -7,6 +10,7 @@ interface GroupDetailsProps {
 	description: string
 	members: number
 	isOnline: boolean
+	groupID: number
 	onBack: () => void
 }
 
@@ -16,10 +20,26 @@ const GroupDetails: React.FC<GroupDetailsProps> = ({
 	description,
 	members,
 	isOnline,
+	groupID,
 	onBack,
 }) => {
-	const handleApplyClick = () => {
-		alert('Apply button clicked!')
+	const handleApplyClick = async () => {
+		try {
+			const currentUser = auth?.currentUser
+			const token = await currentUser?.getIdToken()
+
+			const response = await axios.post(
+				`http://${BACKEND_URL}/social/join-request/${groupID}`,
+				{},
+				{
+					headers: { Authorization: `Bearer ${token}` },
+				},
+			)
+
+			console.log(response.data)
+		} catch (err) {
+			console.error('Error requesting to join group:', err)
+		}
 	}
 
 	return (

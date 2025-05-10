@@ -3,23 +3,26 @@ import './GroupForm.scss'
 
 interface GroupFormProps {
 	onClose: () => void
+	createGroup: (name: string, description: string, photo: File | null) => void
 }
 
-const GroupForm: FC<GroupFormProps> = ({ onClose }) => {
+const GroupForm: FC<GroupFormProps> = ({ onClose, createGroup }) => {
 	const [name, setName] = useState('')
 	const [description, setDescription] = useState('')
 	const [photo, setPhoto] = useState<File | null>(null)
-
-	const handleSubmit = (e: React.FormEvent) => {
-		e.preventDefault()
-		console.log('New group:', { name, description, photo })
-		onClose()
-	}
 
 	const handlePhotoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		if (e.target.files && e.target.files.length > 0) {
 			setPhoto(e.target.files[0])
 		}
+	}
+
+	const handleSubmit = (e: React.FormEvent) => {
+		e.preventDefault()
+		createGroup(name, description, photo)
+		setName('')
+		setDescription('')
+		setPhoto(null)
 	}
 
 	return (
