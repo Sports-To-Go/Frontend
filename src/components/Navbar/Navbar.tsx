@@ -6,15 +6,16 @@ import { GrHomeRounded, GrLanguage } from 'react-icons/gr'
 import { FaRegSquarePlus } from 'react-icons/fa6'
 import { CiUser, CiMap } from 'react-icons/ci'
 import UserMenu from '../UserMenu/UserMenu'
+import { useNavigate } from 'react-router-dom'
 
 interface NavbarProps {
 	showTabs?: boolean
 }
 
 const Navbar: React.FC<NavbarProps> = ({ showTabs }) => {
-	const [showMenu, setShowMenu] = useState<boolean>(false)
-
+	const [showMenu, setShowMenu] = useState(false)
 	const menuRef = useRef<HTMLDivElement | null>(null)
+	const navigate = useNavigate()
 
 	useEffect(() => {
 		const handleClickOutside = (event: MouseEvent) => {
@@ -22,7 +23,6 @@ const Navbar: React.FC<NavbarProps> = ({ showTabs }) => {
 				setShowMenu(false)
 			}
 		}
-
 		document.addEventListener('mousedown', handleClickOutside)
 		return () => {
 			document.removeEventListener('mousedown', handleClickOutside)
@@ -35,6 +35,7 @@ const Navbar: React.FC<NavbarProps> = ({ showTabs }) => {
 
 	return (
 		<nav className="navbar">
+			{/* Desktop Navbar */}
 			<div className="navbar-container">
 				<Logo />
 				{showTabs && (
@@ -44,17 +45,35 @@ const Navbar: React.FC<NavbarProps> = ({ showTabs }) => {
 						<NavTab icon={<CiMap />} text="See Groups" dest="/social" />
 					</div>
 				)}
-					<div className="navbar-right-container">
-						<GrLanguage />
-
-						<div className="navbar-profile-container" style={{ position: 'relative' }}>
-							<div onClick={toggleMenu}>
-								<CiUser style={{ fontSize: 32 }} cursor={"pointer"} />
-							</div>
-							{showMenu && <UserMenu menuRef={menuRef} />}
-						</div>
+				<div className="navbar-right-container">
+					<GrLanguage />
+					<div className="navbar-profile-container" onClick={toggleMenu} style={{ position: 'relative' }}>
+						<CiUser style={{ fontSize: 32 }} cursor="pointer" />
 					</div>
+				</div>
 			</div>
+
+			{/* Mobile Top Bar */}
+			<div className="navbar-top-mobile">
+				<Logo />
+				<div className="navbar-profile-container" onClick={toggleMenu} style={{ position: 'relative' }}>
+					<CiUser style={{ fontSize: 28 }} cursor="pointer" />
+				</div>
+			</div>
+
+			{/* Mobile Bottom Bar */}
+			<div className="navbar-bottom-mobile">
+				<GrHomeRounded onClick={() => navigate('/locations')} />
+				<FaRegSquarePlus onClick={() => navigate('/add-location')} />
+				<CiMap onClick={() => navigate('/social')} />
+			</div>
+
+			{/* Single UserMenu instance */}
+			{showMenu && (
+				<div className="user-menu-wrapper" ref={menuRef}>
+					<UserMenu menuRef={menuRef} />
+				</div>
+			)}
 		</nav>
 	)
 }
