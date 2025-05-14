@@ -8,6 +8,7 @@ import { auth } from '../../firebase/firebase'
 import { useAuth } from '../../context/UserContext'
 import axios from 'axios'
 import './GroupChat.scss'
+import Loader from '../Loader/Loader'
 
 interface GroupProps {
 	groupID: number
@@ -41,17 +42,19 @@ const GroupChat: FC<GroupProps> = ({ groupID, onBack, onLeave }) => {
 	const [groupName, setGroupName] = useState<string>('Loading...')
 	const [groupMembers, setGroupMembers] = useState<Map<string, GroupMember>>(new Map())
 	const [joinRequests, setJoinRequests] = useState<JoinRequest[]>([])
+	const [isLoading, setIsLoading] = useState(true)
 
 	const [messages, setMessages] = useState<Message[]>([])
 	const [newMessage, setNewMessage] = useState('')
 	const [isGroupSettingsOpen, setIsGroupSettingsOpen] = useState(false)
 	const ws = useRef<WebSocket | null>(null)
 	const [themeGradient, setThemeGradient] = useState<string>(
-		'linear-gradient(to right, #ffffff, #ffffff)',
+		'linear-gradient(to right, var(--background), var(--background))',
 	)
 
 	const fetchGroupData = async (groupID: number) => {
 		try {
+			setIsLoading(true)
 			const currentUser = auth.currentUser
 			const token = await currentUser?.getIdToken(true)
 
@@ -64,48 +67,45 @@ const GroupChat: FC<GroupProps> = ({ groupID, onBack, onLeave }) => {
 			console.log(response.data)
 
 			setGroupName(response.data.name)
-			setGroupMembers(response.data.groupMembers)
-			setGroupMembers(
-				new Map(response.data.groupMembers.map((member: GroupMember) => [member.id, member])),
-			)
+			setGroupMembers(new Map(response.data.groupMembers.map((member: GroupMember) => [member.id, member])))
 			setJoinRequests(response.data.joinRequests || [])
 		} catch (error) {
 			console.log('Error fetching group data: ' + error)
+		} finally {
+			setIsLoading(false)
 		}
 	}
 
-    const handleJoinRequest = async (id: string, accept: boolean) => {
-        try {
-            const currentUser = auth.currentUser
-            const token = await currentUser?.getIdToken(true)
-    
-            const response = await axios.post(`http://${BACKEND_URL}/social/join-requests/handle`, {
-                groupId: groupID,
-                id: id,
-                accepted: accept
-            }, {
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                }
-            })
-    
-            // If request is successful, remove the join request from frontend
-            if (response.status === 200) {
-                if (accept) {
-                    setGroupMembers((prevMembers) => {
-                      const newMembers = new Map(prevMembers);
-                      newMembers.set(response.data.id, response.data);
-                      return newMembers;
-                    });
-                  }
+	const handleJoinRequest = async (id: string, accept: boolean) => {
+		try {
+			const currentUser = auth.currentUser
+			const token = await currentUser?.getIdToken(true)
 
-                setJoinRequests(prevRequests => prevRequests.filter(req => req.id !== id))
-                console.log(`Join request ${accept ? 'accepted' : 'declined'} for user ${id}`)
-            }
-        } catch (error) {
-            console.error(`Error handling join request:`, error)
-        }
-    }
+			const response = await axios.post(`http://${BACKEND_URL}/social/join-requests/handle`, {
+				groupId: groupID,
+				id: id,
+				accepted: accept
+			}, {
+				headers: {
+					Authorization: `Bearer ${token}`,
+				}
+			})
+
+			if (response.status === 200) {
+				if (accept) {
+					setGroupMembers((prevMembers) => {
+						const newMembers = new Map(prevMembers);
+						newMembers.set(response.data.id, response.data);
+						return newMembers;
+					});
+				}
+				setJoinRequests(prevRequests => prevRequests.filter(req => req.id !== id))
+				console.log(`Join request ${accept ? 'accepted' : 'declined'} for user ${id}`)
+			}
+		} catch (error) {
+			console.error(`Error handling join request:`, error)
+		}
+	}
 
 	useEffect(() => {
 		let reconnectAttempts = 0
@@ -204,27 +204,33 @@ const GroupChat: FC<GroupProps> = ({ groupID, onBack, onLeave }) => {
 				backgroundPosition: themeGradient.includes('url(') ? 'center' : 'initial',
 			}}
 		>
-			<ChatHeader
-				groupName={groupName}
-				status="online"
-				onBack={onBack}
-				onOpenSettings={() => setIsGroupSettingsOpen(true)}
-			/>
-			<ChatMessages messages={messages} />
-			<ChatMessageBar
-				newMessage={newMessage}
-				onMessageChange={setNewMessage}
-				onSendMessage={sendMessage}
-			/>
-			{isGroupSettingsOpen && (
-				<GroupSettings
-					groupMembers={[...groupMembers.values()]}
-					joinRequests={joinRequests}
-                    handleJoinRequest={handleJoinRequest}
-					onClose={() => setIsGroupSettingsOpen(false)}
-					onThemeChange={setThemeGradient}
-					onLeave={onLeave}
-				/>
+			{isLoading ? (
+				<Loader />
+			) : (
+				<>
+					<ChatHeader
+						groupName={groupName}
+						status="online"
+						onBack={onBack}
+						onOpenSettings={() => setIsGroupSettingsOpen(true)}
+					/>
+					<ChatMessages messages={messages} />
+					<ChatMessageBar
+						newMessage={newMessage}
+						onMessageChange={setNewMessage}
+						onSendMessage={sendMessage}
+					/>
+					{isGroupSettingsOpen && (
+						<GroupSettings
+							groupMembers={[...groupMembers.values()]}
+							joinRequests={joinRequests}
+							handleJoinRequest={handleJoinRequest}
+							onClose={() => setIsGroupSettingsOpen(false)}
+							onThemeChange={setThemeGradient}
+							onLeave={onLeave}
+						/>
+					)}
+				</>
 			)}
 		</div>
 	)
