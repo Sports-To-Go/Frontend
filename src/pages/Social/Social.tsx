@@ -8,6 +8,7 @@ import axios from 'axios'
 import { BACKEND_URL } from '../../../integration-config'
 import { auth } from '../../firebase/firebase'
 import GroupForm from '../../components/GroupForm/GroupForm'
+import { FaSearch } from 'react-icons/fa';
 
 interface GroupPreview {
 	groupID: number
@@ -178,11 +179,7 @@ const Social: FC = () => {
 							</div>
 
 							<div className="search-bar">
-								<img
-									src="https://figma-alpha-api.s3.us-west-2.amazonaws.com/images/18d59d14-50c4-44d5-9a7d-67e729ab83ba"
-									alt="search"
-									className="search-icon"
-								/>
+								<FaSearch className="search-icon" />
 								<input
 									type="text"
 									placeholder="Search for groups in SportsToGo"
