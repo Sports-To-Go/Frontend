@@ -4,13 +4,20 @@ import { auth } from '../firebase/firebase'
 import { onAuthStateChanged } from 'firebase/auth'
 
 export interface UserData {
-	uid: string
-	email: string | null
-	displayName: string | null
-	photoURL: string | null
-	createdAt: string
-	lastLoginAt: string
-	emailVerified: boolean
+  uid: string
+  email: string | null
+  displayName: string | null
+  photoURL: string | null
+  createdAt: string
+  lastLoginAt: string
+  emailVerified: boolean
+  providerData?: Array<{
+    providerId: string
+    uid: string
+    displayName: string | null
+    email: string | null
+    photoURL: string | null
+  }>
 }
 
 interface AuthContextType {
@@ -29,26 +36,25 @@ export const AuthProvider: FC<{ children: ReactNode }> = ({ children }) => {
 	}
 
 	useEffect(() => {
-		const unsubscribe = onAuthStateChanged(auth, firebaseUser => {
-			if (firebaseUser && user?.emailVerified) {
-				// Restore user data from the authenticated Firebase user
-				const restoredUser: UserData = {
-					uid: firebaseUser.uid,
-					email: firebaseUser.email,
-					displayName: firebaseUser.displayName || null,
-					photoURL: firebaseUser.photoURL || null,
-					createdAt: firebaseUser.metadata.creationTime || '',
-					lastLoginAt: firebaseUser.metadata.lastSignInTime || '',
-					emailVerified: firebaseUser.emailVerified,
-				}
-				setUser(restoredUser)
-			} else {
-				setUser(null)
-			}
-		})
+    const unsubscribe = onAuthStateChanged(auth, firebaseUser => {
+        if (firebaseUser) {
+            const restoredUser: UserData = {
+                uid: firebaseUser.uid,
+                email: firebaseUser.email,
+                displayName: firebaseUser.displayName || null,
+                photoURL: firebaseUser.photoURL || null,
+                createdAt: firebaseUser.metadata.creationTime || '',
+                lastLoginAt: firebaseUser.metadata.lastSignInTime || '',
+                emailVerified: firebaseUser.emailVerified,
+            }
+            setUser(restoredUser)
+        } else {
+            setUser(null)
+        }
+    })
 
-		return () => unsubscribe()
-	}, [])
+    return () => unsubscribe()
+}, [])
 
 	return (
 		<AuthContext.Provider value={{ user, setUser, unsetUser }}>{children}</AuthContext.Provider>
