@@ -1,3 +1,4 @@
+
 import { createContext, useContext, useState, ReactNode, useEffect, FC } from 'react'
 import { auth } from '../firebase/firebase'
 import { onAuthStateChanged } from 'firebase/auth'
@@ -29,7 +30,7 @@ export const AuthProvider: FC<{ children: ReactNode }> = ({ children }) => {
 
 	useEffect(() => {
 		const unsubscribe = onAuthStateChanged(auth, firebaseUser => {
-			if (firebaseUser) {
+			if (firebaseUser && user?.emailVerified) {
 				// Restore user data from the authenticated Firebase user
 				const restoredUser: UserData = {
 					uid: firebaseUser.uid,
