@@ -28,7 +28,7 @@ const ForgotPass: React.FC = () => {
 
 		try {
 			await sendPasswordResetEmail(auth, email);
-			setMessage('Un email de resetare a fost trimis către adresa ta.');
+			setMessage('Dacă adresa există în sistem, vei primi un email de resetare.');
 			setError('');
 			setTimeout(() => {
 				navigate('/login');
