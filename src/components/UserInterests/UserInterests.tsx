@@ -1,14 +1,18 @@
 import './UserInterests.scss'
+interface Props {
+	interests: string[]
+}
 
-const UserInterests = () => {
+const UserInterests = ({ interests }: Props) => {
 	return (
 		<div className="user-interests-container">
 			<div className="user-interests-header">User Interests</div>
 			<div className="user-interests-content">
-				<span className="interest-item">🎾 Football</span>
-				<span className="interest-item">🏀 Basketball</span>
-				<span className="interest-item">🏋️ Gym</span>
-				<span className="interest-item">🧗 Climbing</span>
+				{interests.map((interest, idx) => (
+					<span key={idx} className="interest-item">
+						{interest}
+					</span>
+				))}
 			</div>
 		</div>
 	)

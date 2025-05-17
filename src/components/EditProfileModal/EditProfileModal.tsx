@@ -4,18 +4,32 @@ import DeleteProfileModal from '../DeleteProfileModal/DeleteProfileModal'
 
 interface Props {
 	onClose: () => void
+	description: string
+	setDescription: (desc: string) => void
+	interests: string[]
+	setInterests: (interests: string[]) => void
 }
 
-const EditProfileModal = ({ onClose }: Props) => {
+const EditProfileModal = ({
+	onClose,
+	description,
+	setDescription,
+	interests,
+	setInterests,
+}: Props) => {
 	const [tab, setTab] = useState<'profile' | 'important'>('profile')
 	const [showDeleteModal, setShowDeleteModal] = useState(false)
 
+	const [localDescription, setLocalDescription] = useState(description)
+	const [localInterests, setLocalInterests] = useState<string[]>(interests)
+
 	const sports = ['Football', 'Basketball', 'Gym', 'Climbing', 'Tennis']
-	const [selectedInterests, setSelectedInterests] = useState<string[]>([])
 
 	const toggleInterest = (sport: string) => {
-		setSelectedInterests(prev =>
-			prev.includes(sport) ? prev.filter(s => s !== sport) : [...prev, sport],
+		setLocalInterests(
+			localInterests.includes(sport)
+				? localInterests.filter(s => s !== sport)
+				: [...localInterests, sport],
 		)
 	}
 
@@ -63,8 +77,15 @@ const EditProfileModal = ({ onClose }: Props) => {
 									</label>
 									<label>
 										Description
-										<textarea placeholder="Short description..." />
+										<textarea
+											placeholder="Short description..."
+											value={localDescription}
+											onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) =>
+												setLocalDescription(e.target.value)
+											}
+										/>
 									</label>
+
 									<label>
 										Interests
 										<div className="edit-profile-modal__interests">
@@ -72,7 +93,7 @@ const EditProfileModal = ({ onClose }: Props) => {
 												<div
 													key={sport}
 													className={`edit-profile-modal__interest ${
-														selectedInterests.includes(sport) ? 'selected' : ''
+														localInterests.includes(sport) ? 'selected' : ''
 													}`}
 													onClick={() => toggleInterest(sport)}
 												>
@@ -107,7 +128,17 @@ const EditProfileModal = ({ onClose }: Props) => {
 						</div>
 
 						<div className="edit-profile-modal__footer">
-							<button className="edit-profile-modal__footer-button" onClick={onClose}>
+							<button className="edit-profile-modal__footer-button cancel" onClick={onClose}>
+								Cancel
+							</button>
+							<button
+								className="edit-profile-modal__footer-button"
+								onClick={() => {
+									setDescription(localDescription)
+									setInterests(localInterests)
+									onClose()
+								}}
+							>
 								Apply
 							</button>
 						</div>
