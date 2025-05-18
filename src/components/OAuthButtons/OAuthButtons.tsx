@@ -58,14 +58,14 @@ const OAuthButtons = () => {
 			photoURL: finalPhotoURL,
 			createdAt: user.metadata.creationTime || '',
 			lastLoginAt: user.metadata.lastSignInTime || '',
-			emailVerified: user.emailVerified,
+			emailVerified: true,
 			providerData: user.providerData.map(p => ({
 			providerId: p.providerId,
 			uid: p.uid,
 			displayName: p.displayName,
 			email: p.email,
 			photoURL: p.photoURL
-	}))
+  }))
 };
 
     setUser(userData);
