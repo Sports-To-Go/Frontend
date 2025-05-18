@@ -20,6 +20,7 @@ export interface UserData {
   }>
 }
 
+
 interface AuthContextType {
 	user: UserData | null
 	setUser: (user: UserData | null) => void
@@ -37,16 +38,23 @@ export const AuthProvider: FC<{ children: ReactNode }> = ({ children }) => {
 
 	useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, firebaseUser => {
-        if (firebaseUser) {
+        if (firebaseUser && firebaseUser.emailVerified) {
             const restoredUser: UserData = {
-                uid: firebaseUser.uid,
-                email: firebaseUser.email,
-                displayName: firebaseUser.displayName || null,
-                photoURL: firebaseUser.photoURL || null,
-                createdAt: firebaseUser.metadata.creationTime || '',
-                lastLoginAt: firebaseUser.metadata.lastSignInTime || '',
-                emailVerified: firebaseUser.emailVerified,
-            }
+       	 	uid: firebaseUser.uid,
+        	email: firebaseUser.email,
+        	displayName: firebaseUser.displayName || null,
+        	photoURL: firebaseUser.photoURL || null,
+        	createdAt: firebaseUser.metadata.creationTime || '',
+        	lastLoginAt: firebaseUser.metadata.lastSignInTime || '',
+        	emailVerified: firebaseUser.emailVerified,
+        	providerData: firebaseUser.providerData.map(p => ({
+          	providerId: p.providerId,
+          	uid: p.uid,
+          	displayName: p.displayName,
+          	email: p.email,	
+          	photoURL: p.photoURL
+        }))
+      }
             setUser(restoredUser)
         } else {
             setUser(null)

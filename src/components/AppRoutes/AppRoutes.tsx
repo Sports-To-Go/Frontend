@@ -11,20 +11,19 @@ import Login from '../../pages/Login/Login'
 import ForgotPass from '../../pages/ForgotPass/ForgotPass';
 import VerifyEmail from '../../pages/VerifyEmail/VerifyEmail';
 
+
 const AppRoutes: React.FC = () => {
   const { user } = useAuth();
   const { showVerifyPage } = useEmailVerification();
 
   const isAdmin = false;
-  const isLogged = !!user && (
-    user.emailVerified || 
-    (user.providerData && user.providerData.some(
-      (p: { providerId: string }) => 
-        ['google', 'facebook', 'github'].some(provider => 
-          p.providerId.includes(provider)
-        )
-    ))
-  );
+ const isLogged = !!user && (
+  user.emailVerified || 
+  (user.providerData && user.providerData.some(
+    (p: { providerId: string }) => 
+      ['facebook.com', 'github.com'].includes(p.providerId)
+  ))
+);
 
   const routes = isAdmin ? (
     <>
@@ -53,4 +52,4 @@ const AppRoutes: React.FC = () => {
   return <Routes>{routes}</Routes>;
 };
 
-export default AppRoutes;
+export default AppRoutes
