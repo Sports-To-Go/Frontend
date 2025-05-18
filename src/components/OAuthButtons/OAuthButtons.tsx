@@ -41,6 +41,14 @@ const OAuthButtons = () => {
       }
     }
 
+	if (provider === 'facebook' && providerAccessToken && user.providerData.length) {
+	const facebookProfile = user.providerData.find(p => p.providerId === 'facebook.com');
+		if (facebookProfile) {
+			const facebookUID = facebookProfile.uid;
+			finalPhotoURL = `https://graph.facebook.com/${facebookUID}/picture?type=large&access_token=${providerAccessToken}`;
+		}
+	}
+
     const res = await fetch(`${BACKEND_URL}/users/profile`, {
       method: 'POST',
       headers: {
@@ -60,11 +68,11 @@ const OAuthButtons = () => {
 			lastLoginAt: user.metadata.lastSignInTime || '',
 			emailVerified: true,
 			providerData: user.providerData.map(p => ({
-			providerId: p.providerId,
-			uid: p.uid,
-			displayName: p.displayName,
-			email: p.email,
-			photoURL: p.photoURL
+				providerId: p.providerId,
+				uid: p.uid,
+				displayName: p.displayName,
+				email: p.email,
+				photoURL: p.photoURL
   }))
 };
 
