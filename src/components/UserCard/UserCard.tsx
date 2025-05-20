@@ -4,6 +4,7 @@ import { FaStar } from 'react-icons/fa'
 import { useAuth } from '../../context/UserContext'
 import { FiAlertTriangle } from 'react-icons/fi'
 import ReportModal from '../ReportModal/ReportModal'
+import { useParams } from 'react-router-dom'
 
 import placeholder from '../../assets/profilePhotoPlaceholder.png'
 
@@ -14,6 +15,8 @@ import { BACKEND_URL } from '../../../integration-config'
 
 const UserCard: FC = () => {
 	const { user } = useAuth()
+	const { username } = useParams()
+	const isMyProfile = user?.displayName === username
 	const [description, setDescription] = useState<string>('')
 	const [showReportModal, setShowReportModal] = useState(false)
 
@@ -40,13 +43,15 @@ const UserCard: FC = () => {
 
 	return (
 		<div className="user-card">
-			<button
-				className="report-button"
-				title="Report User"
-				onClick={() => setShowReportModal(true)}
-			>
-				<FiAlertTriangle />
-			</button>
+			{!isMyProfile && (
+				<button
+					className="report-button"
+					title="Report User"
+					onClick={() => setShowReportModal(true)}
+				>
+					<FiAlertTriangle />
+				</button>
+			)}
 
 			<div className="user-card__header">
 				<div className="user-card__avatar">

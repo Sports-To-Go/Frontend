@@ -55,7 +55,10 @@ const UserMenu: FC<UserMenuProps> = ({ menuRef }) => {
 			</div>
 			{!!user ? (
 				<>
-					<div className="user-menu__item" onClick={() => navigate('/profile')}>
+					<div
+						className="user-menu__item"
+						onClick={() => navigate(`/profile/${user?.displayName || ''}`)}
+					>
 						<FiUser style={{ marginRight: '8px' }} />
 						Profile
 					</div>

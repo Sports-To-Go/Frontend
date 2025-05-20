@@ -11,32 +11,48 @@ import Login from '../../pages/Login/Login'
 const AppRoutes: React.FC = () => {
 	const { user } = useAuth()
 
-	const isAdmin: boolean = false
-	const isLogged: boolean = !!user
+	const isAdmin = false
 
-	const routes = isAdmin ? (
-		<>
-			<Route path="/administration" element={<Administration />} />
-			<Route path="*" element={<Navigate to="/administration" replace />} />
-		</>
-	) : (
-		<>
-			<Route path="/social" element={isLogged ? <Social /> : <Navigate to="/login" replace />} />
+	if (user === undefined) {
+		return
+	}
+
+	const isLogged = !!user
+
+	let routes: React.ReactNode = null
+
+	if (isAdmin) {
+		routes = (
+			<>
+				<Route path="/administration" element={<Administration />} />
+				<Route path="*" element={<Navigate to="/administration" replace />} />
+			</>
+		)
+	} else {
+		const loginRoute = (
 			<Route
-				path="/profile"
-				element={isLogged ? <Profile /> : <Navigate to="/login" replace />}
+				path="/login"
+				element={isLogged ? <Navigate to="/locations" replace /> : <Login />}
 			/>
-			<Route
-				path="/add-location"
-				element={isLogged ? <AddLocationPage /> : <Navigate to="/login" replace />}
-			/>
+		)
 
-			{!isLogged && <Route path="/login" element={<Login />} />}
-
-			<Route path="/locations" element={<Locations />} />
-			<Route path="*" element={<Navigate to="/locations" replace />} />
-		</>
-	)
+		routes = isLogged ? (
+			<>
+				{loginRoute}
+				<Route path="/locations" element={<Locations />} />
+				<Route path="/social" element={<Social />} />
+				<Route path="/profile/:username" element={<Profile />} />
+				<Route path="/add-location" element={<AddLocationPage />} />
+				<Route path="*" element={<Navigate to="/locations" replace />} />
+			</>
+		) : (
+			<>
+				{loginRoute}
+				<Route path="/locations" element={<Locations />} />
+				<Route path="*" element={<Navigate to="/login" replace />} />
+			</>
+		)
+	}
 
 	return <Routes>{routes}</Routes>
 }

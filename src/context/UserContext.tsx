@@ -12,7 +12,7 @@ export interface UserData {
 }
 
 interface AuthContextType {
-	user: UserData | null
+	user: UserData | null | undefined
 	setUser: (user: UserData | null) => void
 	unsetUser: () => void
 }
@@ -20,7 +20,7 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | undefined>(undefined)
 
 export const AuthProvider: FC<{ children: ReactNode }> = ({ children }) => {
-	const [user, setUser] = useState<UserData | null>(null)
+	const [user, setUser] = useState<UserData | null | undefined>(undefined)
 
 	const unsetUser = () => {
 		setUser(null)
