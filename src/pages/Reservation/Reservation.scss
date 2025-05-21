@@ -1,0 +1,62 @@
+.reservation-page {
+    padding: 32px;
+    background-color: var(--background);
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  
+  .reservation-card {
+    display: flex;
+    flex-direction: column;
+    max-width: 600px;
+    width: 100%;
+    background-color: #fff;
+    border-radius: 12px;
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+  }
+  
+  .reservation-image {
+    width: 100%;
+    height: 300px;
+    object-fit: cover;
+  }
+  
+  .reservation-details {
+    padding: 24px;
+  }
+  
+  .reservation-details h2 {
+    margin-top: 0;
+    color: var(--text-primary);
+  }
+  
+  .reservation-stars {
+    color: #d65971;
+    margin-bottom: 12px;
+  }
+  
+  .reservation-price {
+    font-weight: bold;
+    color: #007bff;
+    margin-top: 8px;
+  }
+  
+  .reservation-button {
+    margin-top: 24px;
+    background-color: #007bff;
+    color: white;
+    padding: 12px 20px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 1rem;
+    transition: background-color 0.2s ease;
+  }
+  
+  .reservation-button:hover {
+    background-color: #0056b3;
+  }
+  

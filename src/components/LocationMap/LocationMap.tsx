@@ -73,6 +73,7 @@ const LocationMap = ({
 		if (distance > 50) {
 			onAddressSelect({ lat: newLat, lng: newLng })
 			if (onPinMoved) {
+				// console.log("[LocationMap] pin moved")
 				onPinMoved({ lat: newLat, lng: newLng })
 			}
 			lastGeocodedPositionRef.current = { lat: newLat, lng: newLng }
