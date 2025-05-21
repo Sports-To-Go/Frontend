@@ -5,6 +5,8 @@ import axios from 'axios'
 import { auth } from '../../firebase/firebase'
 import { BACKEND_URL } from '../../../integration-config'
 import { useAuth } from '../../context/UserContext'
+import { updateProfile } from 'firebase/auth'
+import { useNavigate } from 'react-router-dom'
 
 interface Props {
 	onClose: () => void
@@ -26,11 +28,16 @@ const EditProfileModal = ({
 	const { user, setUser } = useAuth()
 	const [localDescription, setLocalDescription] = useState(description)
 	const [localInterests, setLocalInterests] = useState<string[]>(interests)
+	const [localDisplayName, setLocalDisplayName] = useState(user?.displayName || '')
+	const navigate = useNavigate()
 
 	useEffect(() => {
 		setLocalDescription(description)
 		setLocalInterests(interests)
 	}, [description, interests])
+	useEffect(() => {
+		setLocalDisplayName(user?.displayName || '')
+	}, [user?.displayName])
 
 	const sports = ['Football', 'Basketball', 'Gym', 'Climbing', 'Tennis']
 
@@ -82,7 +89,12 @@ const EditProfileModal = ({
 
 									<label>
 										Username
-										<input type="text" placeholder="ex: chucknorris123" />
+										<input
+											type="text"
+											placeholder="ex: chucknorris123"
+											value={localDisplayName}
+											onChange={e => setLocalDisplayName(e.target.value)}
+										/>
 									</label>
 									<label>
 										Description
@@ -120,8 +132,9 @@ const EditProfileModal = ({
 									</label>
 									<label>
 										Email
-										<input type="email" placeholder="mock@mock-email.com" />
+										<input type="email" value={user?.email || ''} readOnly />
 									</label>
+
 									<label>
 										Phone
 										<input type="tel" placeholder="0721 325 812" />
@@ -150,11 +163,13 @@ const EditProfileModal = ({
 									try {
 										const token = await auth.currentUser?.getIdToken()
 
+										await updateProfile(auth.currentUser!, {
+											displayName: localDisplayName,
+										})
+
 										const response = await axios.put(
 											`${BACKEND_URL}/users/profile`,
-											{
-												description: localDescription,
-											},
+											{ description: localDescription },
 											{
 												headers: {
 													Authorization: `Bearer ${token}`,
@@ -165,8 +180,11 @@ const EditProfileModal = ({
 										if (user) {
 											setUser({
 												...user,
+												displayName: localDisplayName,
 												description: response.data.description,
 											})
+
+											navigate(`/profile/${user.uid}`)
 										}
 									} catch (err) {
 										console.error('Failed to update user profile:', err)

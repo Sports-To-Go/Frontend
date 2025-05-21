@@ -15,7 +15,7 @@ import EditProfileModal from '../../components/EditProfileModal/EditProfileModal
 import './Profile.scss'
 
 const Profile = () => {
-	const { username } = useParams()
+	const { uid } = useParams()
 	const { user } = useAuth()
 
 	const [description, setDescription] = useState(user?.description || '')
@@ -23,7 +23,7 @@ const Profile = () => {
 
 	const [isEditModalOpen, setEditModalOpen] = useState(false)
 
-	const isMyProfile = user?.displayName === username
+	const isMyProfile = user?.uid === uid
 
 	return (
 		<Layout>
@@ -34,7 +34,7 @@ const Profile = () => {
 					{isMyProfile ? (
 						<ProfileActions
 							onEditClick={() => setEditModalOpen(true)}
-							username={username || ''}
+							username={uid || ''}
 						/>
 					) : (
 						<ProfileActionsExternal />

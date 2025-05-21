@@ -45,7 +45,7 @@ const AppRoutes: React.FC = () => {
 				{loginRoute}
 				<Route path="/locations" element={<Locations />} />
 				<Route path="/social" element={<Social />} />
-				<Route path="/profile/:username" element={<Profile />} />
+				<Route path="/profile/:uid" element={<Profile />} />
 				<Route path="/add-location" element={<AddLocationPage />} />
 				<Route path="*" element={<Navigate to="/locations" replace />} />
 			</>

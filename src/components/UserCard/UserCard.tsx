@@ -10,8 +10,8 @@ import placeholder from '../../assets/profilePhotoPlaceholder.png'
 
 const UserCard: FC = () => {
 	const { user } = useAuth()
-	const { username } = useParams()
-	const isMyProfile = user?.displayName === username
+	const { uid } = useParams()
+	const isMyProfile = user?.uid === uid
 	const [showReportModal, setShowReportModal] = useState(false)
 
 	return (

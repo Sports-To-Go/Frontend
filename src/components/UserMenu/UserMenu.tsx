@@ -53,11 +53,11 @@ const UserMenu: FC<UserMenuProps> = ({ menuRef }) => {
 				</label>
 				<span className="toggle-label">Toggle theme</span>
 			</div>
-			{!!user ? (
+			{user ? (
 				<>
 					<div
 						className="user-menu__item"
-						onClick={() => navigate(`/profile/${user?.displayName || ''}`)}
+						onClick={() => navigate(`/profile/${user?.uid || ''}`)}
 					>
 						<FiUser style={{ marginRight: '8px' }} />
 						Profile
