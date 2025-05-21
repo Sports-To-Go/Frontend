@@ -1,8 +1,9 @@
-import React from 'react'
+import React, { useState } from 'react'
 import './GroupDetails.scss'
 import { auth } from '../../firebase/firebase'
 import axios from 'axios'
 import { BACKEND_URL } from '../../../integration-config'
+import Loader from '../Loader/Loader'
 
 interface GroupDetailsProps {
 	image: string
@@ -23,8 +24,11 @@ const GroupDetails: React.FC<GroupDetailsProps> = ({
 	groupID,
 	onBack,
 }) => {
+	const [isLoading, setIsLoading] = useState(false)
+
 	const handleApplyClick = async () => {
 		try {
+			setIsLoading(true)
 			const currentUser = auth?.currentUser
 			const token = await currentUser?.getIdToken()
 
@@ -39,11 +43,15 @@ const GroupDetails: React.FC<GroupDetailsProps> = ({
 			console.log(response.data)
 		} catch (err) {
 			console.error('Error requesting to join group:', err)
+		} finally {
+			setIsLoading(false)
 		}
 	}
 
 	return (
 		<div className="group-details">
+			{isLoading && <Loader />}
+
 			<button className="back-button" onClick={onBack}>
 				Back
 			</button>
