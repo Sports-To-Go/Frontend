@@ -1,4 +1,4 @@
-import { useState, useEffect, FC } from 'react'
+import { useState, FC } from 'react'
 import './UserCard.scss'
 import { FaStar } from 'react-icons/fa'
 import { useAuth } from '../../context/UserContext'
@@ -8,38 +8,11 @@ import { useParams } from 'react-router-dom'
 
 import placeholder from '../../assets/profilePhotoPlaceholder.png'
 
-import axios from 'axios'
-import { auth } from '../../firebase/firebase'
-
-import { BACKEND_URL } from '../../../integration-config'
-
 const UserCard: FC = () => {
 	const { user } = useAuth()
 	const { username } = useParams()
 	const isMyProfile = user?.displayName === username
-	const [description, setDescription] = useState<string>('')
 	const [showReportModal, setShowReportModal] = useState(false)
-
-	useEffect(() => {
-		const fetchUserData = async () => {
-			try {
-				const currentUser = auth.currentUser
-				const token = await currentUser?.getIdToken()
-
-				const response = await axios.get(`${BACKEND_URL}/users/profile`, {
-					headers: {
-						Authorization: `Bearer ${token}`,
-					},
-				})
-
-				setDescription(response.data.description)
-			} catch (error) {
-				console.error('Error fetching user description:', error)
-			}
-		}
-
-		fetchUserData()
-	}, [user])
 
 	return (
 		<div className="user-card">
@@ -66,10 +39,6 @@ const UserCard: FC = () => {
 						))}
 					</div>
 				</div>
-			</div>
-
-			<div className="badge-toggle">
-				<span className="toggle-label">{description}</span>
 			</div>
 
 			{showReportModal && (

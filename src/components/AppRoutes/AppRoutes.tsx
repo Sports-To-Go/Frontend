@@ -9,7 +9,11 @@ import Social from '../../pages/Social/Social'
 import Login from '../../pages/Login/Login'
 
 const AppRoutes: React.FC = () => {
-	const { user } = useAuth()
+	const { user, loading } = useAuth()
+	
+	if (loading) {
+		return null
+	}
 
 	const isAdmin = false
 

@@ -18,8 +18,9 @@ const Profile = () => {
 	const { username } = useParams()
 	const { user } = useAuth()
 
-	const [description, setDescription] = useState('This is a default bio.')
-	const [interests, setInterests] = useState<string[]>(['Football', 'Basketball'])
+	const [description, setDescription] = useState(user?.description || '')
+	const [interests, setInterests] = useState<string[]>([]) // dacă o să le adaugi ulterior
+
 	const [isEditModalOpen, setEditModalOpen] = useState(false)
 
 	const isMyProfile = user?.displayName === username
@@ -40,7 +41,7 @@ const Profile = () => {
 					)}
 
 					<UserInterests interests={interests} />
-					<UserBio description={description} />
+					<UserBio />
 				</div>
 
 				<div className="profile-main">

@@ -1,6 +1,10 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import './EditProfileModal.scss'
 import DeleteProfileModal from '../DeleteProfileModal/DeleteProfileModal'
+import axios from 'axios'
+import { auth } from '../../firebase/firebase'
+import { BACKEND_URL } from '../../../integration-config'
+import { useAuth } from '../../context/UserContext'
 
 interface Props {
 	onClose: () => void
@@ -19,9 +23,14 @@ const EditProfileModal = ({
 }: Props) => {
 	const [tab, setTab] = useState<'profile' | 'important'>('profile')
 	const [showDeleteModal, setShowDeleteModal] = useState(false)
-
+	const { user, setUser } = useAuth()
 	const [localDescription, setLocalDescription] = useState(description)
 	const [localInterests, setLocalInterests] = useState<string[]>(interests)
+
+	useEffect(() => {
+		setLocalDescription(description)
+		setLocalInterests(interests)
+	}, [description, interests])
 
 	const sports = ['Football', 'Basketball', 'Gym', 'Climbing', 'Tennis']
 
@@ -133,10 +142,35 @@ const EditProfileModal = ({
 							</button>
 							<button
 								className="edit-profile-modal__footer-button"
-								onClick={() => {
+								onClick={async () => {
 									setDescription(localDescription)
 									setInterests(localInterests)
 									onClose()
+
+									try {
+										const token = await auth.currentUser?.getIdToken()
+
+										const response = await axios.put(
+											`${BACKEND_URL}/users/profile`,
+											{
+												description: localDescription,
+											},
+											{
+												headers: {
+													Authorization: `Bearer ${token}`,
+												},
+											},
+										)
+
+										if (user) {
+											setUser({
+												...user,
+												description: response.data.description,
+											})
+										}
+									} catch (err) {
+										console.error('Failed to update user profile:', err)
+									}
 								}}
 							>
 								Apply
