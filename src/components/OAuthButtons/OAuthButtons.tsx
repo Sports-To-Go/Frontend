@@ -3,8 +3,8 @@ import { loginWithProvider } from './OAuthProviders'
 import { useAuth } from '../../context/UserContext'
 import { useNavigate } from 'react-router-dom'
 import { BACKEND_URL } from '../../../integration-config'
-import { auth } from '../../firebase/firebase'
-import { signOut } from 'firebase/auth'
+import { auth} from '../../firebase/firebase'
+import { signOut , updateProfile} from 'firebase/auth'
 
 const OAuthButtons = () => {
   const { setUser, unsetUser } = useAuth()
@@ -32,6 +32,12 @@ const OAuthButtons = () => {
           
           finalDisplayName = githubData.name || githubData.login;
           finalPhotoURL = githubData.avatar_url || user.photoURL;
+
+          await updateProfile(auth.currentUser!, {
+            displayName: finalDisplayName,
+            photoURL: finalPhotoURL
+          });
+  
         } else {
           console.warn('GitHub API response not OK:', await githubResponse.text());
         }
@@ -46,6 +52,11 @@ const OAuthButtons = () => {
 		if (facebookProfile) {
 			const facebookUID = facebookProfile.uid;
 			finalPhotoURL = `https://graph.facebook.com/${facebookUID}/picture?type=large&access_token=${providerAccessToken}`;
+
+      await updateProfile(auth.currentUser!, {
+          photoURL: finalPhotoURL
+      });
+
 		}
 	}
 

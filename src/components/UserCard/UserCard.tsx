@@ -11,7 +11,7 @@ import { auth } from '../../firebase/firebase'
 
 import { BACKEND_URL } from '../../../integration-config'
 
-const UserCard: FC = () => {
+const UserCard: FC = () => {	
 	const { user } = useAuth()
 
 	const [description, setDescription] = useState<string>('')
