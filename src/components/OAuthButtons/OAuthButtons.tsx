@@ -10,6 +10,7 @@ const OAuthButtons = () => {
   const { setUser, unsetUser } = useAuth()
   const navigate = useNavigate()
 
+//NU TE ATINGE DE ACEASTA FUNCTIE SAU CRAPA!
  const handleOAuthLogin = async (provider: 'google' | 'facebook' | 'github') => {
   try {
     const { user, token, providerAccessToken } = await loginWithProvider(provider);
