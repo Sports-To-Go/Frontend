@@ -1,0 +1,9 @@
+.bugs-container {
+	width: 100%;
+	height: 375px;
+	overflow-y: scroll;
+	display: flex;
+	flex-direction: column;
+	gap: 10px;
+	padding-left: 10px;
+}

@@ -8,9 +8,13 @@ import StatCard from '../../components/StatCards/StatCards'
 import AdminTab from '../../components/AdminTabs/AdminTab'
 import { LineChart } from '@mui/x-charts/LineChart'
 import AdminError from '../AdminError/AdminError'
+import { auth } from '../../firebase/firebase'
+import Bugs from '../../components/Bugs/Bugs'
 
 export const Administration: React.FC = () => {
 	const [isMobile, setIsMobile] = useState(window.innerWidth < 1000)
+	//const currentUser = auth?.currentUser
+	//const token = currentUser?.getIdToken()
 
 	useEffect(() => {
 		const handleResize = () => {
@@ -81,12 +85,8 @@ export const Administration: React.FC = () => {
 						<div style={{ width: '90%' }}>
 							<h2>Manage {manageTitle}</h2>
 						</div>
-						{manageTitle !== 'Analytics' ? (
-							<AdminTable
-								header={tableHeadersMap[manageTitle]}
-								rows={tableDataMap[manageTitle]}
-							/>
-						) : (
+
+						{manageTitle === 'Analytics' ? (
 							<LineChart
 								xAxis={[
 									{
@@ -118,6 +118,13 @@ export const Administration: React.FC = () => {
 								]}
 								height={350}
 								width={800}
+							/>
+						) : manageTitle === 'Bugs' ? (
+							<Bugs />
+						) : (
+							<AdminTable
+								header={tableHeadersMap[manageTitle]}
+								rows={tableDataMap[manageTitle]}
 							/>
 						)}
 					</div>
