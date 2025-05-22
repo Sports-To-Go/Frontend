@@ -2,6 +2,7 @@ import React, { useState } from 'react'
 import './GroupSettings.scss'
 import ThemeButtons from './ThemeButtons'
 import { useAuth } from '../../context/UserContext'
+import { useSocial } from '../../context/SocialContext'
 
 interface GroupMember {
 	displayName: string
@@ -21,10 +22,8 @@ interface GroupSettingsProps {
 	handleJoinRequest: (id: string, accepted: boolean) => void
 	onClose: () => void
 	onThemeChange: (theme: string) => void
-	onLeave: () => void
+	groupID: number
 }
-
-
 
 const GroupSettings: React.FC<GroupSettingsProps> = ({
 	groupMembers,
@@ -32,13 +31,15 @@ const GroupSettings: React.FC<GroupSettingsProps> = ({
 	onThemeChange,
 	joinRequests,
 	handleJoinRequest,
-	onLeave,
+	groupID,
 }) => {
 	const [isMembersModalOpen, setIsMembersModalOpen] = useState(false)
 	const [isThemeModalOpen, setIsThemeModalOpen] = useState(false)
 	const [activeModal, setActiveModal] = useState<string | null>(null)
 	const [searchQuery, setSearchQuery] = useState('')
 	const [isConfirmingLeave, setIsConfirmingLeave] = useState(false)
+
+	const { leaveGroup } = useSocial()
 
 	const closeModal = () => {
 		setActiveModal(null)
@@ -51,7 +52,7 @@ const GroupSettings: React.FC<GroupSettingsProps> = ({
 		if (!isConfirmingLeave) {
 			setIsConfirmingLeave(true)
 		} else {
-			onLeave()
+			leaveGroup(groupID)
 		}
 	}
 
@@ -64,8 +65,11 @@ const GroupSettings: React.FC<GroupSettingsProps> = ({
 		return roleOrder[a.role] - roleOrder[b.role]
 	})
 
-	const {user} = useAuth();
-	const isMember = groupMembers.find((member: GroupMember) => {return member.id == user?.uid || ''})?.role == 'member'
+	const { user } = useAuth()
+	const isMember =
+		groupMembers.find((member: GroupMember) => {
+			return member.id == user?.uid || ''
+		})?.role == 'member'
 
 	return (
 		<div className="modal-overlay" onClick={onClose}>
@@ -84,14 +88,19 @@ const GroupSettings: React.FC<GroupSettingsProps> = ({
 					</div>
 
 					{/* Join Requests Section */}
-					{!isMember && <div className="section">
-						<h4>Requests</h4>
-						<div className="action-buttons">
-							<span className="modal-button" onClick={() => setActiveModal('Join Requests')}>
-								See Join Requests
-							</span>
+					{!isMember && (
+						<div className="section">
+							<h4>Requests</h4>
+							<div className="action-buttons">
+								<span
+									className="modal-button"
+									onClick={() => setActiveModal('Join Requests')}
+								>
+									See Join Requests
+								</span>
+							</div>
 						</div>
-					</div>}
+					)}
 
 					{/* Customization Section */}
 					<div className="section">
@@ -197,17 +206,13 @@ const GroupSettings: React.FC<GroupSettingsProps> = ({
 											<div className="action-buttons">
 												<button
 													className="accept-button"
-													onClick={() =>
-														handleJoinRequest(request.id, true)
-													}
+													onClick={() => handleJoinRequest(request.id, true)}
 												>
 													Accept
 												</button>
 												<button
 													className="decline-button"
-													onClick={() =>
-														handleJoinRequest(request.id, false)
-													}
+													onClick={() => handleJoinRequest(request.id, false)}
 												>
 													Decline
 												</button>
