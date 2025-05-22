@@ -7,3 +7,33 @@
 	gap: 10px;
 	padding-left: 10px;
 }
+
+.bugs-container--loading {
+	width: 100%;
+	height: 375px;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+
+	.circle {
+		border: 8px solid var(--table-status);
+		border-radius: 50%;
+		height: 50px;
+		aspect-ratio: 1/1;
+		border-bottom-color: transparent;
+		animation: loading 1s linear infinite;
+	}
+}
+
+@keyframes loading {
+	0% {
+		transform: rotate(0deg);
+	}
+
+	60% {
+		transform: rotate(280deg);
+	}
+	100% {
+		transform: rotate(360deg);
+	}
+}

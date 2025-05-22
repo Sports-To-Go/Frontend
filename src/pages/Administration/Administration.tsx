@@ -4,17 +4,14 @@ import './Administration.scss'
 import AdminTable from '../../components/AdminTable/AdminTable'
 import { groups, tableData, users } from '../../assets/dummy-data'
 import '../../components/StatCards/StatCards.scss'
-import {StatCard} from '../../components/StatCards/StatCards'
+import StatCardsContainer from '../../components/StatCards/StatCards'
 import AdminTab from '../../components/AdminTabs/AdminTab'
 import { LineChart } from '@mui/x-charts/LineChart'
 import AdminError from '../AdminError/AdminError'
-import { auth } from '../../firebase/firebase'
 import Bugs from '../../components/Bugs/Bugs'
 
 export const Administration: React.FC = () => {
 	const [isMobile, setIsMobile] = useState(window.innerWidth < 1000)
-	//const currentUser = auth?.currentUser
-	//const token = currentUser?.getIdToken()
 
 	useEffect(() => {
 		const handleResize = () => {
@@ -41,13 +38,6 @@ export const Administration: React.FC = () => {
 		Bugs: [],
 	}
 	const [manageTitle, setManageTitle] = useState('Venues')
-	const cards = [
-		{ id: 'bookings', title: 'Total', subtitle: 'Bookings', value: '367' },
-		{ id: 'venues', title: 'Active', subtitle: 'Venues', value: '10' },
-		{ id: 'new-users', title: 'New', subtitle: 'Users', value: '14' },
-		{ id: 'total-users', title: 'Total', subtitle: 'Users', value: '1.340' },
-		{ id: 'revenue', title: 'Revenue', subtitle: 'This Month', value: '$2.786' },
-	]
 
 	if (isMobile) {
 		return <AdminError />
@@ -58,16 +48,7 @@ export const Administration: React.FC = () => {
 			<div className="administration--container">
 				<h2>Admin dashboard</h2>
 				<div className="admin-cards--container">
-					<div className="stats-grid">
-						{cards.map(card => (
-							<StatCard
-								key={card.id}
-								title={card.title}
-								subtitle={card.subtitle}
-								value={card.value}
-							/>
-						))}
-					</div>
+					<StatCardsContainer />
 				</div>
 				<div className="manage--container">
 					<div className="admin-tabs--container">

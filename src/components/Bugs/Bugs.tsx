@@ -9,12 +9,17 @@ interface BugInfoProps {
 	title: string
 	reportedBy: string
 	description: string
-	reportDate: Date
+	reportedTime: Date
 	id: number
 }
 
 const Bugs: React.FC = () => {
 	const [bugs, setBugs] = useState<BugInfoProps[]>([])
+	const [isLoading, setIsLoading] = useState(true)
+
+	const removeBug = (id: number) => {
+		setBugs(bugs.filter(bug => bug.id !== id))
+	}
 
 	useEffect(() => {
 		const fetchBugs = async () => {
@@ -33,11 +38,20 @@ const Bugs: React.FC = () => {
 				setBugs(response.data)
 			} catch (error) {
 				console.error('Error fetching bugs:', error)
+			} finally {
+				setIsLoading(false)
 			}
 		}
 
 		fetchBugs()
 	}, [])
+
+	if (isLoading)
+		return (
+			<div className="bugs-container--loading">
+				<div className="circle"></div>
+			</div>
+		)
 
 	return (
 		<div className="bugs-container">
@@ -47,9 +61,10 @@ const Bugs: React.FC = () => {
 						key={bug.id}
 						id={bug.id}
 						title={bug.title}
-						reportDate={bug.reportDate}
+						reportedTime={bug.reportedTime}
 						reportedBy={bug.reportedBy}
 						description={bug.description}
+						removeBug={removeBug}
 					/>
 				))
 			) : (
