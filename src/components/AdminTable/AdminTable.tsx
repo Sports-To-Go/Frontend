@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import './AdminTable.scss'
 import { FaChevronDown } from 'react-icons/fa'
+import ReportDetailModal from '../ReportDetailModal/ReportDetailModal'
 
 export interface adminTableRow {
 	image: { url: string; alt: string }
@@ -17,6 +18,8 @@ interface adminTableProps {
 }
 
 const AdminTable: React.FC<adminTableProps> = ({ header, rows }) => {
+	const [showModal, setShowModal] = useState(false)
+
 	const minBookings = 0
 	const maxBookings = 100
 	const getBookingColor = (value: number): string => {
@@ -26,13 +29,18 @@ const AdminTable: React.FC<adminTableProps> = ({ header, rows }) => {
 		return `rgb(${red}, ${green}, 100)`
 	}
 
-	const [openActions, setOpenActions] = useState<number | null>(null)
-	const toggleActions = (index: number) => {
-		setOpenActions(openActions === index ? null : index)
+	const openModal = () => {
+		setShowModal(true)
+	}
+
+	const closeModal = () => {
+		setShowModal(false)
 	}
 
 	return (
 		<div className="admin-table-wrapper">
+			{showModal && <ReportDetailModal name={'Misu'} close={closeModal} />}
+
 			<table>
 				<thead>
 					<tr>
@@ -62,14 +70,8 @@ const AdminTable: React.FC<adminTableProps> = ({ header, rows }) => {
 								<div style={{ position: 'relative' }}>
 									<FaChevronDown
 										style={{ cursor: 'pointer' }}
-										onClick={() => toggleActions(index)}
+										onClick={() => openModal()}
 									/>
-									{openActions === index && (
-										<div className="action-buttons">
-											<button className="action-btn">Suspend</button>
-											<button className="action-btn">Reject</button>
-										</div>
-									)}
 								</div>
 							</td>
 						</tr>
