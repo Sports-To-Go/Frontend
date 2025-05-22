@@ -11,6 +11,7 @@ import { useEffect, useState } from 'react'
 import { auth } from '../../firebase/firebase'
 import { BACKEND_URL } from '../../../integration-config'
 import axios from 'axios'
+import FAQPage from '../../pages/FAQ/FAQ'
 
 const AppRoutes: React.FC = () => {
 	const { user } = useAuth()
@@ -53,6 +54,7 @@ const AppRoutes: React.FC = () => {
 	const routes = isAdmin ? (
 		<>
 			<Route path="/administration" element={<Administration />} />
+			<Route path="/faq" element={<FAQPage />} />
 			<Route path="*" element={<Navigate to="/administration" replace />} />
 		</>
 	) : (
@@ -72,6 +74,7 @@ const AppRoutes: React.FC = () => {
 				path="/add-location"
 				element={isLogged ? <AddLocationPage /> : <Navigate to="/login" replace />}
 			/>
+			<Route path="/faq" element={<FAQPage />} />
 
 			{!isLogged && <Route path="/login" element={<Login />} />}
 
