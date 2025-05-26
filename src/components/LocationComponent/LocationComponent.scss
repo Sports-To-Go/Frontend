@@ -1,73 +1,76 @@
 .location-box {
-  border-radius: 12px;
-  background-color: var(--background);
-  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
-  overflow: hidden;
-  padding: 0;
-  margin: 12px;
-  width: 100%;
-  height: 450px;
-  display: flex;
-  flex-direction: column;
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+	border-radius: 12px;
+	background-color: var(--background);
+	box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+	overflow: hidden;
+	padding: 0;
+	margin: 12px;
+	width: 100%;
+	height: 450px;
+	display: flex;
+	flex-direction: column;
+	transition:
+		transform 0.2s ease,
+		box-shadow 0.2s ease;
 
-  &:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
-  }
+	&:hover {
+		transform: translateY(-4px);
+		box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
+	}
 
-  .location-image-container {
-    height: 50%;
-    width: 100%;
-    overflow: hidden;
-  }
+	.location-image-container {
+		height: 50%;
+		width: 100%;
+		overflow: hidden;
+	}
 
-  .location-header-image {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-  }
+	.location-header-image {
+		width: 100%;
+		height: 100%;
+		object-fit: cover;
+	}
 
-  .location-content {
-    padding: 16px;
-    height: 50%;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-  }
+	.location-content {
+		padding: 16px;
+		height: 50%;
+		display: flex;
+		flex-direction: column;
+		justify-content: space-between;
+		position: relative;
+	}
 
-  .location-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 4px;
-  }
+	.location-header {
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		margin-bottom: 4px;
+	}
 
-  .location-title {
-    font-size: 1.2rem;
-    font-weight: bold;
-    color: var(--text-primary);
-    margin-bottom: 4px;
-  }
+	.location-title {
+		font-size: 1.2rem;
+		font-weight: bold;
+		color: var(--text-primary);
+		margin-bottom: 4px;
+	}
 
-  .location-stars {
-    font-size: 1rem;
-    color: #D65971;
-  }
+	.location-stars {
+		font-size: 1rem;
+		color: #d65971;
+	}
 
-  .location-description {
-    font-size: 0.9rem;
-    color: var(--text-secondary);
-    margin-bottom: 16px;
-    flex-grow: 1;
-  }
+	.location-description {
+		font-size: 0.9rem;
+		color: var(--text-secondary);
+		margin-bottom: 16px;
+		flex-grow: 1;
+	}
 
-  .location-price {
-    font-size: 1rem;
-    font-weight: bold;
-    color: #007bff;
-    position: absolute;
-    bottom: 16px;
-    right: 16px;
-  }
+	.location-price {
+		font-size: 1rem;
+		font-weight: bold;
+		color: #007bff;
+		position: absolute;
+		bottom: 16px;
+		right: 16px;
+	}
 }
