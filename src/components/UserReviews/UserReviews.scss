@@ -111,3 +111,14 @@
 		}
 	}
 }
+@media (max-width: 600px) {
+	.user-reviews {
+		padding-bottom: 50px;
+	}
+	.user-reviews__card {
+		width: 90%;
+	}
+	.user-reviews__title {
+		text-align: center;
+	}
+}

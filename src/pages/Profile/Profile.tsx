@@ -19,7 +19,7 @@ const Profile = () => {
 	const { user } = useAuth()
 
 	const [description, setDescription] = useState(user?.description || '')
-	const [interests, setInterests] = useState<string[]>([]) // dacă o să le adaugi ulterior
+	const [interests, setInterests] = useState<string[]>([])
 
 	const [isEditModalOpen, setEditModalOpen] = useState(false)
 

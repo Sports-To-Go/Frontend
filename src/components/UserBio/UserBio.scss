@@ -10,7 +10,7 @@
 	transition: all 0.3s ease;
 	overflow: hidden;
 
-	height: 280px;
+	height: 187px;
 	display: flex;
 	flex-direction: column;
 	align-items: center;
@@ -52,5 +52,20 @@
 
 	&::-webkit-scrollbar-track {
 		background: transparent;
+	}
+}
+
+
+
+@media screen and (max-width: 768px) {
+	.user-interests-container,
+	.user-bio-container {
+		width: 100%;
+		max-width: 385px;
+		min-width: unset;
+		margin: 0 auto;
+		box-sizing: border-box;
+		padding-left: 1px;
+		padding-right: 1px;
 	}
 }

@@ -25,3 +25,43 @@
 	display: flex;
 	flex-direction: column;
 }
+
+@media screen and (max-width: 768px) {
+	.profile-page {
+	  flex-direction: column;
+	  align-items: center;
+	  padding: 1rem 0;
+	}
+  
+	.profile-sidebar,
+	.profile-main {
+	  width: 100%;
+	  padding: 0;
+	  margin: 0;
+	  display: flex;
+	  flex-direction: column;
+	  align-items: center;
+	}
+  
+	.profile-sidebar > *,
+	.profile-main > *,
+	.user-profile-card,
+	.user-interests-container,
+	.user-bio-container,
+	.activity-section,
+	.user-reviews-section {
+	  width: calc(100% - 2px);     
+	  max-width: 385px;            
+	  margin-left: auto;
+	  margin-right: auto;
+	  box-sizing: border-box;
+	}
+  
+	
+	.activity-section > *,
+	.user-reviews-section > * {
+	  width: 100%;
+	  box-sizing: border-box;
+	}
+  }
+  
