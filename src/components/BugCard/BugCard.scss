@@ -1,12 +1,11 @@
 .bug-card--info {
-	width: 100%;
-	border: 2px solid gray;
-	display: flex;
-	flex-direction: column;
-	padding: 5px;
-	border-radius: 5px;
-	box-sizing: border-box;
-	box-shadow: 8px 5px 5px black;
+	background-color: var(--background-green);
+	border: 1px solid var(--border-color);
+	border-radius: 12px;
+	padding: 10px;
+	text-align: left;
+	transition: box-shadow 0.2s ease;
+	box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
 
 	button {
 		border: 2px solid gray;

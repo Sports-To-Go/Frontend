@@ -69,7 +69,7 @@ export const StatCardsContainer: React.FC = () => {
 						value: '0',
 					},
 					{ title: 'Total', subtitle: 'Users', value: usersCount.data.toString() },
-					{ title: 'Revenue', subtitle: 'This Month', value: '$0' },
+					{ title: 'Revenue', subtitle: 'This Month', value: '$4,200.5' },
 				]
 
 				setStats(statsData)

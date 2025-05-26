@@ -9,8 +9,12 @@ import AdminTab from '../../components/AdminTabs/AdminTab'
 import { LineChart } from '@mui/x-charts/LineChart'
 import AdminError from '../AdminError/AdminError'
 import Bugs from '../../components/Bugs/Bugs'
+import { auth } from '../../firebase/firebase'
+import axios from 'axios'
+import { BACKEND_URL } from '../../../integration-config'
 
 export const Administration: React.FC = () => {
+	const [monthlyRevenue, setMonthlyRevenue] = useState<number[]>([])
 	const [isMobile, setIsMobile] = useState(window.innerWidth < 1000)
 
 	useEffect(() => {
@@ -18,6 +22,36 @@ export const Administration: React.FC = () => {
 			setIsMobile(window.innerWidth < 1000)
 		}
 
+		const getMonthlyRevenue = async () => {
+			const currentUser = auth.currentUser
+			if (!currentUser) return
+
+			try {
+				const token = await currentUser.getIdToken(true)
+				const res = await axios.get(`http://${BACKEND_URL}/admin/revenue/monthly`, {
+					params: {
+						from: '2024-01-01',
+						to: '2024-12-31',
+					},
+					headers: {
+						Authorization: `Bearer ${token}`,
+					},
+				})
+
+				const monthly: number[] = Array(12).fill(0)
+				res.data.forEach((rev: any) => {
+					const month = new Date(rev.periodStart).getMonth()
+					monthly[month] = rev.totalAmount
+				})
+
+				console.log('MONTHLY ARRAY:', monthly)
+				setMonthlyRevenue(monthly)
+			} catch (error) {
+				console.error(error)
+			}
+		}
+
+		getMonthlyRevenue()
 		window.addEventListener('resize', handleResize)
 		return () => window.removeEventListener('resize', handleResize)
 	}, [])
@@ -26,16 +60,12 @@ export const Administration: React.FC = () => {
 		Venues: ['Venue', 'Name', 'Type', 'Status', 'Bookings', 'Ratings'],
 		Users: ['User', 'Name', 'Type', 'Status', 'Reports', 'Rating'],
 		Groups: ['Group', 'Name', 'Type', 'Status', 'Members', 'Created'],
-		Analytics: ['I', 'do_not', 'know'],
-		Bugs: ['Issue', 'Status', 'Reported By', 'Number of reports'],
 	}
 
 	const tableDataMap: { [key: string]: any[] } = {
 		Venues: tableData,
 		Users: users,
 		Groups: groups,
-		Analytics: [],
-		Bugs: [],
 	}
 	const [manageTitle, setManageTitle] = useState('Venues')
 
@@ -91,10 +121,7 @@ export const Administration: React.FC = () => {
 								]}
 								series={[
 									{
-										data: [
-											1200, 550.5, 2100, 800.5, 1601.5, 125.5, 1110, 2000, 1900, 1200,
-											900, 110,
-										],
+										data: monthlyRevenue,
 									},
 								]}
 								height={350}

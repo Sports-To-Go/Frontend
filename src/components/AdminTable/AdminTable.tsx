@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import './AdminTable.scss'
 import { FaChevronDown } from 'react-icons/fa'
 import ReportDetailModal from '../ReportDetailModal/ReportDetailModal'
@@ -19,6 +19,11 @@ interface adminTableProps {
 
 const AdminTable: React.FC<adminTableProps> = ({ header, rows }) => {
 	const [showModal, setShowModal] = useState(false)
+	const [isLoading, setIsLoading] = useState(true)
+
+	useEffect(() => {
+		setTimeout(() => setIsLoading(false), 1500)
+	}, [])
 
 	const minBookings = 0
 	const maxBookings = 100
@@ -36,6 +41,13 @@ const AdminTable: React.FC<adminTableProps> = ({ header, rows }) => {
 	const closeModal = () => {
 		setShowModal(false)
 	}
+
+	if (isLoading)
+		return (
+			<div className="bugs-container--loading">
+				<div className="circle"></div>
+			</div>
+		)
 
 	return (
 		<div className="admin-table-wrapper">
