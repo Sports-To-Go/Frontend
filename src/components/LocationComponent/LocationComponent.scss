@@ -1,7 +1,7 @@
 .location-box {
 	border-radius: 12px;
 	background-color: var(--background);
-	box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+	box-shadow: 0 6px 12px var(--location-shadow);
 	overflow: hidden;
 	padding: 0;
 	margin: 12px;
@@ -12,10 +12,11 @@
 	transition:
 		transform 0.2s ease,
 		box-shadow 0.2s ease;
+	color: var(--text-primary);
 
 	&:hover {
 		transform: translateY(-4px);
-		box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
+		box-shadow: 0 10px 20px var(--location-shadow-hover);
 	}
 
 	.location-image-container {
