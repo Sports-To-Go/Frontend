@@ -18,48 +18,67 @@ interface GroupMessage {
 	senderID: string
 	content: string
 	timestamp: string
+	type: 'TEXT' | 'SYSTEM'
 }
 
 const GroupChat: FC<GroupProps> = ({ groupID, onBack }) => {
 	const [newMessage, setNewMessage] = useState('')
 	const [isGroupSettingsOpen, setIsGroupSettingsOpen] = useState(false)
-	const [groupName, setGroupName] = useState("Loading...")
-	const [groupMessages, setGroupMessages] = useState<GroupMessage[]>([])
+	const [groupName, setGroupName] = useState('Loading...')
 	const [groupMembers, setGroupMembers] = useState<Map<string, any>>(new Map())
 	const [joinRequests, setJoinRequests] = useState<any[]>([])
+	const [loadingHistory, setLoadingHistory] = useState(false)
 
 	const {
 		state: { messages, members, selectedGroup },
 		sendMessage,
+		loadMessageHistory,
 	} = useSocial()
+
+	const rawMessages = selectedGroup ? messages.get(selectedGroup.id) || [] : []
+
+	// Get the earliest timestamp from the current messages
+	const earliestTimestamp = rawMessages.length > 0 ? rawMessages[0].timestamp : null
+
+	const groupMessages: GroupMessage[] = rawMessages.map((msg: Message) => ({
+		id: msg.id,
+		senderID: msg.senderID,
+		senderName: members.get(msg.senderID)?.displayName || 'Unknown User',
+		content: msg.content,
+		timestamp: msg.timestamp,
+		type: msg.type || 'TEXT',
+	}))
 
 	useEffect(() => {
 		if (selectedGroup) {
 			setGroupName(selectedGroup.name)
-			
-			// Get messages for this group and convert to GroupMessage format
-			const rawMessages = messages.get(selectedGroup.id) || []
-			const formattedMessages: GroupMessage[] = rawMessages.map((msg: Message) => ({
-				id: msg.id,
-				senderID: msg.senderID,
-				senderName: members.get(msg.senderID)?.displayName || 'Unknown User',
-				content: msg.content,
-				timestamp: msg.timestamp
-			}))
-			
-			setGroupMessages(formattedMessages)
+			const currentMessages = messages.get(selectedGroup.id) || []
+			if (currentMessages.length === 0) {
+				loadMessageHistory(selectedGroup.id, new Date().toISOString().replace('Z', ''))
+			}
 		}
-	}, [selectedGroup, messages, members])
+	}, [selectedGroup])
 
 	const handleSendMessage = () => {
 		if (!newMessage.trim()) return
-		
+
 		sendMessage(newMessage)
 		setNewMessage('')
 	}
 
+	const handleLoadMore = async () => {
+		if (!selectedGroup || loadingHistory) return
+
+		const oldest = groupMessages[0]?.timestamp
+		if (!oldest) return
+
+		setLoadingHistory(true)
+		await loadMessageHistory(selectedGroup.id, oldest.replace('Z', ''))
+		setLoadingHistory(false)
+	}
+
 	const [themeGradient, setThemeGradient] = useState<string>(
-		'linear-gradient(to right, #ffffff, #ffffff)',
+		'linear-gradient(to right, var(--background), var(--background))',
 	)
 
 	return (
@@ -77,7 +96,12 @@ const GroupChat: FC<GroupProps> = ({ groupID, onBack }) => {
 				onBack={onBack}
 				onOpenSettings={() => setIsGroupSettingsOpen(true)}
 			/>
-			<ChatMessages messages={groupMessages} />
+			<ChatMessages
+				messages={groupMessages}
+				onTopReached={handleLoadMore}
+				loadingTop={loadingHistory}
+			/>
+
 			<ChatMessageBar
 				newMessage={newMessage}
 				onMessageChange={setNewMessage}

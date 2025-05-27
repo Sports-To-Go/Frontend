@@ -6,12 +6,15 @@ import ChatPreview from '../../components/ChatPreview/ChatPreview'
 import GroupChat from '../../components/GroupChat/GroupChat'
 import GroupDetails from '../../components/GroupDetails/GroupDetails'
 import GroupForm from '../../components/GroupForm/GroupForm'
+import Spinner from '../../components/Spinner/Spinner'
+import { CiSearch } from 'react-icons/ci'
 
 const SocialContent: FC = () => {
 	const [activeTab, setActiveTab] = useState<'myGroups' | 'lookForGroups'>('myGroups')
 	const [search, setSearch] = useState('')
 	const [isMobile, setIsMobile] = useState(window.innerWidth <= 768)
 	const [showGroupForm, setShowGroupForm] = useState(false)
+	const [isLoading, setIsLoading] = useState<boolean>(true)
 
 	const {
 		state: { groups, recommendations, selectedGroup, members },
@@ -27,10 +30,16 @@ const SocialContent: FC = () => {
 		}
 		window.addEventListener('resize', handleResize)
 
-		if (!mounted.current) {
-			connectSocial()
-			mounted.current = true
+		const init = async () => {
+			if (!mounted.current) {
+				setIsLoading(true)
+				await connectSocial()
+				setIsLoading(false)
+				mounted.current = true
+			}
 		}
+
+		init()
 
 		return () => window.removeEventListener('resize', handleResize)
 	}, [])
@@ -54,13 +63,13 @@ const SocialContent: FC = () => {
 			// For recommendations, always show description
 			return group.description
 		}
-		
+
 		// For myGroups, show last message if it exists, otherwise show description
 		if (group.lastMessage) {
 			const senderName = members.get(group.lastMessage.senderID)?.displayName || 'Unknown'
 			return `${senderName}: ${group.lastMessage.content}`
 		}
-		
+
 		return group.description
 	}
 
@@ -69,59 +78,61 @@ const SocialContent: FC = () => {
 			<div className="social-container">
 				<div className="social-left-container">
 					{(!isMobile || (isMobile && !selectedGroup && !showGroupForm)) && (
-						<div className="upper-message-preview">
-							<div className="tabs">
-								<div
-									onClick={() => {
-										setActiveTab('myGroups')
-										selectGroup(null)
-									}}
-									className={`tab ${activeTab === 'myGroups' ? 'active' : ''}`}
-								>
-									My Groups
+						<>
+							<div className="upper-message-preview">
+								<div className="tabs">
+									<div
+										onClick={() => {
+											setActiveTab('myGroups')
+											selectGroup(null)
+										}}
+										className={`tab ${activeTab === 'myGroups' ? 'active' : ''}`}
+									>
+										My Groups
+									</div>
+									<div
+										onClick={() => {
+											setActiveTab('lookForGroups')
+											selectGroup(null)
+										}}
+										className={`tab ${activeTab === 'lookForGroups' ? 'active' : ''}`}
+									>
+										Look for Groups
+									</div>
 								</div>
-								<div
-									onClick={() => {
-										setActiveTab('lookForGroups')
-										selectGroup(null)
-									}}
-									className={`tab ${activeTab === 'lookForGroups' ? 'active' : ''}`}
-								>
-									Look for Groups
+
+								<div className="search-bar">
+									<CiSearch className="search-icon"/>
+									<input
+										type="text"
+										placeholder="Search for groups in SportsToGo"
+										className="search-input"
+										value={search}
+										onChange={e => setSearch(e.target.value)}
+									/>
 								</div>
 							</div>
 
-							<div className="search-bar">
-								<img
-									src="https://figma-alpha-api.s3.us-west-2.amazonaws.com/images/18d59d14-50c4-44d5-9a7d-67e729ab83ba"
-									alt="search"
-									className="search-icon"
-								/>
-								<input
-									type="text"
-									placeholder="Search for groups in SportsToGo"
-									className="search-input"
-									value={search}
-									onChange={e => setSearch(e.target.value)}
-								/>
-							</div>
-
-							<ul className="message-list">
-								{filteredGroupPreviews.map((preview, index) => {
-									return (
-										<ChatPreview
-											key={index}
-											name={preview.name}
-											image={''}
-											isOnline={true}
-											description={getPreviewText(preview)}
-											members={preview.memberCount || 0}
-											onClick={() => selectGroup(preview)}
-										/>
-									)
-								})}
-							</ul>
-						</div>
+							{isLoading ? (
+								<Spinner />
+							) : (
+								<ul className="message-list">
+									{filteredGroupPreviews.map((preview) => {
+										return (
+											<ChatPreview
+												key={preview.id}
+												name={preview.name}
+												image={''}
+												isOnline={true}
+												description={getPreviewText(preview)}
+												members={preview.memberCount || 0}
+												onClick={() => selectGroup(preview)}
+											/>
+										)
+									})}
+								</ul>
+							)}
+						</>
 					)}
 				</div>
 

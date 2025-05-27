@@ -1,7 +1,27 @@
 .chat-container {
+    position: relative;
+    overflow: hidden;
     min-width: auto;
     flex: 1;
     display: flex;
     flex-direction: column;
     background-color: var(--background);
+    height: 100vh; 
+    overflow: hidden; 
 }
+
+.chat-header {
+    flex-shrink: 0; 
+}
+
+.chat-messages {
+    flex: 1;
+    overflow-y: auto;
+    padding: 10px; 
+    display: flex;
+    flex-direction: column;
+}
+
+.chat-message-bar {
+    flex-shrink: 0; 
+} 

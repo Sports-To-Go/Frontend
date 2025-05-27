@@ -1,5 +1,4 @@
 import { createContext, useContext, FC, ReactNode, useReducer, useRef } from 'react'
-import { useAuth } from './UserContext'
 import { auth } from '../firebase/firebase'
 import { BACKEND_URL } from '../../integration-config'
 import axios from 'axios'
@@ -29,7 +28,7 @@ export interface Message {
 	groupID: number
 	content: string
 	timestamp: string
-	// type: string
+	type: 'TEXT' | 'SYSTEM' // | 'IMAGE'
 }
 
 export interface GroupData extends GroupPreview {
@@ -55,7 +54,8 @@ interface SocialContextType {
 	joinGroup: (groupID: number) => {}
 	leaveGroup: (groupID: number) => {}
 	createGroup: (name: string, description: string) => {}
-    sendMessage: (content: string) => void
+	sendMessage: (content: string) => void
+	loadMessageHistory: (groupID: number, before: string) => void
 }
 
 type SocialAction =
@@ -66,6 +66,7 @@ type SocialAction =
 	| { type: 'CREATE_GROUP'; payload: GroupData }
 	| { type: 'ADD_MESSAGE'; payload: Message }
 	| { type: 'SET_MEMBERS'; payload: Map<string, GroupMember> }
+	| { type: 'PREPEND_MESSAGES'; payload: { groupID: number; messages: Message[] } }
 
 const initialState: SocialState = {
 	recommendations: [],
@@ -106,7 +107,7 @@ const socialReducer = (state: SocialState, action: SocialAction): SocialState =>
 			if (groupIndex !== -1) {
 				const updatedGroups = [...state.groups]
 				const updatedGroup = { ...updatedGroups[groupIndex], lastMessage: message }
-				
+
 				// Remove from current position and add to front
 				updatedGroups.splice(groupIndex, 1)
 				updatedGroups.unshift(updatedGroup)
@@ -122,6 +123,14 @@ const socialReducer = (state: SocialState, action: SocialAction): SocialState =>
 				...state,
 				messages: newMessagesMap,
 			}
+		}
+
+		case 'PREPEND_MESSAGES': {
+			const { groupID, messages } = action.payload
+			const newMessagesMap = new Map(state.messages)
+			const existingMessages = newMessagesMap.get(groupID) || []
+			newMessagesMap.set(groupID, [...messages, ...existingMessages])
+			return { ...state, messages: newMessagesMap }
 		}
 
 		case 'LEAVE_GROUP': {
@@ -153,7 +162,6 @@ interface SocialProviderProps {
 
 export const SocialProvider: FC<SocialProviderProps> = ({ children }) => {
 	const [state, dispatch] = useReducer(socialReducer, initialState)
-	const { user } = useAuth()
 	const websocket = useRef<WebSocket | null>(null)
 
 	const fetchGroupData = async () => {
@@ -290,7 +298,7 @@ export const SocialProvider: FC<SocialProviderProps> = ({ children }) => {
 				console.log('WebSocket connection established')
 			}
 
-			ws.onmessage = (event) => {
+			ws.onmessage = event => {
 				try {
 					const message: Message = JSON.parse(event.data)
 					console.log('Received message:', message)
@@ -305,7 +313,7 @@ export const SocialProvider: FC<SocialProviderProps> = ({ children }) => {
 				websocket.current = null
 			}
 
-			ws.onerror = (error) => {
+			ws.onerror = error => {
 				console.error('WebSocket connection error:', error)
 			}
 		} catch (err) {
@@ -341,6 +349,26 @@ export const SocialProvider: FC<SocialProviderProps> = ({ children }) => {
 		}
 	}
 
+	const loadMessageHistory = async (groupID: number, before: string) => {
+		try {
+			const token = await auth.currentUser?.getIdToken(true)
+			const response = await axios.get(
+				`http://${BACKEND_URL}/social/group/${groupID}/messages`,
+				{
+					params: { before },
+					headers: { Authorization: `Bearer ${token}` },
+				},
+			)
+
+			console.log("Message history: " + response.data)
+
+			const fetchedMessages: Message[] = response.data
+			dispatch({ type: 'PREPEND_MESSAGES', payload: { groupID, messages: fetchedMessages } })
+		} catch (error) {
+			console.error('Failed to load message history:', error)
+		}
+	}
+
 	const contextValue: SocialContextType = {
 		state,
 		connectSocial: connectSocial,
@@ -348,7 +376,8 @@ export const SocialProvider: FC<SocialProviderProps> = ({ children }) => {
 		joinGroup: joinGroup,
 		leaveGroup: leaveGroup,
 		createGroup: createGroup,
-        sendMessage: sendMessage,
+		sendMessage: sendMessage,
+		loadMessageHistory: loadMessageHistory
 	}
 
 	return <SocialContext.Provider value={contextValue}>{children}</SocialContext.Provider>
