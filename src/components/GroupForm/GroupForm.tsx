@@ -1,15 +1,17 @@
 import { FC, useState } from 'react'
 import './GroupForm.scss'
+import { useSocial } from '../../context/SocialContext'
 
 interface GroupFormProps {
 	onClose: () => void
-	createGroup: (name: string, description: string, photo: File | null) => void
 }
 
-const GroupForm: FC<GroupFormProps> = ({ onClose, createGroup }) => {
+const GroupForm: FC<GroupFormProps> = ({ onClose }) => {
 	const [name, setName] = useState('')
 	const [description, setDescription] = useState('')
 	const [photo, setPhoto] = useState<File | null>(null)
+
+	const { createGroup } = useSocial()
 
 	const handlePhotoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		if (e.target.files && e.target.files.length > 0) {
@@ -19,7 +21,7 @@ const GroupForm: FC<GroupFormProps> = ({ onClose, createGroup }) => {
 
 	const handleSubmit = (e: React.FormEvent) => {
 		e.preventDefault()
-		createGroup(name, description, photo)
+		createGroup(name, description)
 		setName('')
 		setDescription('')
 		setPhoto(null)

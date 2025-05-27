@@ -3,6 +3,7 @@ import './GroupDetails.scss'
 import { auth } from '../../firebase/firebase'
 import axios from 'axios'
 import { BACKEND_URL } from '../../../integration-config'
+import { useSocial } from '../../context/SocialContext'
 
 interface GroupDetailsProps {
 	image: string
@@ -23,24 +24,7 @@ const GroupDetails: React.FC<GroupDetailsProps> = ({
 	groupID,
 	onBack,
 }) => {
-	const handleApplyClick = async () => {
-		try {
-			const currentUser = auth?.currentUser
-			const token = await currentUser?.getIdToken()
-
-			const response = await axios.post(
-				`http://${BACKEND_URL}/social/join-request/${groupID}`,
-				{},
-				{
-					headers: { Authorization: `Bearer ${token}` },
-				},
-			)
-
-			console.log(response.data)
-		} catch (err) {
-			console.error('Error requesting to join group:', err)
-		}
-	}
+	const { joinGroup } = useSocial()
 
 	return (
 		<div className="group-details">
@@ -49,7 +33,15 @@ const GroupDetails: React.FC<GroupDetailsProps> = ({
 			</button>
 
 			<div className="group-header">
-				<img src={image} alt={`${name}'s avatar`} className="group-image" />
+				<img
+					src={
+						image != ''
+							? image
+							: 'https://dashboard.codeparrot.ai/api/image/Z_T76IDi91IKZZrg/image.png'
+					}
+					alt={`${name}'s avatar`}
+					className="group-image"
+				/>
 				<div className="group-status">
 					<h1 className="group-name">{name}</h1>
 					<div className={`online-indicator ${isOnline ? 'online' : ''}`}>
@@ -70,7 +62,7 @@ const GroupDetails: React.FC<GroupDetailsProps> = ({
 
 			{/*Apply button*/}
 			<div className="modal-button-container">
-				<button className="modal-button" onClick={handleApplyClick}>
+				<button className="modal-button" onClick={() => joinGroup(groupID)}>
 					Apply
 				</button>
 			</div>

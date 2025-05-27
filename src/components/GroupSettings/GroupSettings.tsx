@@ -2,6 +2,7 @@ import React, { useState } from 'react'
 import './GroupSettings.scss'
 import ThemeButtons from './ThemeButtons'
 import { useAuth } from '../../context/UserContext'
+import { useSocial } from '../../context/SocialContext'
 
 interface GroupMember {
 	displayName: string
@@ -16,42 +17,44 @@ interface JoinRequest {
 }
 
 interface GroupSettingsProps {
-	groupMembers: GroupMember[]
 	joinRequests: JoinRequest[]
 	handleJoinRequest: (id: string, accepted: boolean) => void
 	onClose: () => void
 	onThemeChange: (theme: string) => void
-	onLeave: () => void
+	groupID: number
 }
 
-
-
 const GroupSettings: React.FC<GroupSettingsProps> = ({
-	groupMembers,
 	onClose,
 	onThemeChange,
 	joinRequests,
 	handleJoinRequest,
-	onLeave,
+	groupID,
 }) => {
 	const [isMembersModalOpen, setIsMembersModalOpen] = useState(false)
 	const [isThemeModalOpen, setIsThemeModalOpen] = useState(false)
 	const [activeModal, setActiveModal] = useState<string | null>(null)
-	const [searchQuery, setSearchQuery] = useState('')
 	const [isConfirmingLeave, setIsConfirmingLeave] = useState(false)
+
+	const {
+		state: { members, selectedGroup },
+		leaveGroup,
+	} = useSocial()
+
+	const groupMembersMap = selectedGroup ? members.get(selectedGroup.id) : new Map()
+	const groupMembers = [...(groupMembersMap?.values() || [])]
 
 	const closeModal = () => {
 		setActiveModal(null)
 		setIsMembersModalOpen(false)
 		setIsThemeModalOpen(false)
-		setSearchQuery('')
 	}
 
 	const handleLeaveChat = async () => {
 		if (!isConfirmingLeave) {
 			setIsConfirmingLeave(true)
 		} else {
-			onLeave()
+			leaveGroup(groupID)
 		}
 	}
 
@@ -64,8 +67,11 @@ const GroupSettings: React.FC<GroupSettingsProps> = ({
 		return roleOrder[a.role] - roleOrder[b.role]
 	})
 
-	const {user} = useAuth();
-	const isMember = groupMembers.find((member: GroupMember) => {return member.id == user?.uid || ''})?.role == 'member'
+	const { user } = useAuth()
+	const isMember =
+		groupMembers.find((member: GroupMember) => {
+			return member.id == user?.uid || ''
+		})?.role == 'member'
 
 	return (
 		<div className="modal-overlay" onClick={onClose}>
@@ -84,14 +90,19 @@ const GroupSettings: React.FC<GroupSettingsProps> = ({
 					</div>
 
 					{/* Join Requests Section */}
-					{!isMember && <div className="section">
-						<h4>Requests</h4>
-						<div className="action-buttons">
-							<span className="modal-button" onClick={() => setActiveModal('Join Requests')}>
-								See Join Requests
-							</span>
+					{!isMember && (
+						<div className="section">
+							<h4>Requests</h4>
+							<div className="action-buttons">
+								<span
+									className="modal-button"
+									onClick={() => setActiveModal('Join Requests')}
+								>
+									See Join Requests
+								</span>
+							</div>
 						</div>
-					</div>}
+					)}
 
 					{/* Customization Section */}
 					<div className="section">
@@ -106,38 +117,10 @@ const GroupSettings: React.FC<GroupSettingsProps> = ({
 						</div>
 					</div>
 
-					{/* More Actions Section */}
+					{/* Support Section */}
 					<div className="section">
-						<h4>More Actions</h4>
+						<h4>Support</h4>
 						<div className="action-buttons">
-							<span
-								className="modal-button"
-								onClick={() => setActiveModal('View Media & Files')}
-							>
-								View Media & Files
-							</span>
-							<span
-								className="modal-button"
-								onClick={() => setActiveModal('Pinned Messages')}
-							>
-								Pinned Messages
-							</span>
-							<span
-								className="modal-button"
-								onClick={() => setActiveModal('Search in Conversation')}
-							>
-								Search in Conversation
-							</span>
-						</div>
-					</div>
-
-					{/* Privacy & Support Section */}
-					<div className="section">
-						<h4>Privacy & Support</h4>
-						<div className="action-buttons">
-							<span className="modal-button" onClick={() => setActiveModal('Notifications')}>
-								Notifications
-							</span>
 							<span className="modal-button" onClick={() => setActiveModal('Report')}>
 								Report
 							</span>
@@ -176,18 +159,7 @@ const GroupSettings: React.FC<GroupSettingsProps> = ({
 				<div className="members-modal" onClick={closeModal}>
 					<div className="modal fade-in" onClick={e => e.stopPropagation()}>
 						<h3>{activeModal}</h3>
-						{activeModal === 'Search in Conversation' ? (
-							<div>
-								<input
-									type="text"
-									className="search-bar"
-									placeholder="Search messages..."
-									value={searchQuery}
-									onChange={e => setSearchQuery(e.target.value)}
-								/>
-								<p>Search results for "{searchQuery}" to be added.</p>
-							</div>
-						) : activeModal === 'Join Requests' ? (
+						{activeModal === 'Join Requests' ? (
 							joinRequests.length > 0 ? (
 								<ul>
 									{joinRequests.map((request, index) => (
@@ -197,17 +169,13 @@ const GroupSettings: React.FC<GroupSettingsProps> = ({
 											<div className="action-buttons">
 												<button
 													className="accept-button"
-													onClick={() =>
-														handleJoinRequest(request.id, true)
-													}
+													onClick={() => handleJoinRequest(request.id, true)}
 												>
 													Accept
 												</button>
 												<button
 													className="decline-button"
-													onClick={() =>
-														handleJoinRequest(request.id, false)
-													}
+													onClick={() => handleJoinRequest(request.id, false)}
 												>
 													Decline
 												</button>
