@@ -1,5 +1,5 @@
 import { FC, useEffect, useRef, useState } from 'react'
-import { SocialProvider, useSocial } from '../../context/SocialContext'
+import { useSocial } from '../../context/SocialContext'
 import Layout from '../../components/Layout/Layout'
 import './Social.scss'
 import ChatPreview from '../../components/ChatPreview/ChatPreview'
@@ -9,7 +9,7 @@ import GroupForm from '../../components/GroupForm/GroupForm'
 import Spinner from '../../components/Spinner/Spinner'
 import { CiSearch } from 'react-icons/ci'
 
-const SocialContent: FC = () => {
+const Social: FC = () => {
 	const [activeTab, setActiveTab] = useState<'myGroups' | 'lookForGroups'>('myGroups')
 	const [search, setSearch] = useState('')
 	const [isMobile, setIsMobile] = useState(window.innerWidth <= 768)
@@ -66,7 +66,8 @@ const SocialContent: FC = () => {
 
 		// For myGroups, show last message if it exists, otherwise show description
 		if (group.lastMessage) {
-			const senderName = members.get(group.lastMessage.senderID)?.displayName || 'Unknown'
+			const senderName =
+				members.get(group.id)?.get(group.lastMessage.senderID)?.displayName || 'Unknown'
 			return `${senderName}: ${group.lastMessage.content}`
 		}
 
@@ -102,7 +103,7 @@ const SocialContent: FC = () => {
 								</div>
 
 								<div className="search-bar">
-									<CiSearch className="search-icon"/>
+									<CiSearch className="search-icon" />
 									<input
 										type="text"
 										placeholder="Search for groups in SportsToGo"
@@ -117,7 +118,7 @@ const SocialContent: FC = () => {
 								<Spinner />
 							) : (
 								<ul className="message-list">
-									{filteredGroupPreviews.map((preview) => {
+									{filteredGroupPreviews.map(preview => {
 										return (
 											<ChatPreview
 												key={preview.id}
@@ -170,14 +171,6 @@ const SocialContent: FC = () => {
 				)}
 			</div>
 		</Layout>
-	)
-}
-
-const Social: FC = () => {
-	return (
-		<SocialProvider>
-			<SocialContent />
-		</SocialProvider>
 	)
 }
 

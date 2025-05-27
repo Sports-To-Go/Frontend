@@ -17,7 +17,6 @@ interface JoinRequest {
 }
 
 interface GroupSettingsProps {
-	groupMembers: GroupMember[]
 	joinRequests: JoinRequest[]
 	handleJoinRequest: (id: string, accepted: boolean) => void
 	onClose: () => void
@@ -26,7 +25,6 @@ interface GroupSettingsProps {
 }
 
 const GroupSettings: React.FC<GroupSettingsProps> = ({
-	groupMembers,
 	onClose,
 	onThemeChange,
 	joinRequests,
@@ -36,16 +34,20 @@ const GroupSettings: React.FC<GroupSettingsProps> = ({
 	const [isMembersModalOpen, setIsMembersModalOpen] = useState(false)
 	const [isThemeModalOpen, setIsThemeModalOpen] = useState(false)
 	const [activeModal, setActiveModal] = useState<string | null>(null)
-	const [searchQuery, setSearchQuery] = useState('')
 	const [isConfirmingLeave, setIsConfirmingLeave] = useState(false)
 
-	const { leaveGroup } = useSocial()
+	const {
+		state: { members, selectedGroup },
+		leaveGroup,
+	} = useSocial()
+
+	const groupMembersMap = selectedGroup ? members.get(selectedGroup.id) : new Map()
+	const groupMembers = [...(groupMembersMap?.values() || [])]
 
 	const closeModal = () => {
 		setActiveModal(null)
 		setIsMembersModalOpen(false)
 		setIsThemeModalOpen(false)
-		setSearchQuery('')
 	}
 
 	const handleLeaveChat = async () => {
@@ -115,38 +117,10 @@ const GroupSettings: React.FC<GroupSettingsProps> = ({
 						</div>
 					</div>
 
-					{/* More Actions Section */}
+					{/* Support Section */}
 					<div className="section">
-						<h4>More Actions</h4>
+						<h4>Support</h4>
 						<div className="action-buttons">
-							<span
-								className="modal-button"
-								onClick={() => setActiveModal('View Media & Files')}
-							>
-								View Media & Files
-							</span>
-							<span
-								className="modal-button"
-								onClick={() => setActiveModal('Pinned Messages')}
-							>
-								Pinned Messages
-							</span>
-							<span
-								className="modal-button"
-								onClick={() => setActiveModal('Search in Conversation')}
-							>
-								Search in Conversation
-							</span>
-						</div>
-					</div>
-
-					{/* Privacy & Support Section */}
-					<div className="section">
-						<h4>Privacy & Support</h4>
-						<div className="action-buttons">
-							<span className="modal-button" onClick={() => setActiveModal('Notifications')}>
-								Notifications
-							</span>
 							<span className="modal-button" onClick={() => setActiveModal('Report')}>
 								Report
 							</span>
@@ -185,18 +159,7 @@ const GroupSettings: React.FC<GroupSettingsProps> = ({
 				<div className="members-modal" onClick={closeModal}>
 					<div className="modal fade-in" onClick={e => e.stopPropagation()}>
 						<h3>{activeModal}</h3>
-						{activeModal === 'Search in Conversation' ? (
-							<div>
-								<input
-									type="text"
-									className="search-bar"
-									placeholder="Search messages..."
-									value={searchQuery}
-									onChange={e => setSearchQuery(e.target.value)}
-								/>
-								<p>Search results for "{searchQuery}" to be added.</p>
-							</div>
-						) : activeModal === 'Join Requests' ? (
+						{activeModal === 'Join Requests' ? (
 							joinRequests.length > 0 ? (
 								<ul>
 									{joinRequests.map((request, index) => (

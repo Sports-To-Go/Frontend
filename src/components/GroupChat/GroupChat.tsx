@@ -12,20 +12,10 @@ interface GroupProps {
 	onLeave: () => void
 }
 
-interface GroupMessage {
-	id: number
-	senderName: string
-	senderID: string
-	content: string
-	timestamp: string
-	type: 'TEXT' | 'SYSTEM'
-}
-
 const GroupChat: FC<GroupProps> = ({ groupID, onBack }) => {
 	const [newMessage, setNewMessage] = useState('')
 	const [isGroupSettingsOpen, setIsGroupSettingsOpen] = useState(false)
 	const [groupName, setGroupName] = useState('Loading...')
-	const [groupMembers, setGroupMembers] = useState<Map<string, any>>(new Map())
 	const [joinRequests, setJoinRequests] = useState<any[]>([])
 	const [loadingHistory, setLoadingHistory] = useState(false)
 
@@ -37,17 +27,13 @@ const GroupChat: FC<GroupProps> = ({ groupID, onBack }) => {
 
 	const rawMessages = selectedGroup ? messages.get(selectedGroup.id) || [] : []
 
-	// Get the earliest timestamp from the current messages
-	const earliestTimestamp = rawMessages.length > 0 ? rawMessages[0].timestamp : null
-
-	const groupMessages: GroupMessage[] = rawMessages.map((msg: Message) => ({
-		id: msg.id,
-		senderID: msg.senderID,
-		senderName: members.get(msg.senderID)?.displayName || 'Unknown User',
-		content: msg.content,
-		timestamp: msg.timestamp,
-		type: msg.type || 'TEXT',
-	}))
+	const groupMessages: (Message & { senderName?: string })[] = rawMessages.map((msg: Message) => {
+		const groupMember = members.get(groupID)?.get(msg.senderID)
+		return {
+			...msg,
+			senderName: msg.type === 'SYSTEM' ? '' : groupMember?.displayName || 'Unknown User',
+		}
+	})
 
 	useEffect(() => {
 		if (selectedGroup) {
@@ -61,17 +47,14 @@ const GroupChat: FC<GroupProps> = ({ groupID, onBack }) => {
 
 	const handleSendMessage = () => {
 		if (!newMessage.trim()) return
-
 		sendMessage(newMessage)
 		setNewMessage('')
 	}
 
 	const handleLoadMore = async () => {
 		if (!selectedGroup || loadingHistory) return
-
 		const oldest = groupMessages[0]?.timestamp
 		if (!oldest) return
-
 		setLoadingHistory(true)
 		await loadMessageHistory(selectedGroup.id, oldest.replace('Z', ''))
 		setLoadingHistory(false)
@@ -100,8 +83,8 @@ const GroupChat: FC<GroupProps> = ({ groupID, onBack }) => {
 				messages={groupMessages}
 				onTopReached={handleLoadMore}
 				loadingTop={loadingHistory}
+				groupID={groupID}
 			/>
-
 			<ChatMessageBar
 				newMessage={newMessage}
 				onMessageChange={setNewMessage}
@@ -109,7 +92,6 @@ const GroupChat: FC<GroupProps> = ({ groupID, onBack }) => {
 			/>
 			{isGroupSettingsOpen && (
 				<GroupSettings
-					groupMembers={[...groupMembers.values()]}
 					joinRequests={joinRequests}
 					handleJoinRequest={(id: string, accepted: boolean) => {}}
 					onClose={() => setIsGroupSettingsOpen(false)}
