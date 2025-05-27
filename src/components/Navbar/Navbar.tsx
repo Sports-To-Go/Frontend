@@ -31,7 +31,7 @@ const Navbar: React.FC<NavbarProps> = ({ showTabs }) => {
 
 	const toggleMenu = () => setShowMenu(prev => !prev)
 
-	if (showTabs == null) showTabs = true
+	if (showTabs == null) showTabs = true	
 
 	return (
 		<nav className="navbar">

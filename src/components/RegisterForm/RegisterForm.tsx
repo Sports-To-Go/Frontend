@@ -2,9 +2,9 @@ import { useState } from 'react'
 import './RegisterForm.scss'
 import { createUserWithEmailAndPassword, updateProfile } from 'firebase/auth'
 import { auth } from '../../firebase/firebase'
-import { UserData } from '../../context/UserContext'
 import { useNavigate } from 'react-router'
-import { useAuth } from '../../context/UserContext'
+import { sendEmailVerification } from 'firebase/auth';
+import { useEmailVerification } from '../../context/EmailVerificationContext';
 import axios from 'axios'
 
 import { BACKEND_URL } from "../../../integration-config.ts"
@@ -18,7 +18,7 @@ const RegisterForm = () => {
 
 	const navigate = useNavigate()
 
-	const { setUser } = useAuth()
+	const { setShowVerifyPage } = useEmailVerification();
 
 	const handleSubmit = async (e: React.FormEvent) => {
 		e.preventDefault()
@@ -40,14 +40,7 @@ const RegisterForm = () => {
 				displayName: username,
 			})
 
-			const user: UserData = {
-				uid: userCredential.user.uid,
-				email: userCredential.user.email,
-				displayName: username,
-				photoURL: null,
-				createdAt: userCredential.user.metadata.creationTime || '',
-				lastLoginAt: userCredential.user.metadata.lastSignInTime || '',
-			}
+			await sendEmailVerification(userCredential.user);
 
 			const currentUser = auth.currentUser
 
@@ -62,8 +55,8 @@ const RegisterForm = () => {
 				},
 			)
 
-			setUser(user)
-			navigate('/')
+			setShowVerifyPage(true)
+			navigate('/verify-email')
 		} catch (err: any) {
 			if (err.code === 'auth/email-already-in-use') {
 				setError('This email is already in use. Please try another one.')
@@ -88,11 +81,11 @@ const RegisterForm = () => {
 				type="email"
 				placeholder="Email address"
 				value={email}
-				onChange={e => setEmail(e.target.value)}
+				onChange={e => setEmail(e.target.value)}	
 			/>
 			<input
 				type="password"
-				placeholder="Password"
+				placeholder="Password"	
 				value={password}
 				onChange={e => setPassword(e.target.value)}
 			/>

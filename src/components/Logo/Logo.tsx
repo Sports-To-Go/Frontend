@@ -6,7 +6,7 @@ const Logo: React.FC = () => {
 	const navigate = useNavigate()
 
 	return (
-		<div className="logo" onClick={() => navigate('/')}>
+		<div className="logo" onClick={() => navigate('/locations')}>
 			S
 		</div>
 	)
