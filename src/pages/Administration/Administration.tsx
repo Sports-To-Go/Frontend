@@ -1,8 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import Layout from '../../components/Layout/Layout'
 import './Administration.scss'
-import AdminTable from '../../components/AdminTable/AdminTable'
-import { groups, tableData, users } from '../../assets/dummy-data'
+import AdminTable, { adminTableRow } from '../../components/AdminTable/AdminTable'
 import '../../components/StatCards/StatCards.scss'
 import StatCardsContainer from '../../components/StatCards/StatCards'
 import AdminTab from '../../components/AdminTabs/AdminTab'
@@ -16,6 +15,8 @@ import { BACKEND_URL } from '../../../integration-config'
 export const Administration: React.FC = () => {
 	const [monthlyRevenue, setMonthlyRevenue] = useState<number[]>([])
 	const [isMobile, setIsMobile] = useState(window.innerWidth < 1000)
+	const [pass, setPass] = useState('')
+	const [reports, setReports] = useState<adminTableRow[]>([])
 
 	useEffect(() => {
 		const handleResize = () => {
@@ -25,13 +26,14 @@ export const Administration: React.FC = () => {
 		const getMonthlyRevenue = async () => {
 			const currentUser = auth.currentUser
 			if (!currentUser) return
-
+			const year = new Date().toISOString().split('T')[0].split('-')[0]
 			try {
 				const token = await currentUser.getIdToken(true)
+				setPass(token)
 				const res = await axios.get(`http://${BACKEND_URL}/admin/revenue/monthly`, {
 					params: {
-						from: '2024-01-01',
-						to: '2024-12-31',
+						from: `${year}-01-01`,
+						to: `${year}-12-31`,
 					},
 					headers: {
 						Authorization: `Bearer ${token}`,
@@ -39,33 +41,54 @@ export const Administration: React.FC = () => {
 				})
 
 				const monthly: number[] = Array(12).fill(0)
-				res.data.forEach((rev: any) => {
-					const month = new Date(rev.periodStart).getMonth()
-					monthly[month] = rev.totalAmount
-				})
 
-				console.log('MONTHLY ARRAY:', monthly)
+				if (!!res.data) {
+					res.data.forEach((rev: any) => {
+						const month = new Date(rev.periodStart).getMonth()
+						monthly[month] = rev.totalAmount
+					})
+				}
 				setMonthlyRevenue(monthly)
 			} catch (error) {
 				console.error(error)
 			}
 		}
 
+		const getReports = async () => {
+			const currentUser = auth.currentUser
+			if (!currentUser) return
+
+			try {
+				const token = await currentUser.getIdToken(true)
+				const res = await axios.get(`http://${BACKEND_URL}/admin/reports/info`, {
+					headers: {
+						Authorization: `Bearer ${token}`,
+					},
+				})
+
+				console.log(res.data)
+				setReports(res.data)
+			} catch (error) {
+				console.error(error)
+			}
+		}
+
+		getReports()
 		getMonthlyRevenue()
 		window.addEventListener('resize', handleResize)
 		return () => window.removeEventListener('resize', handleResize)
 	}, [])
 
 	const tableHeadersMap: { [key: string]: string[] } = {
-		Venues: ['Venue', 'Name', 'Type', 'Status', 'Bookings', 'Ratings'],
-		Users: ['User', 'Name', 'Type', 'Status', 'Reports', 'Rating'],
-		Groups: ['Group', 'Name', 'Type', 'Status', 'Members', 'Created'],
+		Venues: ['Venue', 'Name', 'Type', 'Reports'],
+		Users: ['User', 'Name', 'Type', 'Reports'],
+		//Groups: ['Group', 'Name', 'Type', 'Members'],
 	}
 
 	const tableDataMap: { [key: string]: any[] } = {
-		Venues: tableData,
-		Users: users,
-		Groups: groups,
+		Venues: reports.filter(report => report.type === 'Location'),
+		Users: reports.filter(report => report.type === 'User'),
+		//Groups: groups,
 	}
 	const [manageTitle, setManageTitle] = useState('Venues')
 
@@ -77,12 +100,13 @@ export const Administration: React.FC = () => {
 		<Layout showTabs={false} showFooter={true}>
 			<div className="administration--container">
 				<h2>Admin dashboard</h2>
+				<p>{pass}</p>
 				<div className="admin-cards--container">
 					<StatCardsContainer />
 				</div>
 				<div className="manage--container">
 					<div className="admin-tabs--container">
-						{['Venues', 'Users', 'Groups', 'Analytics', 'Bugs'].map(tab => (
+						{['Venues', 'Users', 'Analytics', 'Bugs'].map(tab => (
 							<AdminTab
 								key={tab}
 								label={`Manage ${tab}`}

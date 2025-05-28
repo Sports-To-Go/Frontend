@@ -1,18 +1,53 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import { IoClose } from 'react-icons/io5'
 import './ReportDetailModal.scss'
 import ReportCardInfo from '../ReportCardInfo/ReportCardInfo'
 import { auth } from '../../firebase/firebase'
+import axios from 'axios'
+import { BACKEND_URL } from '../../../integration-config'
 
-interface modalReportProps {
+export interface modalReportProps {
 	name: string
-	close: () => void
+	id: string
+	type: 'User' | 'Location' | 'Group'
+	close?: () => void
 }
 
-const ReportDetailModal: React.FC<modalReportProps> = ({ close, name }) => {
-	const currentUser = auth?.currentUser
-	const token = currentUser?.getIdToken()
-	console.log(token)
+interface repsonseReports {
+	reportedBy: string
+	reason: string
+	createdAt: string
+}
+
+const ReportDetailModal: React.FC<modalReportProps> = ({ close, name, id, type }) => {
+	const [reports, setReports] = useState<repsonseReports[]>()
+	const [isLoading, setIsLoading] = useState(true)
+	useEffect(() => {
+		const getReports = async () => {
+			const currentUser = auth.currentUser
+			if (!currentUser) return
+			try {
+				const token = await currentUser.getIdToken(true)
+
+				const res = await axios.get(
+					`http://${BACKEND_URL}/admin/reports/${type}/${id}/messages`,
+					{
+						headers: {
+							Authorization: `Bearer ${token}`,
+						},
+					},
+				)
+				setReports(res.data)
+			} catch (error) {
+				console.error(error)
+			} finally {
+				setIsLoading(false)
+			}
+		}
+
+		getReports()
+	}, [])
+
 	return (
 		<div className="backdrop" onClick={close}>
 			<dialog
@@ -26,72 +61,20 @@ const ReportDetailModal: React.FC<modalReportProps> = ({ close, name }) => {
 					<IoClose size={30} onClick={close} cursor={'pointer'} />
 				</div>
 				<div className="modal--body">
-					<ReportCardInfo
-						title="Suji"
-						reportDate="ieri"
-						reportedBy="Mamaia"
-						description="dsafsadsa dsadasd as dsa d asd as das d sa dsa d as da sdsa das d asd as dsa d"
-					/>
-					<ReportCardInfo
-						title="Suji"
-						reportDate="ieri"
-						reportedBy="Mamaia"
-						description="dsafsadsa dsadasd as dsa d asd as das d sa dsa d as da sdsa das d asd as dsa d"
-					/>
-					<ReportCardInfo
-						title="Suji"
-						reportDate="ieri"
-						reportedBy="Mamaia"
-						description="dsafsadsa dsadasd as dsa d asd as das d sa dsa d as da sdsa das d asd as dsa d"
-					/>
-					<ReportCardInfo
-						title="Suji"
-						reportDate="ieri"
-						reportedBy="Mamaia"
-						description="dsafsadsa dsadasd as dsa d asd as das d sa dsa d as da sdsa das d asd as dsa d"
-					/>
-					<ReportCardInfo
-						title="Suji"
-						reportDate="ieri"
-						reportedBy="Mamaia"
-						description="dsafsadsa dsadasd as dsa d asd as das d sa dsa d as da sdsa das d asd as dsa d"
-					/>
-					<ReportCardInfo
-						title="Suji"
-						reportDate="ieri"
-						reportedBy="Mamaia"
-						description="dsafsadsa dsadasd as dsa d asd as das d sa dsa d as da sdsa das d asd as dsa d"
-					/>
-					<ReportCardInfo
-						title="Suji"
-						reportDate="ieri"
-						reportedBy="Mamaia"
-						description="dsafsadsa dsadasd as dsa d asd as das d sa dsa d as da sdsa das d asd as dsa d"
-					/>
-					<ReportCardInfo
-						title="Suji"
-						reportDate="ieri"
-						reportedBy="Mamaia"
-						description="dsafsadsa dsadasd as dsa d asd as das d sa dsa d as da sdsa das d asd as dsa d"
-					/>
-					<ReportCardInfo
-						title="Suji"
-						reportDate="ieri"
-						reportedBy="Mamaia"
-						description="dsafsadsa dsadasd as dsa d asd as das d sa dsa d as da sdsa das d asd as dsa d"
-					/>
-					<ReportCardInfo
-						title="Suji"
-						reportDate="ieri"
-						reportedBy="Mamaia"
-						description="dsafsadsa dsadasd as dsa d asd as das d sa dsa d as da sdsa das d asd as dsa d"
-					/>
-					<ReportCardInfo
-						title="Suji"
-						reportDate="ieri"
-						reportedBy="Mamaia"
-						description="dsafsadsa dsadasd as dsa d asd as das d sa dsa d as da sdsa das d asd as dsa d"
-					/>
+					{isLoading ? (
+						<div className="bugs-container--loading">
+							<div className="circle"></div>
+						</div>
+					) : (
+						reports?.map(({ reason, reportedBy, createdAt }, index) => (
+							<ReportCardInfo
+								key={index}
+								reportDate={createdAt}
+								reportedBy={reportedBy}
+								description={reason}
+							/>
+						))
+					)}
 				</div>
 				<div className="modal--footer">
 					<div className="ban--container">

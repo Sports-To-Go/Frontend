@@ -1,15 +1,14 @@
 import React, { useEffect, useState } from 'react'
 import './AdminTable.scss'
 import { FaChevronDown } from 'react-icons/fa'
-import ReportDetailModal from '../ReportDetailModal/ReportDetailModal'
+import ReportDetailModal, { modalReportProps } from '../ReportDetailModal/ReportDetailModal'
+import { Link } from 'react-router'
 
 export interface adminTableRow {
-	image: { url: string; alt: string }
-	name: string
-	type: string
-	status: 'Active' | 'Inactive'
-	bookings: number
-	rating: number
+	name?: string
+	id: string
+	type: 'User' | 'Location' | 'Group'
+	reports: number
 }
 
 interface adminTableProps {
@@ -20,6 +19,7 @@ interface adminTableProps {
 const AdminTable: React.FC<adminTableProps> = ({ header, rows }) => {
 	const [showModal, setShowModal] = useState(false)
 	const [isLoading, setIsLoading] = useState(true)
+	const [modalData, setModalData] = useState<modalReportProps>()
 
 	useEffect(() => {
 		setTimeout(() => setIsLoading(false), 1500)
@@ -34,7 +34,8 @@ const AdminTable: React.FC<adminTableProps> = ({ header, rows }) => {
 		return `rgb(${red}, ${green}, 100)`
 	}
 
-	const openModal = () => {
+	const openModal = (name: string, id: string, type: 'User' | 'Location' | 'Group') => {
+		setModalData({ name: name, id: id, type: type })
 		setShowModal(true)
 	}
 
@@ -51,7 +52,14 @@ const AdminTable: React.FC<adminTableProps> = ({ header, rows }) => {
 
 	return (
 		<div className="admin-table-wrapper">
-			{showModal && <ReportDetailModal name={'Misu'} close={closeModal} />}
+			{showModal && (
+				<ReportDetailModal
+					name={modalData!.name}
+					id={modalData!.id}
+					type={modalData!.type}
+					close={closeModal}
+				/>
+			)}
 
 			<table>
 				<thead>
@@ -63,26 +71,26 @@ const AdminTable: React.FC<adminTableProps> = ({ header, rows }) => {
 					</tr>
 				</thead>
 				<tbody>
-					{rows.map(({ image, name, type, status, bookings, rating }, index) => (
+					{rows.map(({ name = 'proba', id, type, reports }, index) => (
 						<tr key={index}>
 							<td>
-								<img src={image.url} alt={image.alt} />
+								{type === 'User' ? (
+									<Link to={'/faq'} target="_blank" style={{ cursor: 'pointer' }}>
+										View profile
+									</Link>
+								) : (
+									<img src="https://i.pravatar.cc/100?u=5" alt="poza" />
+								)}
 							</td>
 							<td>{name}</td>
 							<td>{type}</td>
-							<td>
-								<div className={`status-adm ${status}`}>
-									<div className={`circle-status ${status}`}></div>
-									{status}
-								</div>
-							</td>
-							<td style={{ color: getBookingColor(bookings) }}>{bookings}</td>
-							<td>{rating}/5</td>
+
+							<td style={{ color: getBookingColor(reports) }}>{reports}</td>
 							<td>
 								<div style={{ position: 'relative' }}>
 									<FaChevronDown
 										style={{ cursor: 'pointer' }}
-										onClick={() => openModal()}
+										onClick={() => openModal(name, id, type)}
 									/>
 								</div>
 							</td>

@@ -32,25 +32,39 @@ export const StatCardsContainer: React.FC = () => {
 			try {
 				// Fetch all statistics in parallel
 				const token = await currentUser.getIdToken(true)
-				console.log(token)
-				const [locationsCountRes, reservationsCountRes, usersCount] = await Promise.all([
-					axios.get<number>(`http://${BACKEND_URL}/admin/locations/count`, {
-						headers: {
-							Authorization: `Bearer ${token}`,
-						},
-					}),
-					axios.get<number>(`http://${BACKEND_URL}/admin/reservations/count`, {
-						headers: {
-							Authorization: `Bearer ${token}`,
-						},
-					}),
-					axios.get<number>(`http://${BACKEND_URL}/admin/user/count`, {
-						headers: {
-							Authorization: `Bearer ${token}`,
-						},
-					}),
-				])
+				const year = new Date().toISOString().split('T')[0].split('-')[0]
+				const month = new Date().toISOString().split('T')[0].split('-')[1]
 
+				const [locationsCountRes, reservationsCountRes, usersCount, currentMonthIncome] =
+					await Promise.all([
+						axios.get<number>(`http://${BACKEND_URL}/admin/locations/count`, {
+							headers: {
+								Authorization: `Bearer ${token}`,
+							},
+						}),
+						axios.get<number>(`http://${BACKEND_URL}/admin/reservations/count`, {
+							headers: {
+								Authorization: `Bearer ${token}`,
+							},
+						}),
+						axios.get<number>(`http://${BACKEND_URL}/admin/user/count`, {
+							headers: {
+								Authorization: `Bearer ${token}`,
+							},
+						}),
+						axios.get(`http://${BACKEND_URL}/admin/revenue/monthly`, {
+							params: {
+								from: `${year}-${month}-01`,
+								to: `${year}-${month}-31`,
+							},
+							headers: {
+								Authorization: `Bearer ${token}`,
+							},
+						}),
+					])
+				const totalAmount = currentMonthIncome.data.length
+					? currentMonthIncome.data[0].totalAmount
+					: 0
 				// Transform the responses into StatCardProps format
 				const statsData: StatCardProps[] = [
 					{
@@ -69,7 +83,11 @@ export const StatCardsContainer: React.FC = () => {
 						value: '0',
 					},
 					{ title: 'Total', subtitle: 'Users', value: usersCount.data.toString() },
-					{ title: 'Revenue', subtitle: 'This Month', value: '$4,200.5' },
+					{
+						title: 'Revenue',
+						subtitle: 'This Month',
+						value: `${totalAmount.toString()}$`,
+					},
 				]
 
 				setStats(statsData)
