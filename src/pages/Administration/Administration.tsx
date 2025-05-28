@@ -65,8 +65,6 @@ export const Administration: React.FC = () => {
 						Authorization: `Bearer ${token}`,
 					},
 				})
-
-				console.log(res.data)
 				setReports(res.data)
 			} catch (error) {
 				console.error(error)

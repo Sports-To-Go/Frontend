@@ -3,6 +3,9 @@ import './AdminTable.scss'
 import { FaChevronDown } from 'react-icons/fa'
 import ReportDetailModal, { modalReportProps } from '../ReportDetailModal/ReportDetailModal'
 import { Link } from 'react-router'
+import axios from 'axios'
+import { auth } from '../../firebase/firebase'
+import { BACKEND_URL } from '../../../integration-config'
 
 export interface adminTableRow {
 	name?: string
@@ -20,10 +23,42 @@ const AdminTable: React.FC<adminTableProps> = ({ header, rows }) => {
 	const [showModal, setShowModal] = useState(false)
 	const [isLoading, setIsLoading] = useState(true)
 	const [modalData, setModalData] = useState<modalReportProps>()
+	const [tableRows, setTableRows] = useState<adminTableRow[]>([])
 
 	useEffect(() => {
-		setTimeout(() => setIsLoading(false), 1500)
-	}, [])
+		setIsLoading(true)
+		setTableRows(rows)
+
+		const fetchNames = async () => {
+			const currentUser = auth.currentUser
+			if (!currentUser) {
+				setIsLoading(false)
+				return
+			}
+			try {
+				const token = await currentUser.getIdToken(true)
+				const updated = await Promise.all(
+					rows.map(async row => {
+						try {
+							const res = await axios.get<{ name: string }>(
+								`http://${BACKEND_URL}/admin/${row.id}/${row.type}/name`,
+								{ headers: { Authorization: `Bearer ${token}` } },
+							)
+							return { ...row, name: res.data.name }
+						} catch (err) {
+							console.error('Failed to fetch name for', row, err)
+							return { ...row, name: '—' }
+						}
+					}),
+				)
+				setTableRows(updated)
+			} finally {
+				setTimeout(() => setIsLoading(false), 500)
+			}
+		}
+
+		fetchNames()
+	}, [rows])
 
 	const minBookings = 0
 	const maxBookings = 100
@@ -34,8 +69,12 @@ const AdminTable: React.FC<adminTableProps> = ({ header, rows }) => {
 		return `rgb(${red}, ${green}, 100)`
 	}
 
+	const removeReport = (id: string) => {
+		setTableRows(prev => prev.filter(r => r.id !== id))
+	}
+
 	const openModal = (name: string, id: string, type: 'User' | 'Location' | 'Group') => {
-		setModalData({ name: name, id: id, type: type })
+		setModalData({ name, id, type, removeReport })
 		setShowModal(true)
 	}
 
@@ -50,6 +89,10 @@ const AdminTable: React.FC<adminTableProps> = ({ header, rows }) => {
 			</div>
 		)
 
+	if (tableRows.length === 0) {
+		return <div className="nodata-container">No data found...</div>
+	}
+
 	return (
 		<div className="admin-table-wrapper">
 			{showModal && (
@@ -57,6 +100,7 @@ const AdminTable: React.FC<adminTableProps> = ({ header, rows }) => {
 					name={modalData!.name}
 					id={modalData!.id}
 					type={modalData!.type}
+					removeReport={modalData!.removeReport}
 					close={closeModal}
 				/>
 			)}
@@ -71,11 +115,11 @@ const AdminTable: React.FC<adminTableProps> = ({ header, rows }) => {
 					</tr>
 				</thead>
 				<tbody>
-					{rows.map(({ name = 'proba', id, type, reports }, index) => (
-						<tr key={index}>
+					{tableRows.map(({ name, id, type, reports }) => (
+						<tr key={id}>
 							<td>
 								{type === 'User' ? (
-									<Link to={'/faq'} target="_blank" style={{ cursor: 'pointer' }}>
+									<Link to={'/profile'} style={{ cursor: 'pointer' }}>
 										View profile
 									</Link>
 								) : (
@@ -84,13 +128,12 @@ const AdminTable: React.FC<adminTableProps> = ({ header, rows }) => {
 							</td>
 							<td>{name}</td>
 							<td>{type}</td>
-
 							<td style={{ color: getBookingColor(reports) }}>{reports}</td>
 							<td>
 								<div style={{ position: 'relative' }}>
 									<FaChevronDown
 										style={{ cursor: 'pointer' }}
-										onClick={() => openModal(name, id, type)}
+										onClick={() => openModal(name!, id, type)}
 									/>
 								</div>
 							</td>
