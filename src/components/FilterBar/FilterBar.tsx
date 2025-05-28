@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useRef } from 'react'
 import './FilterBar.scss'
 
 interface Filters {
@@ -28,6 +28,7 @@ const FilterBar: React.FC<FilterBarProps> = ({ onFilterChange }) => {
 		endTime: '',
 	})
 	const [showFiltersMenu, setShowFiltersMenu] = useState(false)
+	const sportsIconsRef = useRef<HTMLDivElement>(null)
 
 	const handleSportClick = (sport: string) => {
 		const updatedFilters = {
@@ -48,24 +49,37 @@ const FilterBar: React.FC<FilterBarProps> = ({ onFilterChange }) => {
 		onFilterChange(updatedFilters)
 	}
 
+	// Scroll sports icons left/right
+	const scrollIcons = (direction: 'left' | 'right') => {
+		const container = sportsIconsRef.current
+		if (!container) return
+		const scrollAmount = 80 // px, adjust for icon+gap width
+		if (direction === 'left') {
+			container.scrollBy({ left: -scrollAmount, behavior: 'smooth' })
+		} else {
+			container.scrollBy({ left: scrollAmount, behavior: 'smooth' })
+		}
+	}
+
 	return (
 		<div className="filter-bar-container">
 			<div className="filter-bar">
 				<button
 					className="arrow-button left"
-					onClick={() => {
-						/* Scroll left functionality */
-					}}
+					onClick={() => scrollIcons('left')}
+					type="button"
+					aria-label="Scroll sports left"
 				>
 					&lt;
 				</button>
 
-				<div className="sports-icons">
+				<div className="sports-icons" ref={sportsIconsRef}>
 					{sportsIcons.map(sport => (
 						<button
 							key={sport.id}
 							className={`sport-icon ${localFilters.sport === sport.id ? 'active' : ''}`}
 							onClick={() => handleSportClick(sport.id)}
+							type="button"
 						>
 							{sport.icon}
 						</button>
@@ -74,21 +88,21 @@ const FilterBar: React.FC<FilterBarProps> = ({ onFilterChange }) => {
 
 				<button
 					className="arrow-button right"
-					onClick={() => {
-						/* Scroll right functionality */
-					}}
+					onClick={() => scrollIcons('right')}
+					type="button"
+					aria-label="Scroll sports right"
 				>
 					&gt;
 				</button>
 
-				<button className="filters-button" onClick={toggleFiltersMenu}>
+				<button className="filters-button" onClick={toggleFiltersMenu} type="button">
 					Filters
 				</button>
 			</div>
 
 			{showFiltersMenu && (
 				<div className="filters-menu">
-					<button className="close-button" onClick={toggleFiltersMenu}>
+					<button className="close-button" onClick={toggleFiltersMenu} type="button">
 						X
 					</button>
 					<h3>Filters</h3>
