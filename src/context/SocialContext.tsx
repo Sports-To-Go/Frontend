@@ -61,11 +61,12 @@ interface SocialContextType {
 	state: SocialState
 	connectSocial: () => void
 	selectGroup: (group: GroupPreview | null) => void
-	joinGroup: (groupID: number) => void
+	joinGroup: (groupID: number) => Promise<boolean>
 	leaveGroup: (groupID: number) => void
 	createGroup: (name: string, description: string) => void
 	sendMessage: (content: string) => void
 	loadMessageHistory: (groupID: number, before: string) => void
+	removeRecommendation: (groupID: number) => void
 }
 
 const initialState: SocialState = {
@@ -84,6 +85,13 @@ const socialReducer = (state: SocialState, action: any): SocialState => {
 			return { ...state, selectedGroup: action.payload }
 		case 'SET_RECOMMENDATIONS':
 			return { ...state, recommendations: action.payload }
+		case 'REMOVE_RECOMMENDATION': {
+			const { groupID } = action.payload
+			const updatedRecommendations = state.recommendations.filter(
+				recommendation => recommendation.id != groupID,
+			)
+			return { ...state, recommendations: updatedRecommendations, selectedGroup: null }
+		}
 		case 'SET_MEMBERS':
 			return { ...state, members: action.payload }
 		case 'CREATE_GROUP':
@@ -242,13 +250,14 @@ export const SocialProvider: FC<{ children: ReactNode }> = ({ children }) => {
 				selectGroup: g => dispatch({ type: 'SELECT_GROUP', payload: g }),
 				joinGroup: async id => {
 					const token = await auth.currentUser?.getIdToken()
-					await axios.post(
+					const response = await axios.post(
 						`http://${BACKEND_URL}/social/join-request/${id}`,
 						{},
 						{
 							headers: { Authorization: `Bearer ${token}` },
 						},
 					)
+					return response.status === 201
 				},
 				leaveGroup: async id => {
 					const token = await auth.currentUser?.getIdToken(true)
@@ -284,6 +293,9 @@ export const SocialProvider: FC<{ children: ReactNode }> = ({ children }) => {
 					websocket.current.send(JSON.stringify({ groupID: g.id, content }))
 				},
 				loadMessageHistory,
+				removeRecommendation: (groupID: number) => {
+					dispatch({ type: 'REMOVE_RECOMMENDATION', payload: { groupID } })
+				},
 			}}
 		>
 			{children}
