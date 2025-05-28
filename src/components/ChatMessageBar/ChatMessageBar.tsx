@@ -6,10 +6,14 @@ import './ChatMessageBar.scss'
 interface ChatMessageBarProps {
     newMessage: string
     onMessageChange: (value: string) => void
-    onSendMessage: () => void
+    onSendMessage: (content: string, type: "TEXT" | "SYSTEM") => void;
 }
 
-const ChatMessageBar: FC<ChatMessageBarProps> = ({ newMessage, onMessageChange, onSendMessage }) => {
+const ChatMessageBar: FC<ChatMessageBarProps> = ({
+    newMessage,
+    onMessageChange,
+    onSendMessage,
+}) => {
     return (
         <div className="chat-message-bar">
             <MdLink onClick={() => alert('links to be added')} cursor="pointer" />
@@ -21,10 +25,13 @@ const ChatMessageBar: FC<ChatMessageBarProps> = ({ newMessage, onMessageChange, 
                     value={newMessage}
                     onChange={e => onMessageChange(e.target.value)}
                     onKeyDown={e => {
-                        if (e.key === 'Enter') onSendMessage()
+                        if (e.key === 'Enter') onSendMessage(newMessage,"TEXT")
                     }}
                 />
-                <FiMessageCircle onClick={onSendMessage} cursor="pointer" />
+                <FiMessageCircle
+                    onClick={() => onSendMessage(newMessage,"TEXT")}
+                    cursor="pointer"
+                />
             </div>
         </div>
     )
