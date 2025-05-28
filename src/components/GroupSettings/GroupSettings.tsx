@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import './GroupSettings.scss'
 import ThemeButtons from './ThemeButtons'
 import { useAuth } from '../../context/UserContext'
@@ -72,6 +72,10 @@ const GroupSettings: React.FC<GroupSettingsProps> = ({
 		groupMembers.find((member: GroupMember) => {
 			return member.id == user?.uid || ''
 		})?.role == 'member'
+
+	
+
+
 
 	return (
 		<div className="modal-overlay" onClick={onClose}>

@@ -3,6 +3,8 @@ import { auth } from '../firebase/firebase'
 import { BACKEND_URL } from '../../integration-config'
 import axios from 'axios'
 
+
+
 export interface GroupPreview {
 	id: number
 	name: string
@@ -47,6 +49,7 @@ export interface Message {
 export interface GroupData extends GroupPreview {
 	lastMessage?: Message
 	joinRequests: JoinRequest[]
+	theme:string
 }
 
 interface SocialState {
@@ -64,7 +67,7 @@ interface SocialContextType {
 	joinGroup: (groupID: number) => void
 	leaveGroup: (groupID: number) => void
 	createGroup: (name: string, description: string) => void
-	sendMessage: (content: string) => void
+	sendMessage: (args: { content: string; type: 'TEXT' | 'SYSTEM' }) => void
 	loadMessageHistory: (groupID: number, before: string) => void
 }
 
@@ -75,6 +78,7 @@ const initialState: SocialState = {
 	messages: new Map(),
 	members: new Map(),
 }
+
 
 const socialReducer = (state: SocialState, action: any): SocialState => {
 	switch (action.type) {
@@ -89,21 +93,53 @@ const socialReducer = (state: SocialState, action: any): SocialState => {
 		case 'CREATE_GROUP':
 			return { ...state, groups: [action.payload, ...state.groups] }
 		case 'ADD_MESSAGE': {
-			const message = action.payload
-			const groupID = message.groupID
-			const newMessagesMap = new Map(state.messages)
-			const existingMessages = newMessagesMap.get(groupID) || []
-			newMessagesMap.set(groupID, [...existingMessages, message])
+		const message = action.payload;
 
-			const groupIndex = state.groups.findIndex(group => group.id === groupID)
-			if (groupIndex !== -1) {
-				const updatedGroups = [...state.groups]
-				const updatedGroup = { ...updatedGroups[groupIndex], lastMessage: message }
-				updatedGroups.splice(groupIndex, 1)
-				updatedGroups.unshift(updatedGroup)
-				return { ...state, groups: updatedGroups, messages: newMessagesMap }
+		
+		if (message.type === "SYSTEM" && message.systemEvent === "THEME_CHANGED") {
+			const updatedGroups = state.groups.map(group => {
+			if (group.id === message.groupID) {
+				return {
+				...group,
+				theme: message.meta?.themeName || group.theme,
+				};
 			}
-			return { ...state, messages: newMessagesMap }
+			return group;
+			});
+
+			
+			const groupID = message.groupID;
+			const newMessagesMap = new Map(state.messages);
+			const existingMessages = newMessagesMap.get(groupID) || [];
+			newMessagesMap.set(groupID, [...existingMessages, message]);
+
+			const groupIndex = updatedGroups.findIndex(group => group.id === groupID);
+			if (groupIndex !== -1) {
+			const reorderedGroups = [...updatedGroups];
+			const updatedGroup = { ...reorderedGroups[groupIndex], lastMessage: message };
+			reorderedGroups.splice(groupIndex, 1);
+			reorderedGroups.unshift(updatedGroup);
+			return { ...state, groups: reorderedGroups, messages: newMessagesMap };
+			}
+
+			return { ...state, groups: updatedGroups, messages: newMessagesMap };
+		}
+
+		// Logica normală pentru adăugarea mesajelor fără schimbare temă
+		const groupID = message.groupID;
+		const newMessagesMap = new Map(state.messages);
+		const existingMessages = newMessagesMap.get(groupID) || [];
+		newMessagesMap.set(groupID, [...existingMessages, message]);
+
+		const groupIndex = state.groups.findIndex(group => group.id === groupID);
+		if (groupIndex !== -1) {
+			const updatedGroups = [...state.groups];
+			const updatedGroup = { ...updatedGroups[groupIndex], lastMessage: message };
+			updatedGroups.splice(groupIndex, 1);
+			updatedGroups.unshift(updatedGroup);
+			return { ...state, groups: updatedGroups, messages: newMessagesMap };
+		}
+		return { ...state, messages: newMessagesMap };
 		}
 		case 'PREPEND_MESSAGES': {
 			const { groupID, messages } = action.payload
@@ -161,6 +197,7 @@ export const SocialProvider: FC<{ children: ReactNode }> = ({ children }) => {
 				groupData.push({
 					id: group.id,
 					name: group.name,
+					theme:group.theme,
 					description: group.description,
 					memberCount: group.groupMembers.length,
 					joinRequests: [],
@@ -278,11 +315,29 @@ export const SocialProvider: FC<{ children: ReactNode }> = ({ children }) => {
 						},
 					})
 				},
-				sendMessage: content => {
+				sendMessage: ({ content, type }: { content: string, type: 'TEXT'| 'SYSTEM' }) => {
 					const g = state.selectedGroup
-					if (!g || !content.trim() || !websocket.current) return
-					websocket.current.send(JSON.stringify({ groupID: g.id, content }))
-				},
+					if (!g ||  !websocket.current) return
+					if (type === 'SYSTEM') {
+						try {
+							const system_json = JSON.parse(content)
+							websocket.current.send(JSON.stringify({
+								groupID: g.id,
+								type,
+								...system_json
+							}))
+						} catch (error) {
+							console.error("Invalid SYSTEM content:", content, error)
+						}
+						return
+					}
+					if (!content.trim()) return
+					websocket.current.send(JSON.stringify({
+						groupID: g.id,
+						content,
+						type,
+					}))
+			},
 				loadMessageHistory,
 			}}
 		>
@@ -296,3 +351,8 @@ export const useSocial = () => {
 	if (!ctx) throw new Error('useSocial must be used in provider')
 	return ctx
 }
+function setState(arg0: (prev: any) => any) {
+	throw new Error('Function not implemented.')
+}
+
+
