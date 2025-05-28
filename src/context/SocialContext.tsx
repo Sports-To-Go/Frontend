@@ -2,8 +2,7 @@ import { createContext, useContext, FC, ReactNode, useReducer, useRef } from 're
 import { auth } from '../firebase/firebase'
 import { BACKEND_URL } from '../../integration-config'
 import axios from 'axios'
-
-
+import { useAuth } from './UserContext'
 
 export interface GroupPreview {
 	id: number
@@ -49,7 +48,7 @@ export interface Message {
 export interface GroupData extends GroupPreview {
 	lastMessage?: Message
 	joinRequests: JoinRequest[]
-	theme:string
+	theme: string
 }
 
 interface SocialState {
@@ -79,7 +78,6 @@ const initialState: SocialState = {
 	members: new Map(),
 }
 
-
 const socialReducer = (state: SocialState, action: any): SocialState => {
 	switch (action.type) {
 		case 'SET_GROUPS':
@@ -90,56 +88,68 @@ const socialReducer = (state: SocialState, action: any): SocialState => {
 			return { ...state, recommendations: action.payload }
 		case 'SET_MEMBERS':
 			return { ...state, members: action.payload }
-		case 'CREATE_GROUP':
-			return { ...state, groups: [action.payload, ...state.groups] }
+		case 'CREATE_GROUP': {
+			const { user } = useAuth()
+			if(!user) return state;
+
+			const groupID = action.payload.id
+			const newMembers = new Map(state.members)
+			newMembers.set(groupID, new Map())
+
+			const member: GroupMember = {
+				id: user?.uid,
+				role: 'admin',
+				displayName: user?.displayName || 'Unknown'
+			}
+
+			newMembers.get(groupID)?.set(user?.uid, member)
+			return { ...state, groups: [action.payload, ...state.groups], members: newMembers }
+		}
 		case 'ADD_MESSAGE': {
-		const message = action.payload;
+			const message = action.payload
 
-		
-		if (message.type === "SYSTEM" && message.systemEvent === "THEME_CHANGED") {
-			const updatedGroups = state.groups.map(group => {
-			if (group.id === message.groupID) {
-				return {
-				...group,
-				theme: message.meta?.themeName || group.theme,
-				};
+			if (message.type === 'SYSTEM' && message.systemEvent === 'THEME_CHANGED') {
+				const updatedGroups = state.groups.map(group => {
+					if (group.id === message.groupID) {
+						return {
+							...group,
+							theme: message.meta?.themeName || group.theme,
+						}
+					}
+					return group
+				})
+
+				const groupID = message.groupID
+				const newMessagesMap = new Map(state.messages)
+				const existingMessages = newMessagesMap.get(groupID) || []
+				newMessagesMap.set(groupID, [...existingMessages, message])
+
+				const groupIndex = updatedGroups.findIndex(group => group.id === groupID)
+				if (groupIndex !== -1) {
+					const reorderedGroups = [...updatedGroups]
+					const updatedGroup = { ...reorderedGroups[groupIndex], lastMessage: message }
+					reorderedGroups.splice(groupIndex, 1)
+					reorderedGroups.unshift(updatedGroup)
+					return { ...state, groups: reorderedGroups, messages: newMessagesMap }
+				}
+
+				return { ...state, groups: updatedGroups, messages: newMessagesMap }
 			}
-			return group;
-			});
 
-			
-			const groupID = message.groupID;
-			const newMessagesMap = new Map(state.messages);
-			const existingMessages = newMessagesMap.get(groupID) || [];
-			newMessagesMap.set(groupID, [...existingMessages, message]);
+			const groupID = message.groupID
+			const newMessagesMap = new Map(state.messages)
+			const existingMessages = newMessagesMap.get(groupID) || []
+			newMessagesMap.set(groupID, [...existingMessages, message])
 
-			const groupIndex = updatedGroups.findIndex(group => group.id === groupID);
+			const groupIndex = state.groups.findIndex(group => group.id === groupID)
 			if (groupIndex !== -1) {
-			const reorderedGroups = [...updatedGroups];
-			const updatedGroup = { ...reorderedGroups[groupIndex], lastMessage: message };
-			reorderedGroups.splice(groupIndex, 1);
-			reorderedGroups.unshift(updatedGroup);
-			return { ...state, groups: reorderedGroups, messages: newMessagesMap };
+				const updatedGroups = [...state.groups]
+				const updatedGroup = { ...updatedGroups[groupIndex], lastMessage: message }
+				updatedGroups.splice(groupIndex, 1)
+				updatedGroups.unshift(updatedGroup)
+				return { ...state, groups: updatedGroups, messages: newMessagesMap }
 			}
-
-			return { ...state, groups: updatedGroups, messages: newMessagesMap };
-		}
-
-		// Logica normală pentru adăugarea mesajelor fără schimbare temă
-		const groupID = message.groupID;
-		const newMessagesMap = new Map(state.messages);
-		const existingMessages = newMessagesMap.get(groupID) || [];
-		newMessagesMap.set(groupID, [...existingMessages, message]);
-
-		const groupIndex = state.groups.findIndex(group => group.id === groupID);
-		if (groupIndex !== -1) {
-			const updatedGroups = [...state.groups];
-			const updatedGroup = { ...updatedGroups[groupIndex], lastMessage: message };
-			updatedGroups.splice(groupIndex, 1);
-			updatedGroups.unshift(updatedGroup);
-			return { ...state, groups: updatedGroups, messages: newMessagesMap };
-		}
-		return { ...state, messages: newMessagesMap };
+			return { ...state, messages: newMessagesMap }
 		}
 		case 'PREPEND_MESSAGES': {
 			const { groupID, messages } = action.payload
@@ -197,7 +207,7 @@ export const SocialProvider: FC<{ children: ReactNode }> = ({ children }) => {
 				groupData.push({
 					id: group.id,
 					name: group.name,
-					theme:group.theme,
+					theme: group.theme,
 					description: group.description,
 					memberCount: group.groupMembers.length,
 					joinRequests: [],
@@ -315,29 +325,33 @@ export const SocialProvider: FC<{ children: ReactNode }> = ({ children }) => {
 						},
 					})
 				},
-				sendMessage: ({ content, type }: { content: string, type: 'TEXT'| 'SYSTEM' }) => {
+				sendMessage: ({ content, type }: { content: string; type: 'TEXT' | 'SYSTEM' }) => {
 					const g = state.selectedGroup
-					if (!g ||  !websocket.current) return
+					if (!g || !websocket.current) return
 					if (type === 'SYSTEM') {
 						try {
 							const system_json = JSON.parse(content)
-							websocket.current.send(JSON.stringify({
-								groupID: g.id,
-								type,
-								...system_json
-							}))
+							websocket.current.send(
+								JSON.stringify({
+									groupID: g.id,
+									type,
+									...system_json,
+								}),
+							)
 						} catch (error) {
-							console.error("Invalid SYSTEM content:", content, error)
+							console.error('Invalid SYSTEM content:', content, error)
 						}
 						return
 					}
 					if (!content.trim()) return
-					websocket.current.send(JSON.stringify({
-						groupID: g.id,
-						content,
-						type,
-					}))
-			},
+					websocket.current.send(
+						JSON.stringify({
+							groupID: g.id,
+							content,
+							type,
+						}),
+					)
+				},
 				loadMessageHistory,
 			}}
 		>
@@ -354,5 +368,3 @@ export const useSocial = () => {
 function setState(arg0: (prev: any) => any) {
 	throw new Error('Function not implemented.')
 }
-
-

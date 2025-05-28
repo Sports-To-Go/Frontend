@@ -20,7 +20,7 @@ const GroupChat: FC<GroupProps> = ({ groupID, onBack }) => {
 	const [loadingHistory, setLoadingHistory] = useState(false)
 
 	const {
-		state: { messages, members, selectedGroup,groups },
+		state: { messages, members, selectedGroup, groups },
 		sendMessage,
 		loadMessageHistory,
 	} = useSocial()
@@ -39,11 +39,11 @@ const GroupChat: FC<GroupProps> = ({ groupID, onBack }) => {
 
 	useEffect(() => {
 		if (!selectedGroup) return
-		
+
 		setGroupName(selectedGroup.name)
-		
+
 		if (loadedGroupsRef.current.has(selectedGroup.id)) return
-		
+
 		const currentMessages = messages.get(selectedGroup.id) || []
 		if (currentMessages.length === 0) {
 			loadedGroupsRef.current.add(selectedGroup.id)
@@ -51,12 +51,11 @@ const GroupChat: FC<GroupProps> = ({ groupID, onBack }) => {
 				selectedGroup.id,
 				new Date(new Date().getTime() - new Date().getTimezoneOffset() * 60000)
 					.toISOString()
-					.slice(0, 23)
+					.slice(0, 23),
 			)
 		}
 	}, [selectedGroup?.id])
 
-	
 	const handleLoadMore = async () => {
 		if (!selectedGroup || loadingHistory) return
 		const oldest = groupMessages[0]?.timestamp
@@ -66,100 +65,100 @@ const GroupChat: FC<GroupProps> = ({ groupID, onBack }) => {
 		setLoadingHistory(false)
 	}
 	const themeMap: Record<string, string> = {
-			DEFAULT: 'linear-gradient(to right,var(--background),var(--background))',
-			ORANGE: 'linear-gradient(to right,rgb(215, 84, 101),rgb(233, 125, 86))',
-			BLUE: 'linear-gradient(to right,rgb(113, 245, 205), #6dd5ed)',
-			PURPLE: 'linear-gradient(to right,rgb(101, 48, 198),rgb(229, 97, 198))',
-			MINT: 'linear-gradient(to right,rgb(32, 225, 126), rgb(119, 225, 32))',
-			SAKURA: 'linear-gradient(to right,rgb(203, 70, 112),rgb(127, 221, 210))',
-			DARKNESS: 'linear-gradient(to right,rgb(12, 1, 27),rgb(62, 2, 2))',
-			SOFT: 'linear-gradient(to right,rgb(255, 216, 245),rgb(255, 191, 203))',
-			WINDOWS: 'url(https://upload.wikimedia.org/wikipedia/en/2/27/Bliss_%28Windows_XP%29.png)',
-			'ELDEN RING': 'url(https://images.steamusercontent.com/ugc/2058741034012526512/379E6434B473E7BE31C50525EB946D4212A8C8B3/)',
-			'PIXEL DREAM': 'url(https://images.alphacoders.com/113/1138740.png)',
-			}
-		
-		const handleThemeKeyChange = (themeKey: string) => {
-			if (!themeKey) {
-				console.warn('No themeKey received');
-				return;
-			}
-			const theme = themeMap[themeKey];
-			if (!theme) {
-				console.warn(`Theme key "${themeKey}" not found in themeMap`);
-				return;
-			}
-			setThemeGradient(theme);
-			const systemMessage = JSON.stringify({
-				systemEvent: "THEME_CHANGED",
-				meta: {
-					themeName: themeKey
-				}
-			});
-			handleSendMessage(systemMessage, "SYSTEM");
+		DEFAULT: 'linear-gradient(to right,var(--background),var(--background))',
+		ORANGE: 'linear-gradient(to right,rgb(215, 84, 101),rgb(233, 125, 86))',
+		BLUE: 'linear-gradient(to right,rgb(113, 245, 205), #6dd5ed)',
+		PURPLE: 'linear-gradient(to right,rgb(101, 48, 198),rgb(229, 97, 198))',
+		MINT: 'linear-gradient(to right,rgb(32, 225, 126), rgb(119, 225, 32))',
+		SAKURA: 'linear-gradient(to right,rgb(203, 70, 112),rgb(127, 221, 210))',
+		DARKNESS: 'linear-gradient(to right,rgb(12, 1, 27),rgb(62, 2, 2))',
+		SOFT: 'linear-gradient(to right,rgb(255, 216, 245),rgb(255, 191, 203))',
+		WINDOWS: 'url(https://upload.wikimedia.org/wikipedia/en/2/27/Bliss_%28Windows_XP%29.png)',
+		'ELDEN RING':
+			'url(https://images.steamusercontent.com/ugc/2058741034012526512/379E6434B473E7BE31C50525EB946D4212A8C8B3/)',
+		'PIXEL DREAM': 'url(https://images.alphacoders.com/113/1138740.png)',
 	}
 
-	const handleSendMessage = (content: string, type: 'TEXT'|'SYSTEM') => {
-		if (!newMessage.trim() && type=='TEXT') return
+	const handleThemeKeyChange = (themeKey: string) => {
+		if (!themeKey) {
+			console.warn('No themeKey received')
+			return
+		}
+		const theme = themeMap[themeKey]
+		if (!theme) {
+			console.warn(`Theme key "${themeKey}" not found in themeMap`)
+			return
+		}
+		setThemeGradient(theme)
+		const systemMessage = JSON.stringify({
+			systemEvent: 'THEME_CHANGED',
+			meta: {
+				themeName: themeKey,
+			},
+		})
+		handleSendMessage(systemMessage, 'SYSTEM')
+	}
+
+	const handleSendMessage = (content: string, type: 'TEXT' | 'SYSTEM') => {
+		if (!newMessage.trim() && type == 'TEXT') return
 		sendMessage({ content: content, type: type })
 		setNewMessage('')
 	}
 
 	const initialTheme =
-	selectedGroup && groups.length > 0
-		? themeMap[groups.find(g => g.id === selectedGroup.id)?.theme || 'DEFAULT']
-		: themeMap['DEFAULT']
+		selectedGroup && groups.length > 0
+			? themeMap[groups.find(g => g.id === selectedGroup.id)?.theme || 'DEFAULT']
+			: themeMap['DEFAULT']
 
 	const [themeGradient, setThemeGradient] = useState('')
 	useEffect(() => {
-	if (!selectedGroup) return;
+		if (!selectedGroup) return
 
-	
-	const group = groups.find(g => g.id === selectedGroup.id);
-	const themeKey = group?.theme || 'DEFAULT';
-	const newTheme = themeMap[themeKey] || themeMap['DEFAULT'];
+		const group = groups.find(g => g.id === selectedGroup.id)
+		const themeKey = group?.theme || 'DEFAULT'
+		const newTheme = themeMap[themeKey] || themeMap['DEFAULT']
 
-	setThemeGradient(newTheme);
-	}, [selectedGroup, groups]);
+		setThemeGradient(newTheme)
+	}, [selectedGroup, groups])
 	return (
-	<div
-		className="chat-container"
-		style={{
-			backgroundImage: themeGradient,
-			backgroundSize: themeGradient.includes('url(') ? 'cover' : 'initial',
-			backgroundPosition: themeGradient.includes('url(') ? 'center' : 'initial',
-			backgroundRepeat: 'no-repeat',
-			backgroundColor: !themeGradient.includes('url(') ? 'var(--background)' : undefined,
-		}}
-	>
-		<ChatHeader
-			groupName={groupName}
-			status="online"
-			onBack={onBack}
-			onOpenSettings={() => setIsGroupSettingsOpen(true)}
-		/>
-		<ChatMessages
-			messages={groupMessages}
-			onTopReached={handleLoadMore}
-			loadingTop={loadingHistory}
-			groupID={groupID}
-		/>
-		<ChatMessageBar
-			newMessage={newMessage}
-			onMessageChange={setNewMessage}
-			onSendMessage={handleSendMessage}
-		/>
-		{isGroupSettingsOpen && (
-			<GroupSettings
-				joinRequests={joinRequests}
-				handleJoinRequest={(id: string, accepted: boolean) => {}}
-				onClose={() => setIsGroupSettingsOpen(false)}
-				onThemeChange={handleThemeKeyChange}
+		<div
+			className="chat-container"
+			style={{
+				backgroundImage: themeGradient,
+				backgroundSize: themeGradient.includes('url(') ? 'cover' : 'initial',
+				backgroundPosition: themeGradient.includes('url(') ? 'center' : 'initial',
+				backgroundRepeat: 'no-repeat',
+				backgroundColor: !themeGradient.includes('url(') ? 'var(--background)' : undefined,
+			}}
+		>
+			<ChatHeader
+				groupName={groupName}
+				status="online"
+				onBack={onBack}
+				onOpenSettings={() => setIsGroupSettingsOpen(true)}
+			/>
+			<ChatMessages
+				messages={groupMessages}
+				onTopReached={handleLoadMore}
+				loadingTop={loadingHistory}
 				groupID={groupID}
 			/>
-		)}
-	</div>
-)
+			<ChatMessageBar
+				newMessage={newMessage}
+				onMessageChange={setNewMessage}
+				onSendMessage={handleSendMessage}
+			/>
+			{isGroupSettingsOpen && (
+				<GroupSettings
+					joinRequests={joinRequests}
+					handleJoinRequest={(id: string, accepted: boolean) => {}}
+					onClose={() => setIsGroupSettingsOpen(false)}
+					onThemeChange={handleThemeKeyChange}
+					groupID={groupID}
+				/>
+			)}
+		</div>
+	)
 }
 
 export default GroupChat
