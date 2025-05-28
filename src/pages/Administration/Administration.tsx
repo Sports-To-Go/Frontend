@@ -100,7 +100,6 @@ export const Administration: React.FC = () => {
 		<Layout showTabs={false} showFooter={true}>
 			<div className="administration--container">
 				<h2>Admin dashboard</h2>
-				<p>{pass}</p>
 				<div className="admin-cards--container">
 					<StatCardsContainer />
 				</div>
