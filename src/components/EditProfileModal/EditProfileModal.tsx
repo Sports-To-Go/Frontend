@@ -168,7 +168,7 @@ const EditProfileModal = ({
 										})
 
 										const response = await axios.put(
-											`${BACKEND_URL}/users/profile`,
+											`http://${BACKEND_URL}/users/profile`,
 											{ description: localDescription },
 											{
 												headers: {

@@ -1,25 +1,36 @@
-import React from 'react'
+import { FC, useState } from 'react'
 import './GroupDetails.scss'
+import { useSocial } from '../../context/SocialContext'
+import Spinner from '../Spinner/Spinner'
 
 interface GroupDetailsProps {
 	image: string
 	name: string
 	description: string
 	members: number
-	isOnline: boolean
+	groupID: number
 	onBack: () => void
 }
 
-const GroupDetails: React.FC<GroupDetailsProps> = ({
+const GroupDetails: FC<GroupDetailsProps> = ({
 	image,
 	name,
 	description,
 	members,
-	isOnline,
+	groupID,
 	onBack,
 }) => {
-	const handleApplyClick = () => {
-		alert('Apply button clicked!')
+	const { joinGroup, removeRecommendation } = useSocial()
+	const [status, setStatus] = useState<'' | 'ok' | 'error' | 'loading'>('')
+
+	const handleJoin = async () => {
+		setStatus('loading')
+		const responseStatus = await joinGroup(groupID)
+		setStatus(responseStatus ? 'ok' : 'error')
+		setTimeout(() => {
+			onBack()
+			removeRecommendation(groupID)
+		}, 2000)
 	}
 
 	return (
@@ -29,13 +40,15 @@ const GroupDetails: React.FC<GroupDetailsProps> = ({
 			</button>
 
 			<div className="group-header">
-				<img src={image} alt={`${name}'s avatar`} className="group-image" />
-				<div className="group-status">
-					<h1 className="group-name">{name}</h1>
-					<div className={`online-indicator ${isOnline ? 'online' : ''}`}>
-						{isOnline ? 'Online' : 'Offline'}
-					</div>
-				</div>
+				<img
+					src={
+						image != ''
+							? image
+							: 'https://dashboard.codeparrot.ai/api/image/Z_T76IDi91IKZZrg/image.png'
+					}
+					alt={`${name}'s avatar`}
+					className="group-image"
+				/>
 			</div>
 
 			<div className="group-description-section">
@@ -50,8 +63,16 @@ const GroupDetails: React.FC<GroupDetailsProps> = ({
 
 			{/*Apply button*/}
 			<div className="modal-button-container">
-				<button className="modal-button" onClick={handleApplyClick}>
-					Apply
+				<button className="modal-button" onClick={handleJoin}>
+					{status === '' ? (
+						<>Apply</>
+					) : status === 'ok' ? (
+						<>Applied</>
+					) : status === 'error' ? (
+						<>Error</>
+					) : (
+						<Spinner />
+					)}
 				</button>
 			</div>
 		</div>

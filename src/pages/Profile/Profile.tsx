@@ -32,10 +32,7 @@ const Profile = () => {
 					<UserCard />
 
 					{isMyProfile ? (
-						<ProfileActions
-							onEditClick={() => setEditModalOpen(true)}
-							username={uid || ''}
-						/>
+						<ProfileActions onEditClick={() => setEditModalOpen(true)} username={uid || ''} />
 					) : (
 						<ProfileActionsExternal />
 					)}

@@ -1,4 +1,4 @@
-import { useState, useEffect, FC } from 'react'
+import { FC, useEffect, useState } from 'react'
 import './UserCard.scss'
 import { FaStar } from 'react-icons/fa'
 import { useAuth } from '../../context/UserContext'

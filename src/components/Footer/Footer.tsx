@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import './Footer.scss'
 import { FaChevronDown, FaChevronUp } from 'react-icons/fa'
+import { Link } from 'react-router'
 
 const Footer: React.FC = () => {
 	const [collapsed, setCollapsed] = useState(true)
@@ -53,6 +54,7 @@ const Footer: React.FC = () => {
 
 				<div className="footer-right">
 					<div className="footer-section-links">
+						<Link to="/faq">FAQ</Link>
 						<a href="https://www.instagram.com/officialrickastley/">Instagram</a>
 						<a href="https://www.youtube.com/watch?v=dQw4w9WgXcQ">YouTube</a>
 						<a href="https://www.tiktok.com/@rickastleyofficial?lang=en">TikTok</a>

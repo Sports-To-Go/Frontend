@@ -1,33 +1,50 @@
-import { useState, FC } from 'react'
-import './Social.scss'
+import { FC, useEffect, useRef, useState } from 'react'
+import { useSocial } from '../../context/SocialContext'
 import Layout from '../../components/Layout/Layout'
-import GroupPreview from '../../components/GroupPreview/GroupPreview'
-import GroupDetails from '../../components/GroupDetails/GroupDetails'
+import './Social.scss'
+import ChatPreview from '../../components/ChatPreview/ChatPreview'
 import GroupChat from '../../components/GroupChat/GroupChat'
+import GroupDetails from '../../components/GroupDetails/GroupDetails'
+import GroupForm from '../../components/GroupForm/GroupForm'
+import Spinner from '../../components/Spinner/Spinner'
+import { CiSearch } from 'react-icons/ci'
 
 const Social: FC = () => {
 	const [activeTab, setActiveTab] = useState<'myGroups' | 'lookForGroups'>('myGroups')
 	const [search, setSearch] = useState('')
-	const [selectedGroup, setSelectedGroup] = useState<any | null>(null) // State for selected group
+	const [isMobile, setIsMobile] = useState(window.innerWidth <= 768)
+	const [showGroupForm, setShowGroupForm] = useState(false)
+	const [isLoading, setIsLoading] = useState<boolean>(true)
 
-	const myGroups = Array.from({ length: 20 }, (_, index) => ({
-		groupID: index + 1, 
-		name: `MyGroup ${index + 1}`,
-		description: `Description for group ${index + 1}`,
-		image: 'https://dashboard.codeparrot.ai/api/image/Z_T76IDi91IKZZrg/image.png',
-		isOnline: true, 
-		members: 8, 
-}));
+	const {
+		state: { groups, recommendations, selectedGroup, members },
+		connectSocial,
+		selectGroup,
+	} = useSocial()
 
-	const lookForGroupsPreviews = Array.from({ length: 10 }, (_, index) => ({
-		name: `LookForGroup ${index + 1}`,
-		description: `Description for group ${index + 1}`,
-		image: 'https://dashboard.codeparrot.ai/api/image/Z_T76IDi91IKZZrg/image.png',
-		isOnline: true, 
-		members: 8, 
-}));
+	const mounted = useRef(false)
 
-	const groupPreviews = activeTab === 'myGroups' ? myGroups : lookForGroupsPreviews
+	useEffect(() => {
+		const handleResize = () => {
+			setIsMobile(window.innerWidth <= 768)
+		}
+		window.addEventListener('resize', handleResize)
+
+		const init = async () => {
+			if (!mounted.current) {
+				setIsLoading(true)
+				await connectSocial()
+				setIsLoading(false)
+				mounted.current = true
+			}
+		}
+
+		init()
+
+		return () => window.removeEventListener('resize', handleResize)
+	}, [])
+
+	const groupPreviews = activeTab === 'myGroups' ? groups : recommendations
 
 	const filteredGroupPreviews = groupPreviews.filter(
 		preview =>
@@ -35,81 +52,122 @@ const Social: FC = () => {
 			preview.description.toLowerCase().includes(search.toLowerCase()),
 	)
 
-	const handleGroupClick = (group: any) => {
-		setSelectedGroup(group)
+	const handleBack = () => {
+		setShowGroupForm(false)
+		selectGroup(null)
 	}
 
-	const handleBack = () => {
-		setSelectedGroup(null)
+	// Helper function to get display text for ChatPreview
+	const getPreviewText = (group: any) => {
+		if (activeTab === 'lookForGroups') {
+			// For recommendations, always show description
+			return group.description
+		}
+
+		// For myGroups, show last message if it exists, otherwise show description
+		if (group.lastMessage) {
+			const senderName =
+				members.get(group.id)?.get(group.lastMessage.senderID)?.displayName || 'Unknown'
+			return `${senderName}: ${group.lastMessage.content}`
+		}
+
+		return group.description
 	}
 
 	return (
 		<Layout>
 			<div className="social-container">
 				<div className="social-left-container">
-					<div className="upper-message-preview">
-						{/* Tabs */}
-						<div className="tabs">
-							<div
-								onClick={() => setActiveTab('myGroups')}
-								className={`tab ${activeTab === 'myGroups' ? 'active' : ''}`}
-							>
-								My Groups
+					{(!isMobile || (isMobile && !selectedGroup && !showGroupForm)) && (
+						<>
+							<div className="upper-message-preview">
+								<div className="tabs">
+									<div
+										onClick={() => {
+											setActiveTab('myGroups')
+											selectGroup(null)
+										}}
+										className={`tab ${activeTab === 'myGroups' ? 'active' : ''}`}
+									>
+										My Groups
+									</div>
+									<div
+										onClick={() => {
+											setActiveTab('lookForGroups')
+											selectGroup(null)
+										}}
+										className={`tab ${activeTab === 'lookForGroups' ? 'active' : ''}`}
+									>
+										Look for Groups
+									</div>
+								</div>
+
+								<div className="search-bar">
+									<CiSearch className="search-icon" />
+									<input
+										type="text"
+										placeholder="Search for groups in SportsToGo"
+										className="search-input"
+										value={search}
+										onChange={e => setSearch(e.target.value)}
+									/>
+								</div>
 							</div>
-							<div
-								onClick={() => setActiveTab('lookForGroups')}
-								className={`tab ${activeTab === 'lookForGroups' ? 'active' : ''}`}
-							>
-								Look for Groups
-							</div>
-						</div>
-						{/* Search Bar */}
-						<div className="search-bar">
-							<img
-								src="https://figma-alpha-api.s3.us-west-2.amazonaws.com/images/18d59d14-50c4-44d5-9a7d-67e729ab83ba"
-								alt="search"
-								className="search-icon"
-							/>
-							<input
-								type="text"
-								placeholder="Search for groups in SportsToGo"
-								className="search-input"
-								value={search}
-								onChange={e => setSearch(e.target.value)}
-							/>
-						</div>
-					</div>
-					<ul className="message-list">
-						{filteredGroupPreviews.map((preview, index) => (
-							<GroupPreview
-								key={index}
-								name={preview.name}
-								image={preview.image}
-								isOnline={preview.isOnline}
-								description={preview.description}
-								members={preview.members}
-								onClick={() => handleGroupClick(preview)} 
-							/>
-						))}
-					</ul>
+
+							{isLoading ? (
+								<Spinner />
+							) : (
+								<ul className="message-list">
+									{filteredGroupPreviews.map(preview => {
+										return (
+											<ChatPreview
+												key={preview.id}
+												name={preview.name}
+												image={''}
+												isOnline={true}
+												description={getPreviewText(preview)}
+												members={preview.memberCount || 0}
+												onClick={() => selectGroup(preview)}
+											/>
+										)
+									})}
+								</ul>
+							)}
+						</>
+					)}
 				</div>
 
-				{/*Render GroupDetails or GroupChat*/}
-				{selectedGroup ? (
-					activeTab === 'myGroups' ? (
-						<GroupChat groupID={selectedGroup.groupID} />
+				<div className="social-right-container">
+					{selectedGroup ? (
+						activeTab === 'myGroups' ? (
+							<GroupChat groupID={selectedGroup.id} onBack={handleBack} onLeave={() => {}} />
+						) : (
+							<GroupDetails
+								image={''}
+								name={selectedGroup.name}
+								description={selectedGroup.description}
+								members={selectedGroup.memberCount || 0}
+								isOnline={true}
+								onBack={handleBack}
+								groupID={selectedGroup.id}
+							/>
+						)
+					) : showGroupForm ? (
+						<GroupForm onClose={handleBack} />
 					) : (
-						<GroupDetails
-							image={selectedGroup.image}
-							name={selectedGroup.name}
-							description={selectedGroup.description}
-							members={selectedGroup.members}
-							isOnline={selectedGroup.isOnline}
-							onBack={handleBack}
-						/>
-					)
-				) : (
-					<div className="placeholder"></div>
+						<div className="add-group-placeholder">
+							<div className="add-group-button" onClick={() => setShowGroupForm(true)}>
+								+
+							</div>
+						</div>
+					)}
+				</div>
+
+				{/* Floating + button for mobile */}
+				{isMobile && !selectedGroup && !showGroupForm && (
+					<div className="add-group-floating-button" onClick={() => setShowGroupForm(true)}>
+						+
+					</div>
 				)}
 			</div>
 		</Layout>

@@ -2,7 +2,7 @@
 	width: 200px;
 	display: flex;
 	justify-content: left;
-	align-items: center;
+	align-items: center; /* Vertically center content */
 	border-right: 1px solid var(--text-secondary);
 	color: var(--text-secondary);
 	padding: 0 10px;
@@ -13,12 +13,41 @@
 		margin-right: 10px;
 		font-size: 24px;
 	}
+
+	.navtab-text {
+		display: block; /* Show text by default */
+	}
+
+	&:last-child {
+		border-right: none;
+	}
+
+	&:hover {
+		text-decoration: underline;
+	}
+
+	&.active {
+		font-weight: bold;
+		color: var(--button-green);
+	}
 }
 
-.navtab:last-child {
-	border-right: none;
-}
+// Media query for mobile devices
+@media (max-width: 768px) {
+	.navtab {
+		flex:auto;
+		width: auto; 
+		justify-content: center;
+		padding: 40; 
+		//border-right: none;
+		
+	}
 
-.navtab:hover {
-	text-decoration: underline;
+	.navtab-text {
+		display: none !important; 
+	}
+
+	.navtab-icon {
+		margin-right: 0; 
+	}
 }

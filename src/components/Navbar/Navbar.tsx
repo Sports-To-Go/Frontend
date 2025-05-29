@@ -4,7 +4,8 @@ import Logo from '../Logo/Logo.tsx'
 import NavTab from '../NavTab/NavTab.tsx'
 import { GrHomeRounded, GrLanguage } from 'react-icons/gr'
 import { FaRegSquarePlus } from 'react-icons/fa6'
-import { CiUser, CiMap } from 'react-icons/ci'
+import { CiMap, CiUser } from 'react-icons/ci'
+import { FaUsers } from 'react-icons/fa';
 import UserMenu from '../UserMenu/UserMenu'
 import { useNavigate } from 'react-router-dom'
 
@@ -37,18 +38,24 @@ const Navbar: React.FC<NavbarProps> = ({ showTabs }) => {
 		<nav className="navbar">
 			{/* Desktop Navbar */}
 			<div className="navbar-container">
-				<Logo />
+				<div className="navbar-logo">
+					<Logo />
+				</div>
+
 				{showTabs && (
 					<div className="navbar-menu">
 						<NavTab icon={<GrHomeRounded />} text="Find Locations" dest="/locations" />
 						<NavTab icon={<FaRegSquarePlus />} text="Add Location" dest="/add-location" />
-						<NavTab icon={<CiMap />} text="See Groups" dest="/social" />
+						<NavTab icon={<FaUsers />} text="See Groups" dest="/social" />
 					</div>
 				)}
+				
 				<div className="navbar-right-container">
 					<GrLanguage />
-					<div className="navbar-profile-container" onClick={toggleMenu} style={{ position: 'relative' }}>
-						<CiUser style={{ fontSize: 32 }} cursor="pointer" />
+					<div className="navbar-profile-container" style={{ position: 'relative' }}>
+						<div onClick={toggleMenu}>
+							<CiUser style={{ fontSize: 32 }} cursor={'pointer'} />
+						</div>
 					</div>
 				</div>
 			</div>

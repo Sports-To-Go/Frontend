@@ -1,14 +1,17 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import './AdminTable.scss'
 import { FaChevronDown } from 'react-icons/fa'
+import ReportDetailModal, { modalReportProps } from '../ReportDetailModal/ReportDetailModal'
+import { Link } from 'react-router'
+import axios from 'axios'
+import { auth } from '../../firebase/firebase'
+import { BACKEND_URL } from '../../../integration-config'
 
 export interface adminTableRow {
-	image: { url: string; alt: string }
-	name: string
-	type: string
-	status: 'Active' | 'Inactive'
-	bookings: number
-	rating: number
+	name?: string
+	id: string
+	type: 'User' | 'Location' | 'Group'
+	reports: number
 }
 
 interface adminTableProps {
@@ -17,6 +20,46 @@ interface adminTableProps {
 }
 
 const AdminTable: React.FC<adminTableProps> = ({ header, rows }) => {
+	const [showModal, setShowModal] = useState(false)
+	const [isLoading, setIsLoading] = useState(true)
+	const [modalData, setModalData] = useState<modalReportProps>()
+	const [tableRows, setTableRows] = useState<adminTableRow[]>([])
+
+	useEffect(() => {
+		setIsLoading(true)
+		setTableRows(rows)
+
+		const fetchNames = async () => {
+			const currentUser = auth.currentUser
+			if (!currentUser) {
+				setIsLoading(false)
+				return
+			}
+			try {
+				const token = await currentUser.getIdToken(true)
+				const updated = await Promise.all(
+					rows.map(async row => {
+						try {
+							const res = await axios.get<{ name: string }>(
+								`http://${BACKEND_URL}/admin/${row.id}/${row.type}/name`,
+								{ headers: { Authorization: `Bearer ${token}` } },
+							)
+							return { ...row, name: res.data.name }
+						} catch (err) {
+							console.error('Failed to fetch name for', row, err)
+							return { ...row, name: '—' }
+						}
+					}),
+				)
+				setTableRows(updated)
+			} finally {
+				setTimeout(() => setIsLoading(false), 500)
+			}
+		}
+
+		fetchNames()
+	}, [rows])
+
 	const minBookings = 0
 	const maxBookings = 100
 	const getBookingColor = (value: number): string => {
@@ -26,13 +69,42 @@ const AdminTable: React.FC<adminTableProps> = ({ header, rows }) => {
 		return `rgb(${red}, ${green}, 100)`
 	}
 
-	const [openActions, setOpenActions] = useState<number | null>(null)
-	const toggleActions = (index: number) => {
-		setOpenActions(openActions === index ? null : index)
+	const removeReport = (id: string) => {
+		setTableRows(prev => prev.filter(r => r.id !== id))
+	}
+
+	const openModal = (name: string, id: string, type: 'User' | 'Location' | 'Group') => {
+		setModalData({ name, id, type, removeReport })
+		setShowModal(true)
+	}
+
+	const closeModal = () => {
+		setShowModal(false)
+	}
+
+	if (isLoading)
+		return (
+			<div className="bugs-container--loading">
+				<div className="circle"></div>
+			</div>
+		)
+
+	if (tableRows.length === 0) {
+		return <div className="nodata-container">No data found...</div>
 	}
 
 	return (
 		<div className="admin-table-wrapper">
+			{showModal && (
+				<ReportDetailModal
+					name={modalData!.name}
+					id={modalData!.id}
+					type={modalData!.type}
+					removeReport={modalData!.removeReport}
+					close={closeModal}
+				/>
+			)}
+
 			<table>
 				<thead>
 					<tr>
@@ -43,33 +115,26 @@ const AdminTable: React.FC<adminTableProps> = ({ header, rows }) => {
 					</tr>
 				</thead>
 				<tbody>
-					{rows.map(({ image, name, type, status, bookings, rating }, index) => (
-						<tr key={index}>
+					{tableRows.map(({ name, id, type, reports }) => (
+						<tr key={id}>
 							<td>
-								<img src={image.url} alt={image.alt} />
+								{type === 'User' ? (
+									<Link to={'/profile'} style={{ cursor: 'pointer' }}>
+										View profile
+									</Link>
+								) : (
+									<img src="https://i.pravatar.cc/100?u=5" alt="poza" />
+								)}
 							</td>
 							<td>{name}</td>
 							<td>{type}</td>
-							<td>
-								<div className={`status-adm ${status}`}>
-									<div className={`circle-status ${status}`}></div>
-									{status}
-								</div>
-							</td>
-							<td style={{ color: getBookingColor(bookings) }}>{bookings}</td>
-							<td>{rating}/5</td>
+							<td style={{ color: getBookingColor(reports) }}>{reports}</td>
 							<td>
 								<div style={{ position: 'relative' }}>
 									<FaChevronDown
 										style={{ cursor: 'pointer' }}
-										onClick={() => toggleActions(index)}
+										onClick={() => openModal(name!, id, type)}
 									/>
-									{openActions === index && (
-										<div className="action-buttons">
-											<button className="action-btn">Suspend</button>
-											<button className="action-btn">Reject</button>
-										</div>
-									)}
 								</div>
 							</td>
 						</tr>

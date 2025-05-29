@@ -46,7 +46,7 @@ const RegisterForm = () => {
 
 			const token = await currentUser?.getIdToken()
 			await axios.post(
-				`${BACKEND_URL}/users/profile`,
+				`http://${BACKEND_URL}/users/profile`,
 				{}, // Pass an empty object for the request body if no data needs to be sent
 				{
 					headers: {

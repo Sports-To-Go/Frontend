@@ -1,57 +1,109 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import Layout from '../../components/Layout/Layout'
 import './Administration.scss'
-import AdminTable from '../../components/AdminTable/AdminTable'
-import { groups, tableData, users } from '../../assets/dummy-data'
+import AdminTable, { adminTableRow } from '../../components/AdminTable/AdminTable'
 import '../../components/StatCards/StatCards.scss'
-import StatCard from '../../components/StatCards/StatCards'
+import StatCardsContainer from '../../components/StatCards/StatCards'
 import AdminTab from '../../components/AdminTabs/AdminTab'
 import { LineChart } from '@mui/x-charts/LineChart'
+import AdminError from '../AdminError/AdminError'
+import Bugs from '../../components/Bugs/Bugs'
+import { auth } from '../../firebase/firebase'
+import axios from 'axios'
+import { BACKEND_URL } from '../../../integration-config'
 
 export const Administration: React.FC = () => {
+	const [monthlyRevenue, setMonthlyRevenue] = useState<number[]>([])
+	const [isMobile, setIsMobile] = useState(window.innerWidth < 1000)
+	const [pass, setPass] = useState('')
+	const [reports, setReports] = useState<adminTableRow[]>([])
+
+	useEffect(() => {
+		const handleResize = () => {
+			setIsMobile(window.innerWidth < 1000)
+		}
+
+		const getMonthlyRevenue = async () => {
+			const currentUser = auth.currentUser
+			if (!currentUser) return
+			const year = new Date().toISOString().split('T')[0].split('-')[0]
+			try {
+				const token = await currentUser.getIdToken(true)
+				setPass(token)
+				const res = await axios.get(`http://${BACKEND_URL}/admin/revenue/monthly`, {
+					params: {
+						from: `${year}-01-01`,
+						to: `${year}-12-31`,
+					},
+					headers: {
+						Authorization: `Bearer ${token}`,
+					},
+				})
+
+				const monthly: number[] = Array(12).fill(0)
+
+				if (!!res.data) {
+					res.data.forEach((rev: any) => {
+						const month = new Date(rev.periodStart).getMonth()
+						monthly[month] = rev.totalAmount
+					})
+				}
+				setMonthlyRevenue(monthly)
+			} catch (error) {
+				console.error(error)
+			}
+		}
+
+		const getReports = async () => {
+			const currentUser = auth.currentUser
+			if (!currentUser) return
+
+			try {
+				const token = await currentUser.getIdToken(true)
+				const res = await axios.get(`http://${BACKEND_URL}/admin/reports/info`, {
+					headers: {
+						Authorization: `Bearer ${token}`,
+					},
+				})
+				setReports(res.data)
+			} catch (error) {
+				console.error(error)
+			}
+		}
+
+		getReports()
+		getMonthlyRevenue()
+		window.addEventListener('resize', handleResize)
+		return () => window.removeEventListener('resize', handleResize)
+	}, [])
+
 	const tableHeadersMap: { [key: string]: string[] } = {
-		Venues: ['Venue', 'Name', 'Type', 'Status', 'Bookings', 'Ratings'],
-		Users: ['User', 'Name', 'Type', 'Status', 'Reports', 'Rating'],
-		Groups: ['Group', 'Name', 'Type', 'Status', 'Members', 'Created'],
-		Analytics: ['I', 'do_not', 'know'],
-		Bugs: ['Issue', 'Status', 'Reported By', 'Number of reports'],
+		Venues: ['Venue', 'Name', 'Type', 'Reports'],
+		Users: ['User', 'Name', 'Type', 'Reports'],
+		//Groups: ['Group', 'Name', 'Type', 'Members'],
 	}
 
 	const tableDataMap: { [key: string]: any[] } = {
-		Venues: tableData,
-		Users: users,
-		Groups: groups,
-		Analytics: [],
-		Bugs: [],
+		Venues: reports.filter(report => report.type === 'Location'),
+		Users: reports.filter(report => report.type === 'User'),
+		//Groups: groups,
 	}
 	const [manageTitle, setManageTitle] = useState('Venues')
-	const cards = [
-		{ id: 'bookings', title: 'Total', subtitle: 'Bookings', value: '367' },
-		{ id: 'venues', title: 'Active', subtitle: 'Venues', value: '10' },
-		{ id: 'new-users', title: 'New', subtitle: 'Users', value: '14' },
-		{ id: 'total-users', title: 'Total', subtitle: 'Users', value: '1.340' },
-		{ id: 'revenue', title: 'Revenue', subtitle: 'This Month', value: '$2.786' },
-	]
+
+	if (isMobile) {
+		return <AdminError />
+	}
 
 	return (
 		<Layout showTabs={false} showFooter={true}>
 			<div className="administration--container">
 				<h2>Admin dashboard</h2>
 				<div className="admin-cards--container">
-					<div className="stats-grid">
-						{cards.map(card => (
-							<StatCard
-								key={card.id}
-								title={card.title}
-								subtitle={card.subtitle}
-								value={card.value}
-							/>
-						))}
-					</div>
+					<StatCardsContainer />
 				</div>
 				<div className="manage--container">
 					<div className="admin-tabs--container">
-						{['Venues', 'Users', 'Groups', 'Analytics', 'Bugs'].map(tab => (
+						{['Venues', 'Users', 'Analytics', 'Bugs'].map(tab => (
 							<AdminTab
 								key={tab}
 								label={`Manage ${tab}`}
@@ -65,12 +117,8 @@ export const Administration: React.FC = () => {
 						<div style={{ width: '90%' }}>
 							<h2>Manage {manageTitle}</h2>
 						</div>
-						{manageTitle !== 'Analytics' ? (
-							<AdminTable
-								header={tableHeadersMap[manageTitle]}
-								rows={tableDataMap[manageTitle]}
-							/>
-						) : (
+
+						{manageTitle === 'Analytics' ? (
 							<LineChart
 								xAxis={[
 									{
@@ -94,14 +142,18 @@ export const Administration: React.FC = () => {
 								]}
 								series={[
 									{
-										data: [
-											1200, 550.5, 2100, 800.5, 1601.5, 125.5, 1110, 2000, 1900, 1200,
-											900, 110,
-										],
+										data: monthlyRevenue,
 									},
 								]}
 								height={350}
 								width={800}
+							/>
+						) : manageTitle === 'Bugs' ? (
+							<Bugs />
+						) : (
+							<AdminTable
+								header={tableHeadersMap[manageTitle]}
+								rows={tableDataMap[manageTitle]}
 							/>
 						)}
 					</div>
@@ -111,4 +163,4 @@ export const Administration: React.FC = () => {
 	)
 }
 
-export default Administration;
+export default Administration
