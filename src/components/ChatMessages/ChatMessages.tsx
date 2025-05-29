@@ -24,8 +24,11 @@ function formatSystemMessage(msg: Message): string {
 			return `${meta.displayName} is now ${meta.newRole}.`
 		case 'THEME_CHANGED':
 			return `Theme changed to ${meta.themeName}.`
-		case 'NICKNAME_CHANGED':
-			return `${meta.changedByName} set nickname for ${meta.targetName} to "${meta.newName}".`
+		case 'NICKNAME_CHANGED': {
+			const { changedByName, uid, oldNickanme, newNickname } = meta
+
+			return `${changedByName} set nickname for ${oldNickanme} to "${newNickname}".`
+		}
 		case 'JOIN_REQUESTED':
 			return `${meta.displayName} requested to join: "${meta.motivation}"`
 		case 'GROUP_CREATED':

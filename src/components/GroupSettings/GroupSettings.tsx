@@ -8,6 +8,7 @@ interface GroupMember {
 	displayName: string
 	id: string
 	role: string
+	nickname?: string
 }
 
 interface JoinRequest {
@@ -21,12 +22,14 @@ interface GroupSettingsProps {
 	handleJoinRequest: (id: string, accepted: boolean) => void
 	onClose: () => void
 	onThemeChange: (theme: string) => void
+	onNicknameChange: (group_id: string, nickname: string) => void
 	groupID: number
 }
 
 const GroupSettings: React.FC<GroupSettingsProps> = ({
 	onClose,
 	onThemeChange,
+	onNicknameChange,
 	joinRequests,
 	handleJoinRequest,
 	groupID,
@@ -72,10 +75,6 @@ const GroupSettings: React.FC<GroupSettingsProps> = ({
 		groupMembers.find((member: GroupMember) => {
 			return member.id == user?.uid || ''
 		})?.role == 'member'
-
-	
-
-
 
 	return (
 		<div className="modal-overlay" onClick={onClose}>
@@ -190,6 +189,22 @@ const GroupSettings: React.FC<GroupSettingsProps> = ({
 							) : (
 								<p>No join requests at the moment.</p>
 							)
+						) : activeModal === 'Nicknames' ? (
+							<div className="nickname-modal">
+								<ul className="nicknames-list">
+									{sortedMembers.map(member => (
+										<li key={member.id}>
+											<span>{member.displayName}</span>
+											<input
+												type="text"
+												placeholder="Set nickname"
+												defaultValue={member.nickname || ''}
+												onBlur={e => onNicknameChange(member.id, e.target.value.trim())}
+											/>
+										</li>
+									))}
+								</ul>
+							</div>
 						) : (
 							<p>Content for "{activeModal}" to be added.</p>
 						)}
