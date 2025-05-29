@@ -1,5 +1,6 @@
 import { Routes, Route, Navigate } from 'react-router-dom'
 import { useAuth } from '../../context/UserContext'
+import { useEmailVerification } from '../../context/EmailVerificationContext'
 
 import Administration from '../../pages/Administration/Administration'
 import AddLocationPage from '../../pages/AddLocation/AddLocationPage'
@@ -7,82 +8,76 @@ import Locations from '../../pages/Locations/Locations'
 import Profile from '../../pages/Profile/Profile'
 import Social from '../../pages/Social/Social'
 import Login from '../../pages/Login/Login'
-import { useEffect, useState } from 'react'
-import { auth } from '../../firebase/firebase'
-import { BACKEND_URL } from '../../../integration-config'
-import axios from 'axios'
+import ForgotPass from '../../pages/ForgotPass/ForgotPass'
+import VerifyEmail from '../../pages/VerifyEmail/VerifyEmail'
 import FAQPage from '../../pages/FAQ/FAQ'
 
 const AppRoutes: React.FC = () => {
 	const { user } = useAuth()
+	const { showVerifyPage } = useEmailVerification()
 
-	const [isAdmin, setIsAdmin] = useState(false)
-	const [userDescription, setUserDescription] = useState('')
-	const isLogged = !!user
+	if (user === undefined) {
+		return; // add waiting page here
+	}
 
-	useEffect(() => {
-		const fetchUserData = async () => {
-			if (user === null) {
-				setIsAdmin(false)
-				setUserDescription('')
-				return
-			}
+	const isLogged =
+		!!user &&
+		(user.emailVerified ||
+			(user.providerData &&
+				user.providerData.some((p: { providerId: string }) =>
+					['facebook.com', 'github.com', 'google.com'].includes(p.providerId),
+				)))
 
-			try {
-				const currentUser = auth.currentUser
-				const token = await currentUser?.getIdToken()
+	const isAdmin = user?.isAdmin || false
+	let routes: React.ReactNode = null
 
-				const response = await axios.get(`http://${BACKEND_URL}/users/profile`, {
-					headers: {
-						Authorization: `Bearer ${token}`,
-					},
-				})
-				// console.log(response)
-
-				setIsAdmin(response.data.admin)
-				setUserDescription(response.data.description)
-			} catch (error) {
-				console.error('Error fetching user data:', error)
-				setIsAdmin(false)
-			}
-		}
-
-		fetchUserData()
-	}, [user])
-
-	const routes = isAdmin ? (
-		<>
-			<Route path="/administration" element={<Administration />} />
-			<Route path="/faq" element={<FAQPage />} />
-			<Route path="/profile" element={<Profile description={userDescription} />} />
-			<Route path="*" element={<Navigate to="/administration" replace />} />
-		</>
-	) : (
-		<>
-			<Route path="/social" element={isLogged ? <Social /> : <Navigate to="/login" replace />} />
+	if (isAdmin) {
+		routes = (
+			<>
+				<Route path="/administration" element={<Administration />} />
+				<Route path="/faq" element={<FAQPage />} />
+				<Route path="*" element={<Navigate to="/administration" replace />} />
+			</>
+		)
+	} else if (showVerifyPage) {
+		routes = (
+			<>
+				<Route path="/verify-email" element={<VerifyEmail />} />
+				<Route path="*" element={<Navigate to="/verify-email" replace />} />
+			</>
+		)
+	} else {
+		const loginRoute = (
 			<Route
-				path="/profile"
-				element={
-					isLogged ? (
-						<Profile description={userDescription} />
-					) : (
-						<Navigate to="/login" replace />
-					)
-				}
+				path="/login"
+				element={isLogged ? <Navigate to="/locations" replace /> : <Login />}
 			/>
-			<Route
-				path="/add-location"
-				element={isLogged ? <AddLocationPage /> : <Navigate to="/login" replace />}
-			/>
-			<Route path="/faq" element={<FAQPage />} />
+		)
 
-			{!isLogged && <Route path="/login" element={<Login />} />}
+		const forgotPassRoute = !isLogged && (
+			<Route path="/forgot-password" element={<ForgotPass />} />
+		)
 
-			<Route path="/locations" element={<Locations />} />
-			<Route path="*" element={<Navigate to="/locations" replace />} />
-		</>
-	)
-
+		routes = isLogged ? (
+			<>
+				{loginRoute}
+				{forgotPassRoute}
+				<Route path="/locations" element={<Locations />} />
+				<Route path="/social" element={<Social />} />
+				<Route path="/profile/:uid" element={<Profile />} />
+				<Route path="/add-location" element={<AddLocationPage />} />
+				<Route path="/faq" element={<FAQPage />} />
+				<Route path="*" element={<Navigate to="/locations" replace />} />
+			</>
+		) : (
+			<>
+				{loginRoute}
+				{forgotPassRoute}
+				<Route path="/locations" element={<Locations />} />
+				<Route path="*" element={<Navigate to="/login" replace />} />
+			</>
+		)
+	}
 	return <Routes>{routes}</Routes>
 }
 
