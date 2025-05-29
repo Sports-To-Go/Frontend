@@ -5,12 +5,14 @@ import ReportCardInfo from '../ReportCardInfo/ReportCardInfo'
 import { auth } from '../../firebase/firebase'
 import axios from 'axios'
 import { BACKEND_URL } from '../../../integration-config'
+import { useAuth } from '../../context/UserContext'
 
 export interface modalReportProps {
 	name: string
 	id: string
 	type: 'User' | 'Location' | 'Group'
 	close?: () => void
+	removeReport: (id: string) => void
 }
 
 interface repsonseReports {
@@ -19,9 +21,11 @@ interface repsonseReports {
 	createdAt: string
 }
 
-const ReportDetailModal: React.FC<modalReportProps> = ({ close, name, id, type }) => {
+const ReportDetailModal: React.FC<modalReportProps> = ({ removeReport, close, name, id, type }) => {
 	const [reports, setReports] = useState<repsonseReports[]>()
 	const [isLoading, setIsLoading] = useState(true)
+	const [numberOfDaysBan, setNumberOfDaysBan] = useState<number>(0)
+	const { user } = useAuth()
 	useEffect(() => {
 		const getReports = async () => {
 			const currentUser = auth.currentUser
@@ -47,6 +51,50 @@ const ReportDetailModal: React.FC<modalReportProps> = ({ close, name, id, type }
 
 		getReports()
 	}, [])
+
+	const banUser = async () => {
+		const currentUser = auth.currentUser
+		if (!currentUser) return
+		try {
+			const token = await currentUser.getIdToken(true)
+			axios.post(
+				`http://${BACKEND_URL}/admin/bans`,
+				{
+					idUser: id,
+					beginTime: new Date().toISOString().split('T')[0],
+					duration: numberOfDaysBan,
+					reason: 'Offensive player',
+					bannedBy: user!.displayName,
+				},
+				{
+					headers: {
+						Authorization: `Bearer ${token}`,
+					},
+				},
+			)
+		} catch (error) {
+			console.error(error)
+		}
+		removeReport(id)
+		close!()
+	}
+
+	const forgiveUser = async () => {
+		const currentUser = auth.currentUser
+		if (!currentUser) return
+		try {
+			const token = await currentUser.getIdToken(true)
+			axios.delete(`http://${BACKEND_URL}/admin/reports/${type}/${id}`, {
+				headers: {
+					Authorization: `Bearer ${token}`,
+				},
+			})
+		} catch (error) {
+			console.error(error)
+		}
+		removeReport(id)
+		close!()
+	}
 
 	return (
 		<div className="backdrop" onClick={close}>
@@ -78,10 +126,20 @@ const ReportDetailModal: React.FC<modalReportProps> = ({ close, name, id, type }
 				</div>
 				<div className="modal--footer">
 					<div className="ban--container">
-						<button className="ban-user">Ban</button>
-						<input type="number" min={2} placeholder="Number of days" />
+						<button className="ban-user" onClick={banUser}>
+							Ban
+						</button>
+						<input
+							required
+							type="number"
+							min={2}
+							placeholder="Number of days"
+							onChange={event => setNumberOfDaysBan(Number(event.target.value))}
+						/>
 					</div>
-					<button className="forgive-user">Forgive</button>
+					<button className="forgive-user" onClick={forgiveUser}>
+						Forgive
+					</button>
 				</div>
 			</dialog>
 		</div>

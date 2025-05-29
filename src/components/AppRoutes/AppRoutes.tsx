@@ -16,7 +16,6 @@ import FAQPage from '../../pages/FAQ/FAQ'
 const AppRoutes: React.FC = () => {
 	const { user } = useAuth()
 
-
 	const [isAdmin, setIsAdmin] = useState(false)
 	const [userDescription, setUserDescription] = useState('')
 	const isLogged = !!user
@@ -55,6 +54,7 @@ const AppRoutes: React.FC = () => {
 		<>
 			<Route path="/administration" element={<Administration />} />
 			<Route path="/faq" element={<FAQPage />} />
+			<Route path="/profile" element={<Profile description={userDescription} />} />
 			<Route path="*" element={<Navigate to="/administration" replace />} />
 		</>
 	) : (
