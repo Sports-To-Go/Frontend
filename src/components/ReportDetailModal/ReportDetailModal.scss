@@ -1,0 +1,73 @@
+.backdrop {
+	position: fixed;
+	top: 0;
+	left: 0;
+	width: 100vw;
+	height: 100vh;
+	background-color: rgba(0, 0, 0, 0.3);
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	z-index: 20;
+
+	.modal-reports {
+		width: 45%;
+		display: flex;
+		border: 2px solid black;
+		border-radius: 10px;
+		display: flex;
+		flex-direction: column;
+		background-color: var(--background);
+		color: var(--text-primary);
+
+		.modal--header {
+			display: flex;
+			justify-content: space-between;
+			width: 100%;
+			height: 50px;
+			align-items: center;
+		}
+
+		.modal--body {
+			display: flex;
+			flex-direction: column;
+			max-height: 450px;
+			gap: 10px;
+			overflow-y: scroll;
+		}
+
+		.modal--footer {
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+			button {
+				border: 2px solid gray;
+				box-shadow: 3px 3px 0px var(--text-secondary);
+				background-color: var(--background);
+				color: var(--text-primary);
+				padding: 5px;
+				border-radius: 5px;
+				width: 70px;
+				cursor: pointer;
+				transition: all 0.2s ease;
+
+				&:active {
+					box-shadow: 2px 2px 0px var(--text-secondary);
+					transform: translate(1px, 1px);
+				}
+			}
+
+			.ban--container {
+				display: flex;
+				gap: 10px;
+				align-items: center;
+
+				input {
+					height: 10px;
+					border: 1px solid gray;
+					margin-bottom: 0px;
+				}
+			}
+		}
+	}
+}
