@@ -5,6 +5,7 @@ import ChatMessageBar from '../ChatMessageBar/ChatMessageBar'
 import GroupSettings from '../GroupSettings/GroupSettings'
 import './GroupChat.scss'
 import { useSocial, Message } from '../../context/SocialContext'
+import { auth } from '../../firebase/firebase'
 
 interface GroupProps {
 	groupID: number
@@ -23,6 +24,8 @@ const GroupChat: FC<GroupProps> = ({ groupID, onBack }) => {
 		state: { messages, members, selectedGroup, groups },
 		sendMessage,
 		loadMessageHistory,
+		changeTheme,
+		changeNickname
 	} = useSocial()
 
 	const rawMessages = selectedGroup ? messages.get(selectedGroup.id) || [] : []
@@ -31,7 +34,10 @@ const GroupChat: FC<GroupProps> = ({ groupID, onBack }) => {
 		const groupMember = members.get(groupID)?.get(msg.senderID)
 		return {
 			...msg,
-			senderName: msg.type === 'SYSTEM' ? '' : groupMember?.displayName || 'Unknown User',
+			senderName:
+				msg.type === 'SYSTEM'
+					? ''
+					: groupMember?.nickname || groupMember?.displayName || 'Unknown User',
 		}
 	})
 
@@ -64,6 +70,7 @@ const GroupChat: FC<GroupProps> = ({ groupID, onBack }) => {
 		await loadMessageHistory(selectedGroup.id, oldest.slice(0, 23))
 		setLoadingHistory(false)
 	}
+
 	const themeMap: Record<string, string> = {
 		DEFAULT: 'linear-gradient(to right,var(--background),var(--background))',
 		ORANGE: 'linear-gradient(to right,rgb(215, 84, 101),rgb(233, 125, 86))',
@@ -80,29 +87,27 @@ const GroupChat: FC<GroupProps> = ({ groupID, onBack }) => {
 	}
 
 	const handleThemeKeyChange = (themeKey: string) => {
-		if (!themeKey) {
-			console.warn('No themeKey received')
-			return
-		}
+		if (!themeKey || !selectedGroup) return
 		const theme = themeMap[themeKey]
-		if (!theme) {
-			console.warn(`Theme key "${themeKey}" not found in themeMap`)
-			return
-		}
-		setThemeGradient(theme)
-		const systemMessage = JSON.stringify({
-			systemEvent: 'THEME_CHANGED',
-			meta: {
-				themeName: themeKey,
-			},
-		})
-		handleSendMessage(systemMessage, 'SYSTEM')
+		if (!theme) return
+		changeTheme(selectedGroup.id, themeKey);
 	}
 
-	const handleSendMessage = (content: string, type: 'TEXT' | 'SYSTEM') => {
-		if (!newMessage.trim() && type == 'TEXT') return
-		sendMessage({ content: content, type: type })
+	const handleSendMessage = (content: string) => {
+		if (!newMessage.trim()) return
+		sendMessage({ content: content})
 		setNewMessage('')
+	}
+
+	const handleNicknameChange = (memberID: string, newNickname: string) => {
+		const groupMembers = members.get(groupID)
+		if (!groupMembers|| !selectedGroup) return
+
+		const member = groupMembers.get(memberID)
+		if (!member) return
+
+
+		changeNickname(selectedGroup.id, memberID, newNickname);
 	}
 
 	const initialTheme =
@@ -111,6 +116,7 @@ const GroupChat: FC<GroupProps> = ({ groupID, onBack }) => {
 			: themeMap['DEFAULT']
 
 	const [themeGradient, setThemeGradient] = useState('')
+
 	useEffect(() => {
 		if (!selectedGroup) return
 
@@ -120,6 +126,7 @@ const GroupChat: FC<GroupProps> = ({ groupID, onBack }) => {
 
 		setThemeGradient(newTheme)
 	}, [selectedGroup, groups])
+
 	return (
 		<div
 			className="chat-container"
@@ -154,6 +161,7 @@ const GroupChat: FC<GroupProps> = ({ groupID, onBack }) => {
 					handleJoinRequest={(id: string, accepted: boolean) => {}}
 					onClose={() => setIsGroupSettingsOpen(false)}
 					onThemeChange={handleThemeKeyChange}
+					onNicknameChange={handleNicknameChange}
 					groupID={groupID}
 				/>
 			)}
