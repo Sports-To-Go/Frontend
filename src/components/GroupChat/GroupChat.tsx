@@ -24,6 +24,8 @@ const GroupChat: FC<GroupProps> = ({ groupID, onBack }) => {
 		state: { messages, members, selectedGroup, groups },
 		sendMessage,
 		loadMessageHistory,
+		changeTheme,
+		changeNickname
 	} = useSocial()
 
 	const rawMessages = selectedGroup ? messages.get(selectedGroup.id) || [] : []
@@ -85,48 +87,27 @@ const GroupChat: FC<GroupProps> = ({ groupID, onBack }) => {
 	}
 
 	const handleThemeKeyChange = (themeKey: string) => {
-		if (!themeKey) return
+		if (!themeKey || !selectedGroup) return
 		const theme = themeMap[themeKey]
 		if (!theme) return
-
-		setThemeGradient(theme)
-
-		const systemMessage = JSON.stringify({
-			systemEvent: 'THEME_CHANGED',
-			meta: {
-				themeName: themeKey,
-			},
-		})
-
-		handleSendMessage(systemMessage, 'SYSTEM')
+		changeTheme(selectedGroup.id, themeKey);
 	}
 
-	const handleSendMessage = (content: string, type: 'TEXT' | 'SYSTEM') => {
-		if (!newMessage.trim() && type === 'TEXT') return
-		sendMessage({ content: content, type: type })
+	const handleSendMessage = (content: string) => {
+		if (!newMessage.trim()) return
+		sendMessage({ content: content})
 		setNewMessage('')
 	}
 
 	const handleNicknameChange = (memberID: string, newNickname: string) => {
 		const groupMembers = members.get(groupID)
-		if (!groupMembers) return
+		if (!groupMembers|| !selectedGroup) return
 
 		const member = groupMembers.get(memberID)
 		if (!member) return
 
-		const originalName = member.displayName || 'Unknown User'
 
-		const systemMessage = JSON.stringify({
-			systemEvent: 'NICKNAME_CHANGED',
-			meta: {
-				changedByName: auth.currentUser?.displayName,
-				uid:memberID,
-				oldNickanme: originalName,
-				newNickname:newNickname
-			},
-		})
-
-		handleSendMessage(systemMessage, 'SYSTEM')
+		changeNickname(selectedGroup.id, memberID, newNickname);
 	}
 
 	const initialTheme =

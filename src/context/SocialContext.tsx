@@ -66,8 +66,10 @@ interface SocialContextType {
 	selectGroup: (group: GroupPreview | null) => void
 	joinGroup: (groupID: number) => Promise<boolean>
 	leaveGroup: (groupID: number) => void
+	changeTheme: (groupID: number, theme:string) =>void
+	changeNickname: (groupID:number, memberID: string, nickname:string) =>void
 	createGroup: (name: string, description: string) => void
-	sendMessage: (args: { content: string; type: 'TEXT' | 'SYSTEM' }) => void
+	sendMessage: (args: { content: string}) => void
 	loadMessageHistory: (groupID: number, before: string) => void
 	removeRecommendation: (groupID: number) => void
 }
@@ -151,8 +153,8 @@ const socialReducer = (state: SocialState, action: any): SocialState => {
 
 				// NICKNAME_CHANGED
 				else if (message.systemEvent === 'NICKNAME_CHANGED') {
-					const { uid, newNickname } = message.meta || {}
-					if (!uid || !newNickname) return state
+					const { uid, nickname } = message.meta || {}
+					if (!uid || !nickname) return state
 
 					const groupID = message.groupID
 					const newMembersMap = new Map(state.members)
@@ -162,7 +164,7 @@ const socialReducer = (state: SocialState, action: any): SocialState => {
 					if (member) {
 						groupMembers.set(uid, {
 							...member,
-							nickname: newNickname,
+							nickname: nickname,
 						})
 						newMembersMap.set(groupID, groupMembers)
 					}
@@ -301,7 +303,7 @@ export const SocialProvider: FC<{ children: ReactNode }> = ({ children }) => {
 			console.error('Error loading messages:', err)
 		}
 	}
-
+	
 	const connectWebSocket = async () => {
 		try {
 			if (websocket.current) return
@@ -353,6 +355,33 @@ export const SocialProvider: FC<{ children: ReactNode }> = ({ children }) => {
 					})
 					dispatch({ type: 'LEAVE_GROUP', payload: id })
 				},
+				changeTheme: async (groupID, theme) => {
+					const token = await auth.currentUser?.getIdToken()
+					await axios.put(
+						`http://${BACKEND_URL}/social/group/${groupID}/theme/${theme}`,
+						{},
+						{
+							headers: { Authorization: `Bearer ${token}` },
+						},
+					)
+
+				},
+				changeNickname: async (groupID, memberID, nickname) => {
+					if (!state.selectedGroup) return
+					if (state.members.get(state.selectedGroup.id)?.get(memberID)?.nickname == nickname) return
+					const token = await auth.currentUser?.getIdToken()
+					await axios.put(
+						`http://${BACKEND_URL}/social/group/nickname`,
+						{
+							uid:memberID,
+							groupId:groupID,
+							nickname:nickname
+						},
+						{
+							headers: { Authorization: `Bearer ${token}` },
+						},
+					)
+				},
 				createGroup: async (name, desc) => {
 					if (!name.trim()) return
 					const token = await auth.currentUser?.getIdToken(true)
@@ -374,30 +403,15 @@ export const SocialProvider: FC<{ children: ReactNode }> = ({ children }) => {
 						},
 					})
 				},
-				sendMessage: ({ content, type }: { content: string; type: 'TEXT' | 'SYSTEM' }) => {
+				sendMessage: ({ content }: { content: string; }) => {
 					const g = state.selectedGroup
 					if (!g || !websocket.current) return
-					if (type === 'SYSTEM') {
-						try {
-							const system_json = JSON.parse(content)
-							websocket.current.send(
-								JSON.stringify({
-									groupID: g.id,
-									type,
-									...system_json,
-								}),
-							)
-						} catch (error) {
-							console.error('Invalid SYSTEM content:', content, error)
-						}
-						return
-					}
 					if (!content.trim()) return
 					websocket.current.send(
 						JSON.stringify({
 							groupID: g.id,
 							content,
-							type,
+							type:'TEXT'
 						}),
 					)
 				},
