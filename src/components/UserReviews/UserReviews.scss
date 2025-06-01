@@ -1,0 +1,124 @@
+.user-reviews {
+	display: flex;
+	flex-direction: column;
+	width: 100%;
+	max-width: 100%;
+	margin-top: 2rem;
+
+	&__title {
+		font-size: 1.5rem;
+		color: var(--text-primary);
+		margin: 0;
+		margin-bottom: 0.5rem;
+	}
+
+	&__card {
+		background-color: var(--background-green);
+		border: 1px solid var(--border-color);
+		border-radius: 12px;
+		box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+		padding: 1rem;
+		min-height: 100px;
+		max-height: 200px;
+		width: 100%;
+		display: flex;
+		flex-direction: column;
+		overflow: hidden;
+	}
+
+	&__count {
+		color: var(--text-secondary);
+		font-size: 0.9rem;
+		margin: 0;
+		padding-bottom: 0.5rem;
+		border-bottom: 1px solid var(--border-color);
+	}
+
+	&__scroll-container {
+		flex: 1;
+		overflow-y: auto;
+		display: flex;
+		flex-direction: column;
+		padding-right: 0.5rem;
+
+		scrollbar-width: auto;
+		scrollbar-color: var(--accent-green) transparent;
+
+		&::-webkit-scrollbar {
+			width: 14px;
+		}
+
+		&::-webkit-scrollbar-thumb {
+			background-color: var(--accent-green);
+			border: 4px solid white;
+			border-radius: 20px;
+		}
+
+		&::-webkit-scrollbar-track {
+			background: transparent;
+		}
+	}
+
+	&__item {
+		position: relative;
+		display: flex;
+		align-items: flex-start;
+		gap: 1rem;
+		padding: 0.8rem 0;
+		border-bottom: 1px solid var(--border-color);
+	}
+
+	&__avatar img {
+		width: 48px;
+		height: 48px;
+		border-radius: 50%;
+		object-fit: cover;
+	}
+
+	&__details {
+		flex: 1;
+		display: flex;
+		flex-direction: column;
+		gap: 0.3rem;
+		padding-right: 150px;
+	}
+
+	&__date {
+		font-size: 0.85rem;
+		color: var(--text-secondary);
+		margin: 0;
+	}
+
+	&__text {
+		font-size: 0.9rem;
+		color: var(--text-primary);
+		margin: 0;
+		white-space: normal;
+		word-break: break-word;
+		overflow-wrap: break-word;
+	}
+
+	&__rating {
+		position: absolute;
+		top: 1rem;
+		right: 1rem;
+		display: flex;
+		gap: 0.2rem;
+
+		.star {
+			color: var(--admin-text-red);
+			font-size: 1rem;
+		}
+	}
+}
+@media (max-width: 600px) {
+	.user-reviews {
+		padding-bottom: 50px;
+	}
+	.user-reviews__card {
+		width: 90%;
+	}
+	.user-reviews__title {
+		text-align: center;
+	}
+}

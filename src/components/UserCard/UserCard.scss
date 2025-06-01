@@ -1,4 +1,5 @@
 .user-card {
+	position: relative;
 	display: flex;
 	flex-direction: column;
 	align-items: center;
@@ -10,33 +11,18 @@
 	border-radius: 12px;
 	box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
 
+	width: 320px;
+	min-width: 320px;
 	max-width: 320px;
 	margin: 0 auto;
 
-	.badge-iconic {
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		gap: 0.4rem;
-		font-size: 1rem;
-		font-weight: 500;
-		color: #00e5ff;
-		margin-top: 0.4rem;
-
-		.icon {
-			font-size: 2.5rem;
-			transform: rotate(-90deg);
-		}
-
-		.badge-text {
-			white-space: nowrap;
-		}
-	}
-
 	&__header {
+		width: 100%;
 		display: flex;
+		flex-direction: row;
 		align-items: center;
 		gap: 1rem;
+		overflow: hidden;
 	}
 
 	&__avatar {
@@ -53,15 +39,15 @@
 	}
 
 	&__info {
-		display: flex;
-		flex-direction: column;
-		align-items: flex-start;
-		text-align: left;
+		flex: 1;
+		min-width: 0;
+		max-width: 100%;
+		overflow-wrap: break-word;
 
 		.user-card__rating {
 			display: flex;
 			gap: 0.5rem;
-			color: #d65971;
+			color: var(--admin-text-red);
 			margin-top: 0.5rem;
 		}
 	}
@@ -77,75 +63,23 @@
 		font-weight: bold;
 		color: var(--text-primary);
 		margin: 0;
+		overflow-wrap: break-word;
+		word-break: break-word;
 	}
+}
+.report-button {
+	position: absolute;
+	top: 12px;
+	right: 12px;
+	background: none;
+	border: none;
+	cursor: pointer;
+	color: #e74c3c;
+	font-size: 1.4rem;
+	padding: 0;
+	transition: transform 0.2s ease;
 
-	.badge-toggle {
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		gap: 0.5rem;
-		padding: 0.4rem 0.7rem;
-		border-radius: 999px;
-		font-size: 1rem;
-		font-weight: 500;
-		color: #1f2d5c;
-		margin-top: 0.5rem;
-		width: fit-content;
-
-		.toggle-label {
-			white-space: nowrap;
-		}
-
-		.switch {
-			position: relative;
-			display: inline-block;
-			width: 36px;
-			height: 20px;
-
-			input {
-				opacity: 0;
-				width: 0;
-				height: 0;
-			}
-
-			.slider {
-				position: absolute;
-				cursor: pointer;
-				top: 0;
-				left: 0;
-				right: 0;
-				bottom: 0;
-				background-color: white;
-				border: 2px solid #1f2d5c;
-				border-radius: 45px;
-				transition: 0.4s;
-				box-sizing: border-box;
-
-				&::before {
-					content: '';
-					position: absolute;
-					height: 12px;
-					width: 12px;
-					left: 2px;
-					top: 2px;
-					background-color: white;
-					border: 2px solid #1f2d5c;
-					border-radius: 50%;
-					transition: 0.4s;
-					box-sizing: border-box;
-				}
-			}
-
-			input:checked + .slider {
-				background-color: var(--primary);
-				border: 2px solid #1f2d5c;
-
-				&::before {
-					transform: translateX(15px);
-					background-color: #1f2d5c;
-					border: 2px solid #1f2d5c;
-				}
-			}
-		}
+	&:hover {
+		transform: scale(1.2);
 	}
 }
