@@ -5,7 +5,6 @@ import ChatMessageBar from '../ChatMessageBar/ChatMessageBar'
 import GroupSettings from '../GroupSettings/GroupSettings'
 import './GroupChat.scss'
 import { useSocial, Message } from '../../context/SocialContext'
-import { auth } from '../../firebase/firebase'
 
 interface GroupProps {
 	groupID: number
@@ -17,7 +16,6 @@ const GroupChat: FC<GroupProps> = ({ groupID, onBack }) => {
 	const [newMessage, setNewMessage] = useState('')
 	const [isGroupSettingsOpen, setIsGroupSettingsOpen] = useState(false)
 	const [groupName, setGroupName] = useState('Loading...')
-	const [joinRequests, setJoinRequests] = useState<any[]>([])
 	const [loadingHistory, setLoadingHistory] = useState(false)
 
 	const {
@@ -25,7 +23,7 @@ const GroupChat: FC<GroupProps> = ({ groupID, onBack }) => {
 		sendMessage,
 		loadMessageHistory,
 		changeTheme,
-		changeNickname
+		changeNickname,
 	} = useSocial()
 
 	const rawMessages = selectedGroup ? messages.get(selectedGroup.id) || [] : []
@@ -90,30 +88,24 @@ const GroupChat: FC<GroupProps> = ({ groupID, onBack }) => {
 		if (!themeKey || !selectedGroup) return
 		const theme = themeMap[themeKey]
 		if (!theme) return
-		changeTheme(selectedGroup.id, themeKey);
+		changeTheme(selectedGroup.id, themeKey)
 	}
 
 	const handleSendMessage = (content: string) => {
 		if (!newMessage.trim()) return
-		sendMessage({ content: content})
+		sendMessage({ content: content })
 		setNewMessage('')
 	}
 
 	const handleNicknameChange = (memberID: string, newNickname: string) => {
 		const groupMembers = members.get(groupID)
-		if (!groupMembers|| !selectedGroup) return
+		if (!groupMembers || !selectedGroup) return
 
 		const member = groupMembers.get(memberID)
 		if (!member) return
 
-
-		changeNickname(selectedGroup.id, memberID, newNickname);
+		changeNickname(selectedGroup.id, memberID, newNickname)
 	}
-
-	const initialTheme =
-		selectedGroup && groups.length > 0
-			? themeMap[groups.find(g => g.id === selectedGroup.id)?.theme || 'DEFAULT']
-			: themeMap['DEFAULT']
 
 	const [themeGradient, setThemeGradient] = useState('')
 
@@ -157,8 +149,6 @@ const GroupChat: FC<GroupProps> = ({ groupID, onBack }) => {
 			/>
 			{isGroupSettingsOpen && (
 				<GroupSettings
-					joinRequests={joinRequests}
-					handleJoinRequest={(id: string, accepted: boolean) => {}}
 					onClose={() => setIsGroupSettingsOpen(false)}
 					onThemeChange={handleThemeKeyChange}
 					onNicknameChange={handleNicknameChange}
