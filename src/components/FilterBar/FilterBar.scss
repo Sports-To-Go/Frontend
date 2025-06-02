@@ -1,172 +1,176 @@
 .filter-bar-container {
-    position: relative;
-    background-color: transparent;
-    backdrop-filter: none;
-    z-index: 0;
-    overflow: visible;
-    width: 100vw;
-    left: 0;
-    right: 0;
-    transition: background-color 0.3s, backdrop-filter 0.3s;
-    pointer-events: none; /* bara nu primește clickuri */
+	position: relative;
+	background-color: transparent;
+	backdrop-filter: none;
+	z-index: 0;
+	overflow: visible;
+	left: 0;
+	right: 0;
+	transition:
+		background-color 0.3s,
+		backdrop-filter 0.3s;
+	pointer-events: none; /* bara nu primește clickuri */
 }
 
 .filter-bar * {
-    pointer-events: auto; /* permite interacțiunea cu elementele din bară */
+	pointer-events: auto; /* permite interacțiunea cu elementele din bară */
 }
 
-.filters-menu, .filters-menu * {
-    pointer-events: auto; /* meniul și tot ce e în el sunt interactive */
+.filters-menu,
+.filters-menu * {
+	pointer-events: auto; /* meniul și tot ce e în el sunt interactive */
 }
 
 .filter-bar {
-    display: flex;
-    z-index: 0;
-    align-items: center;
-    justify-content: center;
-    gap: 2rem;
-    margin: 0 auto;
+	display: flex;
+	z-index: 0;
+	align-items: center;
+	justify-content: center;
+	gap: 2rem;
+	margin: 0 auto;
 }
 
 .filter-bar .arrow-button {
-    background: none;
-    border: none;
-    font-size: 2rem;
-    cursor: pointer;
-    color: #05c69d;
-    transition: color 0.2s ease-in-out;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+	background: none;
+	border: none;
+	font-size: 2rem;
+	cursor: pointer;
+	color: #05c69d;
+	transition: color 0.2s ease-in-out;
+	display: flex;
+	align-items: center;
+	justify-content: center;
 }
 .filter-bar .arrow-button:hover {
-    color: #038f72;
+	color: #038f72;
 }
 
 .filter-bar .sports-icons {
-    display: flex;
-    gap: 2.5rem;
-    overflow-x: auto;
-    scrollbar-width: none;
-    -ms-overflow-style: none;
+	display: flex;
+	gap: 2.5rem;
+	overflow-x: auto;
+	scrollbar-width: none;
+	-ms-overflow-style: none;
 }
 .filter-bar .sports-icons::-webkit-scrollbar {
-    display: none;
+	display: none;
 }
 
 .filter-bar .sports-icons .sport-icon {
-    position: relative;
-    background: none;
-    border: 4px solid transparent;
-    border-radius: 50%;
-    width: 70px;
-    height: 70px;
-    font-size: 2rem;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    transition: border-color 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
-    box-sizing: border-box;
+	position: relative;
+	background: none;
+	border: 4px solid transparent;
+	border-radius: 50%;
+	width: 70px;
+	height: 70px;
+	font-size: 2rem;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	cursor: pointer;
+	transition:
+		border-color 0.3s ease-in-out,
+		box-shadow 0.3s ease-in-out;
+	box-sizing: border-box;
 }
 .filter-bar .sports-icons .sport-icon:hover {
-    border-color: #05c69d;
-    box-shadow: 0 0 8px rgba(5, 198, 157, 0.5);
+	border-color: #05c69d;
+	box-shadow: 0 0 8px rgba(5, 198, 157, 0.5);
 }
 .filter-bar .sports-icons .sport-icon.active {
-    border-color: #038f72;
-    background-color: rgba(5, 198, 157, 0.15);
-    box-shadow: 0 0 16px rgba(5, 198, 157, 0.8);
+	border-color: #038f72;
+	background-color: rgba(5, 198, 157, 0.15);
+	box-shadow: 0 0 16px rgba(5, 198, 157, 0.8);
 }
 
 .filter-bar .filters-button {
-    background-color: #05c69d;
-    color: white;
-    border: none;
-    border-radius: 999px;
-    padding: 0.8rem 2rem;
-    font-size: 1.2rem;
-    cursor: pointer;
-    transition: background-color 0.2s ease-in-out;
+	background-color: #05c69d;
+	color: white;
+	border: none;
+	border-radius: 999px;
+	padding: 0.8rem 2rem;
+	font-size: 1.2rem;
+	cursor: pointer;
+	transition: background-color 0.2s ease-in-out;
 }
 .filter-bar .filters-button:hover {
-    background-color: #038f72;
+	background-color: #038f72;
 }
 
 .filters-menu {
-    position: fixed;
-    top: 10%;
-    right: 2%;
-    width: 320px; /* ACEEASI DIMENSIUNE peste tot */
-    min-width: 320px;
-    max-width: 90vw;
-    background: var(--background);
-    border-radius: 1rem;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-    padding: 1.25rem 1.25rem 1.5rem 1.25rem;
-    z-index: 10;
-    display: flex;
-    flex-direction: column;
+	position: fixed;
+	top: 10%;
+	right: 2%;
+	width: 320px; /* ACEEASI DIMENSIUNE peste tot */
+	min-width: 320px;
+	max-width: 90vw;
+	background: var(--background);
+	border-radius: 1rem;
+	box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+	padding: 1.25rem 1.25rem 1.5rem 1.25rem;
+	z-index: 10;
+	display: flex;
+	flex-direction: column;
 }
 
 .filters-menu .close-button {
-    background: none;
-    border: none;
-    font-size: 1.5rem;
-    font-weight: bold;
-    color: #333;
-    position: absolute;
-    top: 0.5rem;
-    right: 0.5rem;
-    cursor: pointer;
-    transition: color 0.2s ease-in-out;
+	background: none;
+	border: none;
+	font-size: 1.5rem;
+	font-weight: bold;
+	color: #333;
+	position: absolute;
+	top: 0.5rem;
+	right: 0.5rem;
+	cursor: pointer;
+	transition: color 0.2s ease-in-out;
 }
 .filters-menu .close-button:hover {
-    color: #ff5e5e;
+	color: #ff5e5e;
 }
 
 .filters-menu h3 {
-    margin-bottom: 1rem;
-    color: #333;
-    font-size: 2rem;
-    font-weight: 700;
+	margin-bottom: 1rem;
+	color: #333;
+	font-size: 2rem;
+	font-weight: 700;
 }
 
 .filters-menu .filters-options {
-    display: flex;
-    flex-direction: column;
-    gap: 1.2rem;
+	display: flex;
+	flex-direction: column;
+	gap: 1.2rem;
 }
 
 .filters-menu .filters-options > div {
-    width: 100%;
+	width: 100%;
 }
 
 .filters-menu .filters-options div p {
-    margin-bottom: 0.5rem;
-    font-size: 0.95rem;
-    color: #555;
+	margin-bottom: 0.5rem;
+	font-size: 0.95rem;
+	color: #555;
 }
 
 .filters-menu .filters-options div select,
 .filters-menu .filters-options div input {
-    width: 100%;
-    padding: 0.7rem;
-    border: 1px solid #ccc;
-    border-radius: 0.6rem;
-    font-size: 1.05rem;
-    background: #f9f9f9;
-    box-sizing: border-box;
+	width: 100%;
+	padding: 0.7rem;
+	border: 1px solid #ccc;
+	border-radius: 0.6rem;
+	font-size: 1.05rem;
+	background: #f9f9f9;
+	box-sizing: border-box;
 }
 
 .time-row {
-    display: flex;
-    flex-direction: column;
-    gap: 1.2rem;
+	display: flex;
+	flex-direction: column;
+	gap: 1.2rem;
 }
 
 .filter-group {
-    flex: 1;
-    width: 100%;
-    min-width: 0;
+	flex: 1;
+	width: 100%;
+	min-width: 0;
 }

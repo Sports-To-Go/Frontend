@@ -1,300 +1,307 @@
 .reservation-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  color: var(--text-primary);
-  width: 100%;
-  height: 100%;
-  backdrop-filter: blur(8px);
-  background-color: var(--background);
-  z-index: 1000;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  padding: 1rem;
+	position: fixed;
+	top: 0;
+	left: 0;
+	color: var(--text-primary);
+	width: 100%;
+	height: 100%;
+	backdrop-filter: blur(8px);
+	background-color: var(--background-location-modal);
+	z-index: 1000;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	padding: 1rem;
 }
 
 /* Modal */
 .reservation-modal {
-  background: var(--background);
-  border-radius: 16px;
-  width: 95%;
-  max-width: 1100px;
-  padding: 32px 48px;
-  box-shadow: 0 12px 30px var(--shadow);
-  display: flex;
-  flex-direction: column;
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  color: var(--text-primary);
-  position: relative;
+	background: var(--background);
+	border-radius: 16px;
+	width: 95%;
+	max-width: 1100px;
+	padding: 32px 48px;
+	box-shadow: 0 12px 30px var(--shadow);
+	display: flex;
+	flex-direction: column;
+	font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+	color: var(--text-primary);
+	position: relative;
+	max-height: 650px;
+	overflow-y: scroll;
 }
 
 /* Grid */
 .reservation-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 2.5rem;
+	display: grid;
+	grid-template-columns: 1fr 1fr;
+	gap: 2.5rem;
 }
 
 @media (max-width: 900px) {
-  .reservation-grid {
-    grid-template-columns: 1fr;
-  }
+	.reservation-grid {
+		grid-template-columns: 1fr;
+	}
 }
 
 /* LEFT SIDE */
 .reservation-left img.reservation-image {
-  width: 100%;
-  height: 280px;
-  object-fit: cover;
-  border-radius: 12px;
-  margin-bottom: 1.2rem;
-  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
-  transition: transform 0.3s ease;
+	width: 100%;
+	height: 280px;
+	object-fit: cover;
+	border-radius: 12px;
+	margin-bottom: 1.2rem;
+	box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+	transition: transform 0.3s ease;
 }
 
 .reservation-left img.reservation-image:hover {
-  transform: scale(1.05);
+	transform: scale(1.05);
 }
 
 .reservation-left h2 {
-  font-size: 2.2rem;
-  margin-bottom: 0.6rem;
-  color: var(--text-primary);
-  font-weight: 700;
+	font-size: 2.2rem;
+	margin-bottom: 0.6rem;
+	color: var(--text-primary);
+	font-weight: 700;
 }
 
 .location-description {
-  font-size: 1.05rem;
-  color: var(--text-secondary);
-  line-height: 1.5;
-  margin-bottom: 1.4rem;
+	font-size: 1.05rem;
+	color: var(--text-secondary);
+	line-height: 1.5;
+	margin-bottom: 1.4rem;
 }
 
 .location-stars {
-  color: var(--gold-color);
-  font-size: 1.4rem;
-  margin-bottom: 0.7rem;
-  letter-spacing: 0.05em;
+	color: var(--gold-color);
+	font-size: 1.4rem;
+	margin-bottom: 0.7rem;
+	letter-spacing: 0.05em;
 }
 
 .price {
-  font-weight: 700;
-  color: var(--price-color);
-  font-size: 1.2rem;
-  margin-bottom: 1.5rem;
+	font-weight: 700;
+	color: var(--price-color);
+	font-size: 1.2rem;
+	margin-bottom: 1.5rem;
 }
 
 .reservation-left p {
-  font-size: 1rem;
-  margin: 0.3rem 0;
+	font-size: 1rem;
+	margin: 0.3rem 0;
 }
 
 .reservation-left p strong {
-  font-weight: 600;
+	font-weight: 600;
 }
 
 /* RIGHT SIDE */
 .reservation-right {
-  display: flex;
-  flex-direction: column;
-  gap: 1.2rem;
-  position: relative;
+	display: flex;
+	flex-direction: column;
+	gap: 1.2rem;
+	position: relative;
 }
 
 .reservation-right label {
-  font-weight: 600;
-  font-size: 1rem;
-  color: var(--text-primary);
+	font-weight: 600;
+	font-size: 1rem;
+	color: var(--text-primary);
 }
 
 .reservation-right input,
 .reservation-right select {
-  padding: 0.75rem 1rem;
-  font-size: 1rem;
-  border: 1.5px solid var(--input-border);
-  border-radius: 8px;
-  transition: border-color 0.3s ease, box-shadow 0.3s ease;
-  outline-offset: 2px;
-  width: 100%;
-  box-sizing: border-box;
-  background-color: transparent;
-  color: var(--text-primary);
+	padding: 0.75rem 1rem;
+	font-size: 1rem;
+	border: 1.5px solid var(--input-border);
+	border-radius: 8px;
+	transition:
+		border-color 0.3s ease,
+		box-shadow 0.3s ease;
+	outline-offset: 2px;
+	width: 100%;
+	box-sizing: border-box;
+	background-color: transparent;
+	color: var(--text-primary);
 }
 
 .reservation-right input::placeholder,
 .reservation-right select::placeholder {
-  color: var(--text-secondary);
+	color: var(--text-secondary);
 }
 
 .reservation-right input:focus,
 .reservation-right select:focus {
-  border-color: var(--input-focus-border);
-  box-shadow: 0 0 8px var(--button-shadow);
-  background-color: var(--background);
-  color: var(--text-primary);
+	border-color: var(--input-focus-border);
+	box-shadow: 0 0 8px var(--button-shadow);
+	background-color: var(--background);
+	color: var(--text-primary);
 }
 
 /* Datepicker */
 .custom-datepicker-input {
-  padding-right: 2.5rem; /* space for icon */
+	padding-right: 2.5rem; /* space for icon */
 }
 
 .react-datepicker-wrapper {
-  width: 100%;
+	width: 100%;
 }
 
 .react-datepicker__input-container input {
-  width: 100%;
-  font-size: 1rem;
-  background: transparent;
-  color: var(--text-primary);
+	width: 100%;
+	font-size: 1rem;
+	background: transparent;
+	color: var(--text-primary);
 }
 
 .reservation-right svg {
-  position: absolute;
-  right: 10px;
-  top: 50%;
-  transform: translateY(-50%);
-  pointer-events: none;
-  color: var(--text-primary);
-  font-size: 1.2rem;
+	position: absolute;
+	right: 10px;
+	top: 50%;
+	transform: translateY(-50%);
+	pointer-events: none;
+	color: var(--text-primary);
+	font-size: 1.2rem;
 }
 
 /* Error messages */
 .error-msg {
-  color: var(--error-color);
-  font-size: 0.9rem;
-  margin-top: -0.6rem;
-  margin-bottom: 0.4rem;
+	color: var(--error-color);
+	font-size: 0.9rem;
+	margin-top: -0.6rem;
+	margin-bottom: 0.4rem;
 }
 
 /* Booked intervals */
 .booked-intervals {
-  margin-top: 1rem;
-  background: var(--booked-bg);
-  padding: 1rem;
-  border-radius: 8px;
-  font-size: 0.95rem;
-  color: var(--booked-color);
-  box-shadow: inset 0 0 10px #f8d7da;
+	margin-top: 1rem;
+	background: var(--booked-bg);
+	padding: 1rem;
+	border-radius: 8px;
+	font-size: 0.95rem;
+	color: var(--booked-color);
+	box-shadow: inset 0 0 10px #f8d7da;
 }
 
 .booked-intervals p {
-  margin: 0.3rem 0;
+	margin: 0.3rem 0;
 }
 
 /* Time overlap message */
 .time-overlap-msg {
-  background-color: var(--time-overlap-bg);
-  border-left: 4px solid var(--time-overlap-border);
-  padding: 1rem 1.2rem;
-  border-radius: 8px;
-  color: var(--error-color);
-  font-size: 1rem;
-  margin-top: 0.5rem;
+	background-color: var(--time-overlap-bg);
+	border-left: 4px solid var(--time-overlap-border);
+	padding: 1rem 1.2rem;
+	border-radius: 8px;
+	color: var(--error-color);
+	font-size: 1rem;
+	margin-top: 0.5rem;
 }
 
 /* Buttons */
 .reservation-buttons {
-  display: flex;
-  gap: 1.25rem;
-  margin-top: 1.5rem;
+	display: flex;
+	gap: 1.25rem;
+	margin-top: 1.5rem;
 }
 
 .reservation-buttons button {
-  flex: 1;
-  padding: 0.75rem 1.75rem;
-  font-size: 1.1rem;
-  font-weight: 700;
-  border-radius: 8px;
-  border: none;
-  cursor: pointer;
-  transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
-  box-shadow: 0 2px 6px var(--button-shadow);
-  background-color: var(--input-focus-border);
-  color: #fff;
+	flex: 1;
+	padding: 0.75rem 1.75rem;
+	font-size: 1.1rem;
+	font-weight: 700;
+	border-radius: 8px;
+	border: none;
+	cursor: pointer;
+	transition:
+		background-color 0.3s ease,
+		transform 0.2s ease,
+		box-shadow 0.3s ease;
+	box-shadow: 0 2px 6px var(--button-shadow);
+	//background-color: var(--input-focus-border);
+	color: #fff;
 }
 
 .reservation-buttons button:hover:not(:disabled) {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 14px var(--button-hover-shadow);
+	transform: translateY(-2px);
+	box-shadow: 0 6px 14px var(--button-hover-shadow);
 }
 
 .reservation-buttons button:disabled {
-  background-color: #999;
-  cursor: not-allowed;
-  transform: none;
-  box-shadow: none;
+	background-color: #999;
+	cursor: not-allowed;
+	transform: none;
+	box-shadow: none;
 }
 
 .reserve-button {
-  background-color: var(--success-color);
-  color: white;
+	background-color: #26993f;
+	color: white;
 }
 
 .reserve-button:hover:not(:disabled) {
-  background-color: #218838;
+	background-color: #218838;
 }
 
 .close-button {
-  background-color: var(--error-color);
-  color: white;
+	background-color: #c42f3e;
+	color: white;
 }
 
 .close-button:hover {
-  background-color: #b02a37;
+	background-color: #b02a37;
 }
 
 /* Summary */
 .reservation-summary {
-  margin-top: 1.8rem;
-  padding: 1.2rem 1.5rem;
-  background-color: var(--summary-bg);
-  border-radius: 8px;
-  font-size: 1rem;
-  box-shadow: 0 2px 10px var(--shadow);
+	margin-top: 1.8rem;
+	padding: 1.2rem 1.5rem;
+	background-color: var(--summary-bg);
+	border-radius: 8px;
+	font-size: 1rem;
+	box-shadow: 0 2px 10px var(--shadow);
 }
 
 .reservation-summary h4 {
-  margin-bottom: 0.75rem;
-  color: var(--text-primary);
-  font-weight: 700;
+	margin-bottom: 0.75rem;
+	color: var(--text-primary);
+	font-weight: 700;
 }
 
 .reservation-summary p {
-  margin: 0.4rem 0;
-  color: var(--text-primary);
+	margin: 0.4rem 0;
+	color: var(--text-primary);
 }
 
 /* SUCCESS OVERLAY */
 .success-overlay {
-  position: absolute;
-  inset: 0;
-  background-color: rgba(255, 255, 255, 0.95);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 1001;
+	position: absolute;
+	inset: 0;
+	background-color: rgba(255, 255, 255, 0.95);
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	z-index: 1001;
 }
 
 .dark .success-overlay {
-  background-color: rgba(18, 18, 18, 0.95);
+	background-color: rgba(18, 18, 18, 0.95);
 }
 
 .success-overlay .checkmark {
-  font-size: 5rem;
-  color: var(--success-color);
-  animation: pop 0.5s ease-out;
+	font-size: 5rem;
+	color: var(--success-color);
+	animation: pop 0.5s ease-out;
 }
 
 @keyframes pop {
-  0% {
-    transform: scale(0.5);
-    opacity: 0;
-  }
-  100% {
-    transform: scale(1);
-    opacity: 1;
-  }
+	0% {
+		transform: scale(0.5);
+		opacity: 0;
+	}
+	100% {
+		transform: scale(1);
+		opacity: 1;
+	}
 }

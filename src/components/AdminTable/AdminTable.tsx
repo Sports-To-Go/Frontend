@@ -119,7 +119,7 @@ const AdminTable: React.FC<adminTableProps> = ({ header, rows }) => {
 						<tr key={id}>
 							<td>
 								{type === 'User' ? (
-									<Link to={'/profile'} style={{ cursor: 'pointer' }}>
+									<Link to={`/profile/${id}`} style={{ cursor: 'pointer' }}>
 										View profile
 									</Link>
 								) : (
