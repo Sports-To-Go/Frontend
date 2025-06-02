@@ -32,8 +32,11 @@ export const StatCardsContainer: React.FC = () => {
 			try {
 				// Fetch all statistics in parallel
 				const token = await currentUser.getIdToken(true)
-				const year = new Date().toISOString().split('T')[0].split('-')[0]
-				const month = new Date().toISOString().split('T')[0].split('-')[1]
+				const now = new Date()
+				const year = now.getFullYear()
+				const month = String(now.getMonth() + 1).padStart(2, '0')
+				const lastDay = new Date(year, now.getMonth() + 1, 0)
+				const lastDayStr = lastDay.toISOString().split('T')[0]
 
 				const [locationsCountRes, reservationsCountRes, usersCount, currentMonthIncome] =
 					await Promise.all([
@@ -55,7 +58,7 @@ export const StatCardsContainer: React.FC = () => {
 						axios.get(`http://${BACKEND_URL}/admin/revenue/monthly`, {
 							params: {
 								from: `${year}-${month}-01`,
-								to: `${year}-${month}-31`,
+								to: lastDayStr,
 							},
 							headers: {
 								Authorization: `Bearer ${token}`,
@@ -86,7 +89,7 @@ export const StatCardsContainer: React.FC = () => {
 					{
 						title: 'Revenue',
 						subtitle: 'This Month',
-						value: `${totalAmount.toString()}$`,
+						value: !!totalAmount ? `${totalAmount.toString()}RON` : '0RON',
 					},
 				]
 

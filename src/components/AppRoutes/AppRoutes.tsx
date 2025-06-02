@@ -56,6 +56,7 @@ const AppRoutes: React.FC = () => {
 			<Routes>
 				<Route path="/administration" element={<Administration />} />
 				<Route path="/faq" element={<FAQPage />} />
+				<Route path="/profile/:uid" element={<Profile />} />
 				<Route path="*" element={<Navigate to="/administration" replace />} />
 			</Routes>
 		)

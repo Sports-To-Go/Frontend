@@ -1,0 +1,27 @@
+.card-form {
+	width: 60%;
+	border: 2px solid gray;
+	padding: 10px;
+	border-radius: 10px;
+	display: flex;
+	flex-direction: column;
+	gap: 10px;
+	margin: 0 auto;
+
+	button {
+		max-width: 100px;
+		padding: 5px 10px;
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		border: 1px solid gray;
+		border-radius: 5px;
+		cursor: pointer;
+	}
+}
+
+@media only screen and (max-width: 600px) {
+	form {
+		width: 80%;
+	}
+}

@@ -19,6 +19,7 @@
 	--admin-text-red: #f64175;
 	--location-shadow: rgba(0, 0, 0, 0.1);
 	--location-shadow-hover: rgba(0, 0, 0, 0.15);
+	--background-location-modal: #ffffff00;
 }
 
 [data-theme='dark'] {
@@ -42,6 +43,7 @@
 	--admin-text-red: #f64175;
 	--location-shadow: rgba(255, 255, 255, 0.1);
 	--location-shadow-hover: rgba(255, 255, 255, 0.15);
+	--background-location-modal: #13131300;
 }
 
 body {

@@ -2,6 +2,10 @@ import React, { useState, useEffect } from 'react'
 import { useAuth } from '../../context/UserContext'
 import { toast } from 'react-toastify'
 import './LocationReservationModal.scss'
+import { BACKEND_URL } from '../../../integration-config'
+import axios from 'axios'
+import { auth } from '../../firebase/firebase'
+import PaymentModal from '../../pages/PaymentModal/PaymentModal'
 
 type Props = {
 	location: {
@@ -25,13 +29,23 @@ type ExistingReservation = {
 	date: string // "YYYY-MM-DD"
 }
 
+interface groupInterface {
+	id: number
+	name: string
+	description: string
+}
+
 const LocationReservationModal: React.FC<Props> = ({ location, onClose }) => {
+	const [showPayment, setShowPayment] = useState(false)
 	const [date, setDate] = useState('')
 	const [startTime, setStartTime] = useState('')
 	const [endTime, setEndTime] = useState('')
 	const [isSubmitting, setIsSubmitting] = useState(false)
 	const [showSuccess, setShowSuccess] = useState(false)
 	const [existingReservations, setExistingReservations] = useState<ExistingReservation[]>([])
+	const [groups, setGroups] = useState<groupInterface[]>([])
+	const [selectedGroupId, setSelectedGroupId] = useState('')
+	const [finalAmount, setFinalAmount] = useState(0)
 	const { user } = useAuth()
 
 	useEffect(() => {
@@ -40,7 +54,7 @@ const LocationReservationModal: React.FC<Props> = ({ location, onClose }) => {
 		const fetchReservations = async () => {
 			try {
 				const response = await fetch(
-					`http://localhost:8081/reservations?locationId=${location.id}`,
+					`http://${BACKEND_URL}/reservations?locationId=${location.id}`,
 				)
 				const data = await response.json()
 				const filtered = data.filter((res: any) => res.date === date)
@@ -53,6 +67,29 @@ const LocationReservationModal: React.FC<Props> = ({ location, onClose }) => {
 		fetchReservations()
 	}, [date, location.id])
 
+	useEffect(() => {
+		if (!user) return
+		const uId = user.uid
+		const currentUser = auth.currentUser
+		if (!currentUser) return
+
+		const getUserGroups = async () => {
+			try {
+				const token = await currentUser.getIdToken(true)
+				const res = await axios.get(`http://${BACKEND_URL}/social/not-basic`, {
+					params: { uid: uId },
+					headers: {
+						Authorization: `Bearer ${token}`,
+					},
+				})
+				setGroups(res.data)
+			} catch (err) {
+				console.error(err)
+			}
+		}
+		getUserGroups()
+	}, [user])
+
 	const hasOverlap = () => {
 		if (!date || !startTime || !endTime) return false
 
@@ -64,6 +101,7 @@ const LocationReservationModal: React.FC<Props> = ({ location, onClose }) => {
 	const isValid = () => {
 		if (!date || !startTime || !endTime) return false
 		if (startTime >= endTime) return false
+		if (!selectedGroupId) return false
 		if (hasOverlap()) return false
 		return true
 	}
@@ -76,18 +114,29 @@ const LocationReservationModal: React.FC<Props> = ({ location, onClose }) => {
 		return Math.max(0, Math.ceil((end - start) / 60))
 	}
 
-	const handleSubmit = async () => {
+	const handleSubmit = () => {
 		if (!user) {
 			toast.error('You must be logged in to make a reservation.')
 			return
 		}
+		const hours = calculateHours()
+		const estimatedRON = hours * location.pricePerHour
+		const estimatedCost = Math.round(estimatedRON * 100)
 
+		setFinalAmount(estimatedCost)
+		setShowPayment(true)
+
+		setShowPayment(true)
+	}
+
+	const handlePaymentSuccess = async () => {
+		setShowPayment(false)
 		setIsSubmitting(true)
 
 		const payload = {
 			locationId: location.id,
-			userId: user.uid,
-			groupId: 0,
+			userId: user!.uid,
+			groupId: Number(selectedGroupId),
 			calendarEventId: Date.now().toString(),
 			date,
 			startTime,
@@ -95,7 +144,7 @@ const LocationReservationModal: React.FC<Props> = ({ location, onClose }) => {
 		}
 
 		try {
-			const response = await fetch('http://localhost:8081/reservations', {
+			const response = await fetch(`http://${BACKEND_URL}/reservations`, {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
 				body: JSON.stringify(payload),
@@ -116,7 +165,7 @@ const LocationReservationModal: React.FC<Props> = ({ location, onClose }) => {
 	}
 
 	const hours = isValid() ? calculateHours() : 0
-	const estimatedCost = hours * location.pricePerHour
+	const estimatedRON = hours * location.pricePerHour
 
 	return (
 		<div className="reservation-overlay" onClick={onClose}>
@@ -163,7 +212,21 @@ const LocationReservationModal: React.FC<Props> = ({ location, onClose }) => {
 						<label>End time:</label>
 						<input type="time" value={endTime} onChange={e => setEndTime(e.target.value)} />
 						{!isValid() && <p className="error-msg">Please enter a valid time range</p>}
-
+						<label>Select a group: </label>
+						<select
+							name="group-select"
+							value={selectedGroupId}
+							onChange={e => setSelectedGroupId(e.target.value)}
+						>
+							<option value="" disabled>
+								Select a group
+							</option>
+							{groups.map(group => (
+								<option key={group.id} value={group.id}>
+									{group.name}
+								</option>
+							))}
+						</select>
 						{hasOverlap() && (
 							<div className="time-overlap-msg">
 								This time slot is already booked. Please choose another.
@@ -211,12 +274,20 @@ const LocationReservationModal: React.FC<Props> = ({ location, onClose }) => {
 									<strong>Hours:</strong> {hours}
 								</p>
 								<p>
-									<strong>Estimated cost:</strong> {estimatedCost} RON
+									<strong>Estimated cost:</strong> {estimatedRON} RON
 								</p>
 							</div>
 						)}
 					</div>
 				</div>
+				{showPayment && (
+					<PaymentModal
+						onClose={() => setShowPayment(false)}
+						onSuccess={handlePaymentSuccess}
+						amount={finalAmount}
+					/>
+				)}
+
 				{showSuccess && (
 					<div className="success-overlay">
 						<div className="checkmark">✔</div>
