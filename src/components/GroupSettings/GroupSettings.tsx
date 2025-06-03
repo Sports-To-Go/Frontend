@@ -25,8 +25,15 @@ const GroupSettings: FC<GroupSettingsProps> = ({
 	const {
 		state: { members, selectedGroup, groups },
 		leaveGroup,
-		handleJoinRequest
+		handleJoinRequest,
+		promoteDemoteMember,
+		kickMember,
 	} = useSocial()
+
+	const { user } = useAuth()
+
+	const currentUserRole =
+		members.get(selectedGroup?.id || -1)?.get(user?.uid || '')?.role || 'member'
 
 	const groupMembersMap = selectedGroup ? members.get(selectedGroup.id) : new Map()
 	const groupMembers = [...(groupMembersMap?.values() || [])]
@@ -55,7 +62,6 @@ const GroupSettings: FC<GroupSettingsProps> = ({
 		return roleOrder[a.role] - roleOrder[b.role]
 	})
 
-	const { user } = useAuth()
 	const isMember =
 		groupMembers.find((member: GroupMember) => {
 			return member.id == user?.uid || ''
@@ -67,7 +73,6 @@ const GroupSettings: FC<GroupSettingsProps> = ({
 				<h3>Group Settings</h3>
 
 				<div className="sections-wrapper">
-					{/* Chat Info Section */}
 					<div className="section">
 						<h4>Chat Info</h4>
 						<div className="action-buttons">
@@ -77,7 +82,6 @@ const GroupSettings: FC<GroupSettingsProps> = ({
 						</div>
 					</div>
 
-					{/* Join Requests Section */}
 					{!isMember && (
 						<div className="section">
 							<h4>Requests</h4>
@@ -92,7 +96,6 @@ const GroupSettings: FC<GroupSettingsProps> = ({
 						</div>
 					)}
 
-					{/* Customization Section */}
 					<div className="section">
 						<h4>Customization</h4>
 						<div className="customization-buttons">
@@ -105,7 +108,6 @@ const GroupSettings: FC<GroupSettingsProps> = ({
 						</div>
 					</div>
 
-					{/* Support Section */}
 					<div className="section">
 						<h4>Support</h4>
 						<div className="action-buttons">
@@ -116,24 +118,63 @@ const GroupSettings: FC<GroupSettingsProps> = ({
 					</div>
 				</div>
 
-				{/* Leave Chat Button */}
 				<span className="leave-chat-button" onClick={handleLeaveChat}>
 					{isConfirmingLeave ? 'Press to confirm leaving the chat' : 'Leave Chat'}
 				</span>
 			</div>
 
-			{/* Members Modal */}
 			{isMembersModalOpen && (
 				<div className="members-modal" onClick={closeModal}>
 					<div className="modal fade-in" onClick={e => e.stopPropagation()}>
 						<h3>Group Members</h3>
 						<ul>
-							{sortedMembers.map((member, index) => (
-								<li key={index} className={`${member.role}`}>
-									{member.displayName}{' '}
-									{member.role !== 'member' && <span>({member.role})</span>}
-								</li>
-							))}
+							{sortedMembers.map((member, index) => {
+								const canKick =
+									(currentUserRole === 'admin' &&
+										member.role !== 'admin' &&
+										member.id !== user?.uid) ||
+									(currentUserRole === 'co_admin' && member.role === 'member')
+
+								const canPromote = currentUserRole === 'admin' && member.role === 'member'
+								const canDemote = currentUserRole === 'admin' && member.role === 'co_admin'
+
+								return (
+									<li key={index} className={`${member.role}`}>
+										{member.displayName}{' '}
+										{member.role !== 'member' && <span>({member.role})</span>}
+										<div className="action-buttons">
+											{canPromote && (
+												<button
+													className="accept-button"
+													onClick={() =>
+														promoteDemoteMember(groupID, member.id, 'co_admin')
+													}
+												>
+													Promote
+												</button>
+											)}
+											{canDemote && (
+												<button
+													className="decline-button"
+													onClick={() =>
+														promoteDemoteMember(groupID, member.id, 'member')
+													}
+												>
+													Demote
+												</button>
+											)}
+											{canKick && (
+												<button
+													className="decline-button"
+													onClick={() => kickMember(groupID, member.id)}
+												>
+													Kick
+												</button>
+											)}
+										</div>
+									</li>
+								)
+							})}
 						</ul>
 						<span className="close-members-modal" onClick={closeModal}>
 							Close
@@ -142,7 +183,6 @@ const GroupSettings: FC<GroupSettingsProps> = ({
 				</div>
 			)}
 
-			{/* Dynamic Modals */}
 			{activeModal && !isThemeModalOpen && !isMembersModalOpen && (
 				<div className="members-modal" onClick={closeModal}>
 					<div className="modal fade-in" onClick={e => e.stopPropagation()}>
@@ -199,7 +239,6 @@ const GroupSettings: FC<GroupSettingsProps> = ({
 				</div>
 			)}
 
-			{/* Theme Modal */}
 			{isThemeModalOpen && (
 				<div className="members-modal" onClick={closeModal}>
 					<div className="modal fade-in" onClick={e => e.stopPropagation()}>

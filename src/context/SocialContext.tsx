@@ -28,6 +28,7 @@ export type SystemEventType =
 	| 'JOIN_REQUEST'
 	| 'USER_JOINED'
 	| 'USER_LEFT'
+	| 'USER_KICKED'
 	| 'ROLE_CHANGED'
 	| 'GROUP_CREATED'
 	| 'THEME_CHANGED'
@@ -73,6 +74,8 @@ interface SocialContextType {
 	loadMessageHistory: (groupID: number, before: string) => void
 	removeRecommendation: (groupID: number) => void
 	handleJoinRequest: (groupID: number, uid: string, accepted: boolean) => void
+	promoteDemoteMember: (groupID: number, targetUID: string, newRole: string) => Promise<void>
+	kickMember: (groupID: number, targetUID: string) => Promise<void>
 }
 
 const initialState: SocialState = {
@@ -263,6 +266,71 @@ const socialReducer = (state: SocialState, action: any): SocialState => {
 						const updatedMessages = new Map(state.messages)
 						const groupMsgs = updatedMessages.get(groupID) || []
 						updatedMessages.set(groupID, [...groupMsgs, message])
+
+						const updatedGroups = state.groups.map(group => {
+							if (groupID === group.id) {
+								return {
+									...group,
+									memberCount: (group.memberCount || 0) + 1,
+								}
+							}
+							return group
+						})
+
+						return {
+							...state,
+							members: updatedMembers,
+							messages: updatedMessages,
+							groups: updatedGroups,
+						}
+					}
+
+					case 'USER_KICKED': {
+						const { uid } = message.meta || {}
+						const groupID = message.groupID
+
+						const newMembersMap = new Map(state.members)
+						const groupMembers = new Map(newMembersMap.get(groupID))
+						groupMembers.delete(uid)
+						newMembersMap.set(groupID, groupMembers)
+
+						const newMessagesMap = new Map(state.messages)
+						const existingMessages = newMessagesMap.get(groupID) || []
+						newMessagesMap.set(groupID, [...existingMessages, message])
+
+						const newGroups = state.groups.map(group => {
+							if (group.id === groupID) {
+								return {
+									...group,
+									memberCount: (group.memberCount || 1) - 1,
+								}
+							}
+							return group
+						})
+
+						return {
+							...state,
+							members: newMembersMap,
+							messages: newMessagesMap,
+							groups: newGroups,
+						}
+					}
+
+					case 'ROLE_CHANGED': {
+						const { uid, newRole } = message.meta || {}
+						const groupID = message.groupID
+
+						const updatedMembers = new Map(state.members)
+						const groupMembers = new Map(updatedMembers.get(groupID))
+						const member = groupMembers.get(uid)
+						if (member) {
+							groupMembers.set(uid, { ...member, role: newRole })
+							updatedMembers.set(groupID, groupMembers)
+						}
+
+						const updatedMessages = new Map(state.messages)
+						const existingMessages = updatedMessages.get(groupID) || []
+						updatedMessages.set(groupID, [...existingMessages, message])
 
 						return {
 							...state,
@@ -579,6 +647,22 @@ export const SocialProvider: FC<{ children: ReactNode }> = ({ children }) => {
 					} catch (err) {
 						console.error('Error handling join request: ' + err)
 					}
+				},
+				promoteDemoteMember: async (groupID, targetUID, newRole) => {
+					const token = await auth.currentUser?.getIdToken()
+					await axios.put(
+						`http://${BACKEND_URL}/social/group/${groupID}/members/${targetUID}/role`,
+						{ newRole },
+						{ headers: { Authorization: `Bearer ${token}` } },
+					)
+				},
+
+				kickMember: async (groupID, targetUID) => {
+					const token = await auth.currentUser?.getIdToken()
+					await axios.delete(
+						`http://${BACKEND_URL}/social/group/${groupID}/members/${targetUID}`,
+						{ headers: { Authorization: `Bearer ${token}` } },
+					)
 				},
 			}}
 		>
