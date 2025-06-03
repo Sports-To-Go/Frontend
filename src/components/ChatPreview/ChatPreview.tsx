@@ -4,7 +4,6 @@ import './ChatPreview.scss'
 
 interface GroupPreviewProps {
 	image: string
-	isOnline: boolean
 	name: string
 	description: string
 	members: number
@@ -12,7 +11,7 @@ interface GroupPreviewProps {
 }
 
 const GroupPreview: React.FC<GroupPreviewProps> = React.memo(
-	({ name, image, isOnline, description, members, onClick }) => {
+	({ name, image, description, members, onClick }) => {
 		return (
 			<li className="message-item" onClick={onClick}>
 				<div className="group-avatar-container">
@@ -25,7 +24,6 @@ const GroupPreview: React.FC<GroupPreviewProps> = React.memo(
 						alt={`${name}'s avatar`}
 						className="group-avatar"
 					/>
-					<div className={`online-indicator ${isOnline ? 'online' : ''}`} />
 				</div>
 				<div className="group-info">
 					<div className="group-name">{name}</div>
@@ -35,7 +33,7 @@ const GroupPreview: React.FC<GroupPreviewProps> = React.memo(
 					<CiUser />
 					<span className="members-count">{members}</span>
 				</div>
-			</li>
+			</li>	
 		)
 	},
 )

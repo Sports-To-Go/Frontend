@@ -9,33 +9,28 @@ interface ChatMessagesProps {
 	onTopReached?: () => void
 	loadingTop?: boolean
 	groupID: number
-	
 }
 
-
 function formatSystemMessage(msg: Message, members: any): string {
-	
 	const meta = msg.meta || {}
 	switch (msg.systemEvent) {
 		case 'USER_JOINED':
 			return `${meta.displayName} joined the group.`
 		case 'USER_LEFT':
 			return `${meta.displayName} left the group.`
-		case 'USER_KICKED':
-			return `${meta.kickedName} was kicked by ${meta.byName}.`
 		case 'ROLE_CHANGED':
 			return `${meta.displayName} is now ${meta.newRole}.`
 		case 'THEME_CHANGED':
 			return `Theme changed to ${meta.themeName}.`
 		case 'NICKNAME_CHANGED': {
 			const { changedByName, uid, nickname } = meta
-			
-			return `${members.get(msg.groupID)?.get(changedByName)?.displayName||'UNDEFINED'} set nickname for ${members.get(msg.groupID)?.get(uid)?.displayName||'UNDEFINED'} to "${nickname}".`
+
+			return `${members.get(msg.groupID)?.get(changedByName)?.displayName || 'UNDEFINED'} set nickname for ${members.get(msg.groupID)?.get(uid)?.displayName || 'UNDEFINED'} to "${nickname}".`
 		}
-		case 'JOIN_REQUESTED':
-			return `${meta.displayName} requested to join: "${meta.motivation}"`
+		case 'JOIN_REQUEST':
+			return `${meta.displayName} requested to join`
 		case 'GROUP_CREATED':
-			return `Group created 🎉`
+			return `Group created`
 		default:
 			return `[Unknown system event]`
 	}
