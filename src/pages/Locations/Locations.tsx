@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import { FC, useState, useEffect } from 'react'
 import Layout from '../../components/Layout/Layout'
 import LocationComponent from '../../components/LocationComponent/LocationComponent'
 import FilterBar from '../../components/FilterBar/FilterBar'
@@ -30,7 +30,7 @@ interface Filters {
 	endTime: string
 }
 
-const Locations = () => {
+const Locations: FC = () => {
 	const [locations, setLocations] = useState<Location[]>([])
 	const [filteredLocations, setFilteredLocations] = useState<Location[]>([])
 	const [filters, setFilters] = useState<Filters>({

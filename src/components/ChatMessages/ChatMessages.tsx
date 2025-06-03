@@ -18,6 +18,10 @@ function formatSystemMessage(msg: Message, members: any): string {
 			return `${meta.displayName} joined the group.`
 		case 'USER_LEFT':
 			return `${meta.displayName} left the group.`
+		case 'USER_KICKED': {
+			const { kickedByName, kickedName } = msg.meta || {}
+			return `${kickedName || 'Someone'} was kicked by ${kickedByName || 'an admin'}.`
+		}
 		case 'ROLE_CHANGED':
 			return `${meta.displayName} is now ${meta.newRole}.`
 		case 'THEME_CHANGED':
