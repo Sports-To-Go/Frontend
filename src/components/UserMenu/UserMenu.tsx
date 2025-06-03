@@ -9,6 +9,7 @@ import { signOut } from 'firebase/auth'
 import placeholder from '../../assets/profilePhotoPlaceholder.png'
 
 import './UserMenu.scss'
+import { FaQuestion } from 'react-icons/fa'
 
 interface UserMenuProps {
 	menuRef: RefObject<HTMLDivElement | null>
@@ -62,7 +63,10 @@ const UserMenu: FC<UserMenuProps> = ({ menuRef }) => {
 						<FiUser style={{ marginRight: '8px' }} />
 						Profile
 					</div>
-
+					<div className="user-menu__item" onClick={() => navigate('/faq')}>
+						<FaQuestion style={{ marginRight: '8px' }} />
+						FaQ
+					</div>
 					<div className="user-menu__item" onClick={handleLogout}>
 						<FiLogOut style={{ marginRight: '8px' }} />
 						Disconnect

@@ -23,6 +23,18 @@
 		height: 50%;
 		width: 100%;
 		overflow: hidden;
+		position: relative;
+		.report-location {
+			position: absolute;
+			left: 10px;
+			top: 10px;
+			z-index: 20;
+			color: red;
+			transition: 0.2s all ease;
+			&:hover {
+				transform: scale(1.2);
+			}
+		}
 	}
 
 	.location-header-image {
