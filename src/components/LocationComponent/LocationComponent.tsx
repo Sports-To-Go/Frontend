@@ -4,6 +4,7 @@ import { MdOutlineReportProblem } from 'react-icons/md'
 import './LocationComponent.scss'
 import ReportLocationModal from '../ReportLocationModal/ReportLocationModal'
 
+
 type LocationProps = {
 	location: {
 		id: number
@@ -20,11 +21,14 @@ type LocationProps = {
 
 const LocationComponent: React.FC<LocationProps> = ({ location }) => {
 	const [isModalOpen, setIsModalOpen] = useState(false)
+
 	const [showReportModal, setShowReportModal] = useState(false)
+
 
 	const handleOpenModal = () => {
 		setIsModalOpen(true)
 	}
+
 
 	const handleCloseReport = () => {
 		setShowReportModal(false)

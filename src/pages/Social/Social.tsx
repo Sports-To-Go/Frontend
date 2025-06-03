@@ -8,6 +8,7 @@ import GroupDetails from '../../components/GroupDetails/GroupDetails'
 import GroupForm from '../../components/GroupForm/GroupForm'
 import Spinner from '../../components/Spinner/Spinner'
 import { CiSearch } from 'react-icons/ci'
+import { useAuth } from '../../context/UserContext'
 
 const Social: FC = () => {
 	const [activeTab, setActiveTab] = useState<'myGroups' | 'lookForGroups'>('myGroups')
@@ -21,6 +22,9 @@ const Social: FC = () => {
 		connectSocial,
 		selectGroup,
 	} = useSocial()
+
+	const { user } = useAuth()
+	if (user === null) return
 
 	const mounted = useRef(false)
 
@@ -66,9 +70,7 @@ const Social: FC = () => {
 
 		// For myGroups, show last message if it exists, otherwise show description
 		if (group.lastMessage) {
-			const senderName =
-				members.get(group.id)?.get(group.lastMessage.senderID)?.displayName || 'Unknown'
-			return `${senderName}: ${group.lastMessage.content}`
+			return `${group.lastMessage.senderID === user.uid ? 'You' : members.get(group.id)?.get(group.lastMessage.senderID)?.displayName || 'Unknown'}: ${group.lastMessage.content}`
 		}
 
 		return group.description
@@ -124,7 +126,6 @@ const Social: FC = () => {
 												key={preview.id}
 												name={preview.name}
 												image={''}
-												isOnline={true}
 												description={getPreviewText(preview)}
 												members={preview.memberCount || 0}
 												onClick={() => selectGroup(preview)}
@@ -147,7 +148,6 @@ const Social: FC = () => {
 								name={selectedGroup.name}
 								description={selectedGroup.description}
 								members={selectedGroup.memberCount || 0}
-								isOnline={true}
 								onBack={handleBack}
 								groupID={selectedGroup.id}
 							/>

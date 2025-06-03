@@ -3,6 +3,7 @@ import { auth } from '../firebase/firebase'
 import { BACKEND_URL } from '../../integration-config'
 import axios from 'axios'
 import { useAuth } from './UserContext'
+import { toast } from 'react-toastify'
 
 export interface GroupPreview {
 	id: number
@@ -21,11 +22,10 @@ export interface GroupMember {
 export interface JoinRequest {
 	id: string
 	displayName: string
-	motivation: string
 }
 
 export type SystemEventType =
-	| 'JOIN_REQUESTED'
+	| 'JOIN_REQUEST'
 	| 'USER_JOINED'
 	| 'USER_LEFT'
 	| 'USER_KICKED'
@@ -33,6 +33,7 @@ export type SystemEventType =
 	| 'GROUP_CREATED'
 	| 'THEME_CHANGED'
 	| 'NICKNAME_CHANGED'
+	| 'JOINED_GROUP'
 
 export interface Message {
 	id: number
@@ -66,12 +67,15 @@ interface SocialContextType {
 	selectGroup: (group: GroupPreview | null) => void
 	joinGroup: (groupID: number) => Promise<boolean>
 	leaveGroup: (groupID: number) => void
-	changeTheme: (groupID: number, theme:string) =>void
-	changeNickname: (groupID:number, memberID: string, nickname:string) =>void
+	changeTheme: (groupID: number, theme: string) => void
+	changeNickname: (groupID: number, memberID: string, nickname: string) => void
 	createGroup: (name: string, description: string) => void
-	sendMessage: (args: { content: string}) => void
+	sendMessage: (args: { content: string }) => void
 	loadMessageHistory: (groupID: number, before: string) => void
 	removeRecommendation: (groupID: number) => void
+	handleJoinRequest: (groupID: number, uid: string, accepted: boolean) => void
+	promoteDemoteMember: (groupID: number, targetUID: string, newRole: string) => Promise<void>
+	kickMember: (groupID: number, targetUID: string) => Promise<void>
 }
 
 const initialState: SocialState = {
@@ -81,7 +85,6 @@ const initialState: SocialState = {
 	messages: new Map(),
 	members: new Map(),
 }
-
 
 const socialReducer = (state: SocialState, action: any): SocialState => {
 	switch (action.type) {
@@ -118,65 +121,226 @@ const socialReducer = (state: SocialState, action: any): SocialState => {
 			newMembers.get(groupID)?.set(user?.uid, member)
 			return { ...state, groups: [action.payload, ...state.groups], members: newMembers }
 		}
+		case 'JOINED_GROUP_SUCCESS': {
+			const group = action.payload
+
+			const newMembers = new Map(state.members)
+			const memberMap = new Map<string, GroupMember>()
+			group.groupMembers.forEach((m: any) => {
+				memberMap.set(m.id, {
+					id: m.id,
+					displayName: m.displayName,
+					role: m.groupRole,
+					nickname: m.nickname,
+				})
+			})
+			newMembers.set(group.id, memberMap)
+
+			const newGroup: GroupData = {
+				id: group.id,
+				name: group.name,
+				theme: group.theme,
+				description: group.description,
+				memberCount: group.groupMembers.length,
+				joinRequests: group.joinRequests,
+			}
+
+			const updatedGroups = [newGroup, ...state.groups.filter(g => g.id !== group.id)]
+
+			return {
+				...state,
+				groups: updatedGroups,
+				members: newMembers,
+			}
+		}
+
 		case 'ADD_MESSAGE': {
 			const message = action.payload
 
 			if (message.type === 'SYSTEM') {
-				// THEME_CHANGED
-				if (message.systemEvent === 'THEME_CHANGED') {
-					const updatedGroups = state.groups.map(group => {
-						if (group.id === message.groupID) {
-							return {
-								...group,
-								theme: message.meta?.themeName || group.theme,
+				switch (message.systemEvent) {
+					case 'THEME_CHANGED': {
+						const updatedGroups = state.groups.map(group => {
+							if (group.id === message.groupID) {
+								return {
+									...group,
+									theme: message.meta?.themeName || group.theme,
+								}
 							}
-						}
-						return group
-					})
-
-					const groupID = message.groupID
-					const newMessagesMap = new Map(state.messages)
-					const existingMessages = newMessagesMap.get(groupID) || []
-					newMessagesMap.set(groupID, [...existingMessages, message])
-
-					const groupIndex = updatedGroups.findIndex(group => group.id === groupID)
-					if (groupIndex !== -1) {
-						const reorderedGroups = [...updatedGroups]
-						const updatedGroup = { ...reorderedGroups[groupIndex], lastMessage: message }
-						reorderedGroups.splice(groupIndex, 1)
-						reorderedGroups.unshift(updatedGroup)
-						return { ...state, groups: reorderedGroups, messages: newMessagesMap }
-					}
-
-					return { ...state, groups: updatedGroups, messages: newMessagesMap }
-				}
-
-				// NICKNAME_CHANGED
-				else if (message.systemEvent === 'NICKNAME_CHANGED') {
-					const { uid, nickname } = message.meta || {}
-					if (!uid || !nickname) return state
-
-					const groupID = message.groupID
-					const newMembersMap = new Map(state.members)
-					const groupMembers = new Map(newMembersMap.get(groupID) || [])
-
-					const member = groupMembers.get(uid)
-					if (member) {
-						groupMembers.set(uid, {
-							...member,
-							nickname: nickname,
+							return group
 						})
-						newMembersMap.set(groupID, groupMembers)
+
+						const groupID = message.groupID
+						const newMessagesMap = new Map(state.messages)
+						const existingMessages = newMessagesMap.get(groupID) || []
+						newMessagesMap.set(groupID, [...existingMessages, message])
+
+						const groupIndex = updatedGroups.findIndex(group => group.id === groupID)
+						if (groupIndex !== -1) {
+							const reorderedGroups = [...updatedGroups]
+							const updatedGroup = { ...reorderedGroups[groupIndex], lastMessage: message }
+							reorderedGroups.splice(groupIndex, 1)
+							reorderedGroups.unshift(updatedGroup)
+							return { ...state, groups: reorderedGroups, messages: newMessagesMap }
+						}
+
+						return { ...state, groups: updatedGroups, messages: newMessagesMap }
 					}
 
-					const newMessagesMap = new Map(state.messages)
-					const existingMessages = newMessagesMap.get(groupID) || []
-					newMessagesMap.set(groupID, [...existingMessages, message])
+					case 'NICKNAME_CHANGED': {
+						const { uid, nickname } = message.meta || {}
+						if (!uid || !nickname) return state
 
-					return {
-						...state,
-						members: newMembersMap,
-						messages: newMessagesMap,
+						const groupID = message.groupID
+						const newMembersMap = new Map(state.members)
+						const groupMembers = new Map(newMembersMap.get(groupID) || [])
+
+						const member = groupMembers.get(uid)
+						if (member) {
+							groupMembers.set(uid, {
+								...member,
+								nickname: nickname,
+							})
+							newMembersMap.set(groupID, groupMembers)
+						}
+
+						const newMessagesMap = new Map(state.messages)
+						const existingMessages = newMessagesMap.get(groupID) || []
+						newMessagesMap.set(groupID, [...existingMessages, message])
+
+						return {
+							...state,
+							members: newMembersMap,
+							messages: newMessagesMap,
+						}
+					}
+
+					case 'JOIN_REQUEST': {
+						const { uid, displayName } = message.meta || {}
+						if (!uid || !displayName) return state
+						const groupID = message.groupID
+
+						const newRequest: JoinRequest = {
+							id: uid,
+							displayName,
+						}
+
+						const updatedGroups = state.groups.map(group => {
+							if (group.id === groupID) {
+								return {
+									...group,
+									joinRequests: [...group.joinRequests, newRequest],
+								}
+							}
+							return group
+						})
+
+						const updatedMessages = new Map(state.messages)
+						const existingMessages = updatedMessages.get(groupID) || []
+						updatedMessages.set(groupID, [...existingMessages, message])
+
+						return {
+							...state,
+							groups: updatedGroups,
+							messages: updatedMessages,
+						}
+					}
+
+					case 'USER_JOINED': {
+						const { uid, displayName, role } = message.meta || {}
+						if (!uid || !displayName || !role) return state
+
+						const newMember: GroupMember = {
+							id: uid,
+							displayName,
+							nickname: null,
+							role,
+						}
+
+						const updatedMembers = new Map(state.members)
+						const groupMembers = new Map(updatedMembers.get(message.groupID) || new Map())
+						groupMembers.set(uid, newMember)
+						updatedMembers.set(message.groupID, groupMembers)
+
+						const groupID = message.groupID
+						const updatedMessages = new Map(state.messages)
+						const groupMsgs = updatedMessages.get(groupID) || []
+						updatedMessages.set(groupID, [...groupMsgs, message])
+
+						const updatedGroups = state.groups.map(group => {
+							if (groupID === group.id) {
+								return {
+									...group,
+									memberCount: (group.memberCount || 0) + 1,
+								}
+							}
+							return group
+						})
+
+						return {
+							...state,
+							members: updatedMembers,
+							messages: updatedMessages,
+							groups: updatedGroups,
+						}
+					}
+
+					case 'USER_KICKED': {
+						const { uid } = message.meta || {}
+						const groupID = message.groupID
+
+						const newMembersMap = new Map(state.members)
+						const groupMembers = new Map(newMembersMap.get(groupID))
+						groupMembers.delete(uid)
+						newMembersMap.set(groupID, groupMembers)
+
+						const newMessagesMap = new Map(state.messages)
+						const existingMessages = newMessagesMap.get(groupID) || []
+						newMessagesMap.set(groupID, [...existingMessages, message])
+
+						const newGroups = state.groups.map(group => {
+							if (group.id === groupID) {
+								return {
+									...group,
+									memberCount: (group.memberCount || 1) - 1,
+								}
+							}
+							return group
+						})
+
+						return {
+							...state,
+							members: newMembersMap,
+							messages: newMessagesMap,
+							groups: newGroups,
+						}
+					}
+
+					case 'ROLE_CHANGED': {
+						const { uid, newRole } = message.meta || {}
+						const groupID = message.groupID
+
+						const updatedMembers = new Map(state.members)
+						const groupMembers = new Map(updatedMembers.get(groupID))
+						const member = groupMembers.get(uid)
+						if (member) {
+							groupMembers.set(uid, { ...member, role: newRole })
+							updatedMembers.set(groupID, groupMembers)
+						}
+
+						const updatedMessages = new Map(state.messages)
+						const existingMessages = updatedMessages.get(groupID) || []
+						updatedMessages.set(groupID, [...existingMessages, message])
+
+						return {
+							...state,
+							members: updatedMembers,
+							messages: updatedMessages,
+						}
+					}
+
+					default: {
+						console.log('implement this: ' + message.systemEvent)
 					}
 				}
 			}
@@ -215,6 +379,24 @@ const socialReducer = (state: SocialState, action: any): SocialState => {
 				messages: newMessagesMap,
 			}
 		}
+		case 'HANDLED_JOIN_REQUEST': {
+			const { groupID, uid } = action.payload
+
+			const updatedGroups = state.groups.map(group => {
+				if (group.id !== groupID) return group
+
+				return {
+					...group,
+					joinRequests: group.joinRequests.filter(request => request.id !== uid),
+				}
+			})
+
+			return {
+				...state,
+				groups: updatedGroups,
+			}
+		}
+
 		default:
 			return state
 	}
@@ -260,7 +442,7 @@ export const SocialProvider: FC<{ children: ReactNode }> = ({ children }) => {
 					theme: group.theme,
 					description: group.description,
 					memberCount: group.groupMembers.length,
-					joinRequests: [],
+					joinRequests: group.joinRequests,
 				})
 			})
 			dispatch({ type: 'SET_MEMBERS', payload: membersByGroup })
@@ -303,7 +485,7 @@ export const SocialProvider: FC<{ children: ReactNode }> = ({ children }) => {
 			console.error('Error loading messages:', err)
 		}
 	}
-	
+
 	const connectWebSocket = async () => {
 		try {
 			if (websocket.current) return
@@ -311,9 +493,35 @@ export const SocialProvider: FC<{ children: ReactNode }> = ({ children }) => {
 			const ws = new WebSocket(`ws://${BACKEND_URL}/social/chat`, [token || ''])
 			websocket.current = ws
 
-			ws.onmessage = e => {
+			ws.onmessage = async e => {
 				try {
 					const raw: Message = JSON.parse(e.data)
+
+					if (raw.type === 'SYSTEM' && raw.systemEvent === 'JOINED_GROUP') {
+						const groupID = raw.meta?.groupID
+						if (!groupID) return
+
+						try {
+							const token = await auth.currentUser?.getIdToken(true)
+							const response = await axios.get(
+								`http://${BACKEND_URL}/social/groups/${groupID}`,
+								{
+									headers: { Authorization: `Bearer ${token}` },
+								},
+							)
+
+							const group = response.data
+
+							dispatch({ type: 'JOINED_GROUP_SUCCESS', payload: group })
+
+							toast.success(`You were added to "${group.name}"`)
+						} catch (err) {
+							console.error('Error fetching joined group data:', err)
+						}
+
+						return
+					}
+
 					dispatch({ type: 'ADD_MESSAGE', payload: enrichMessageWithSenderName(raw) })
 				} catch (err) {
 					console.error('WebSocket parse error:', err)
@@ -364,18 +572,18 @@ export const SocialProvider: FC<{ children: ReactNode }> = ({ children }) => {
 							headers: { Authorization: `Bearer ${token}` },
 						},
 					)
-
 				},
 				changeNickname: async (groupID, memberID, nickname) => {
 					if (!state.selectedGroup) return
-					if (state.members.get(state.selectedGroup.id)?.get(memberID)?.nickname == nickname) return
+					if (state.members.get(state.selectedGroup.id)?.get(memberID)?.nickname == nickname)
+						return
 					const token = await auth.currentUser?.getIdToken()
 					await axios.put(
 						`http://${BACKEND_URL}/social/group/nickname`,
 						{
-							uid:memberID,
-							groupId:groupID,
-							nickname:nickname
+							uid: memberID,
+							groupId: groupID,
+							nickname: nickname,
 						},
 						{
 							headers: { Authorization: `Bearer ${token}` },
@@ -403,7 +611,7 @@ export const SocialProvider: FC<{ children: ReactNode }> = ({ children }) => {
 						},
 					})
 				},
-				sendMessage: ({ content }: { content: string; }) => {
+				sendMessage: ({ content }: { content: string }) => {
 					const g = state.selectedGroup
 					if (!g || !websocket.current) return
 					if (!content.trim()) return
@@ -411,13 +619,50 @@ export const SocialProvider: FC<{ children: ReactNode }> = ({ children }) => {
 						JSON.stringify({
 							groupID: g.id,
 							content,
-							type:'TEXT'
+							type: 'TEXT',
 						}),
 					)
 				},
 				loadMessageHistory,
 				removeRecommendation: (groupID: number) => {
 					dispatch({ type: 'REMOVE_RECOMMENDATION', payload: { groupID } })
+				},
+				handleJoinRequest: async (groupID: number, uid: string, accept: boolean) => {
+					try {
+						const token = await auth.currentUser?.getIdToken()
+						await axios.put(
+							`http://${BACKEND_URL}/social/join-requests/handle`,
+							{
+								groupId: groupID,
+								id: uid,
+								accepted: accept,
+							},
+							{
+								headers: {
+									Authorization: `Bearer ${token}`,
+								},
+							},
+						)
+						dispatch({ type: 'HANDLED_JOIN_REQUEST', payload: { groupID, uid } })
+					} catch (err) {
+						console.error('Error handling join request: ' + err)
+					}
+				},
+				promoteDemoteMember: async (groupID, targetUID, newRole) => {
+					const token = await auth.currentUser?.getIdToken()
+					await axios.put(
+						`http://${BACKEND_URL}/social/group/${groupID}/members/${targetUID}/role`,
+						{ newRole },
+						{ headers: { Authorization: `Bearer ${token}` } },
+					)
+				},
+
+				kickMember: async (groupID, targetUID) => {
+					const token = await auth.currentUser?.getIdToken()
+					await axios.delete(
+						`http://${BACKEND_URL}/social/group/${groupID}/members/${targetUID}`,
+						{ headers: { Authorization: `Bearer ${token}` } },
+					)
 				},
 			}}
 		>
@@ -430,7 +675,4 @@ export const useSocial = () => {
 	const ctx = useContext(SocialContext)
 	if (!ctx) throw new Error('useSocial must be used in provider')
 	return ctx
-}
-function setState(arg0: (prev: any) => any) {
-	throw new Error('Function not implemented.')
 }
