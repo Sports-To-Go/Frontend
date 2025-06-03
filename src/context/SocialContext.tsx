@@ -42,7 +42,7 @@ export interface Message {
 	groupID: number
 	content: string
 	timestamp: string
-	type: 'TEXT' | 'SYSTEM'
+	type: 'TEXT' | 'SYSTEM' | 'IMAGE'
 	systemEvent?: SystemEventType
 	meta?: Record<string, any>
 	senderName?: string
@@ -77,6 +77,8 @@ interface SocialContextType {
 	handleJoinRequest: (groupID: number, uid: string, accepted: boolean) => void
 	promoteDemoteMember: (groupID: number, targetUID: string, newRole: string) => Promise<void>
 	kickMember: (groupID: number, targetUID: string) => Promise<void>
+	sendTextMessage: (content: string) => void
+	sendImageMessage: (file: File) => void
 }
 
 const initialState: SocialState = {
@@ -624,15 +626,22 @@ export const SocialProvider: FC<{ children: ReactNode }> = ({ children }) => {
 						},
 					})
 				},
-				sendMessage: ({ content }: { content: string }) => {
+				sendMessage: ({
+					content,
+					type = 'TEXT',
+				}: {
+					content: string
+					type?: 'TEXT' | 'IMAGE'
+				}) => {
 					const g = state.selectedGroup
 					if (!g || !websocket.current) return
 					if (!content.trim()) return
+
 					websocket.current.send(
 						JSON.stringify({
 							groupID: g.id,
 							content,
-							type: 'TEXT',
+							type,
 						}),
 					)
 				},
@@ -676,6 +685,48 @@ export const SocialProvider: FC<{ children: ReactNode }> = ({ children }) => {
 						`http://${BACKEND_URL}/social/group/${groupID}/members/${targetUID}`,
 						{ headers: { Authorization: `Bearer ${token}` } },
 					)
+				},
+
+				sendTextMessage: (content: string) => {
+					const g = state.selectedGroup
+					if (!g || !websocket.current) return
+					if (!content.trim()) return
+					websocket.current.send(
+						JSON.stringify({
+							groupID: g.id,
+							content,
+							type: 'TEXT',
+						}),
+					)
+				},
+
+				sendImageMessage: async (file: File) => {
+					const g = state.selectedGroup
+					if (!g || !websocket.current) return
+
+					const token = await auth.currentUser?.getIdToken()
+					const formData = new FormData()
+					formData.append('image', file)
+
+					try {
+						const res = await axios.post(`http://${BACKEND_URL}/social/images/upload`, formData, {
+							headers: {
+								Authorization: `Bearer ${token}`,
+								'Content-Type': 'multipart/form-data',
+							},
+						})
+						const imageUrl = res.data.imageUrl
+						websocket.current.send(
+							JSON.stringify({
+								groupID: g.id,
+								content: imageUrl,
+								type: 'IMAGE',
+							}),
+						)
+					} catch (err) {
+						console.error('Failed to upload image', err)
+						toast.error('Image upload failed')
+					}
 				},
 			}}
 		>
