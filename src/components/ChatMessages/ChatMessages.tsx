@@ -86,7 +86,12 @@ const ChatMessages: FC<ChatMessagesProps> = ({ messages, onTopReached, loadingTo
 
 				return (
 					<div key={`${groupID}-${msg.id}`} className="message-container">
-						<RoundedPhoto size={40} />
+						<RoundedPhoto
+							size={40}
+							imagePath={
+								'https://dashboard.codeparrot.ai/api/image/Z_T76IDi91IKZZrg/image.png'
+							}
+						/>
 						<div className="message-content">
 							<div className="message-title">
 								<strong className="message-sender">

@@ -134,6 +134,7 @@ const GroupChat: FC<GroupProps> = ({ groupID, onBack }) => {
 				groupName={groupName}
 				status="online"
 				onBack={onBack}
+				image={selectedGroup?.imageUrl}
 				onOpenSettings={() => setIsGroupSettingsOpen(true)}
 			/>
 			<ChatMessages

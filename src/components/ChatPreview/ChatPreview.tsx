@@ -1,4 +1,4 @@
-import React from 'react'
+import { FC, memo } from 'react'
 import { CiUser } from 'react-icons/ci'
 import './ChatPreview.scss'
 
@@ -10,16 +10,14 @@ interface GroupPreviewProps {
 	onClick?: () => void
 }
 
-const GroupPreview: React.FC<GroupPreviewProps> = React.memo(
+const GroupPreview: FC<GroupPreviewProps> = memo(
 	({ name, image, description, members, onClick }) => {
 		return (
 			<li className="message-item" onClick={onClick}>
 				<div className="group-avatar-container">
 					<img
 						src={
-							image != ''
-								? image
-								: 'https://dashboard.codeparrot.ai/api/image/Z_T76IDi91IKZZrg/image.png'
+							image || 'https://dashboard.codeparrot.ai/api/image/Z_T76IDi91IKZZrg/image.png'
 						}
 						alt={`${name}'s avatar`}
 						className="group-avatar"
@@ -33,7 +31,7 @@ const GroupPreview: React.FC<GroupPreviewProps> = React.memo(
 					<CiUser />
 					<span className="members-count">{members}</span>
 				</div>
-			</li>	
+			</li>
 		)
 	},
 )

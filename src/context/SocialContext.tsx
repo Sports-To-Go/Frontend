@@ -10,6 +10,7 @@ export interface GroupPreview {
 	name: string
 	memberCount?: number
 	description: string
+	imageUrl: string
 }
 
 export interface GroupMember {
@@ -69,7 +70,7 @@ interface SocialContextType {
 	leaveGroup: (groupID: number) => void
 	changeTheme: (groupID: number, theme: string) => void
 	changeNickname: (groupID: number, memberID: string, nickname: string) => void
-	createGroup: (name: string, description: string) => void
+	createGroup: (name: string, description: string, image: File | null) => void
 	sendMessage: (args: { content: string }) => void
 	loadMessageHistory: (groupID: number, before: string) => void
 	removeRecommendation: (groupID: number) => void
@@ -143,6 +144,7 @@ const socialReducer = (state: SocialState, action: any): SocialState => {
 				description: group.description,
 				memberCount: group.groupMembers.length,
 				joinRequests: group.joinRequests,
+				imageUrl: group.imageUrl,
 			}
 
 			const updatedGroups = [newGroup, ...state.groups.filter(g => g.id !== group.id)]
@@ -340,7 +342,6 @@ const socialReducer = (state: SocialState, action: any): SocialState => {
 					}
 
 					default: {
-						console.log('implement this: ' + message.systemEvent)
 					}
 				}
 			}
@@ -436,6 +437,7 @@ export const SocialProvider: FC<{ children: ReactNode }> = ({ children }) => {
 					}),
 				)
 				membersByGroup.set(group.id, memberMap)
+				console.log(group)
 				groupData.push({
 					id: group.id,
 					name: group.name,
@@ -443,6 +445,7 @@ export const SocialProvider: FC<{ children: ReactNode }> = ({ children }) => {
 					description: group.description,
 					memberCount: group.groupMembers.length,
 					joinRequests: group.joinRequests,
+					imageUrl: group.imageUrl,
 				})
 			})
 			dispatch({ type: 'SET_MEMBERS', payload: membersByGroup })
@@ -590,24 +593,34 @@ export const SocialProvider: FC<{ children: ReactNode }> = ({ children }) => {
 						},
 					)
 				},
-				createGroup: async (name, desc) => {
+				createGroup: async (name, desc, image) => {
 					if (!name.trim()) return
 					const token = await auth.currentUser?.getIdToken(true)
-					const res = await axios.post(
-						`http://${BACKEND_URL}/social/group`,
-						{ name, description: desc },
-						{
-							headers: { Authorization: `Bearer ${token}` },
+					const formData = new FormData()
+					formData.append('name', name)
+					formData.append('description', desc)
+					if (image) formData.append('image', image)
+
+					const res = await axios.post(`http://${BACKEND_URL}/social/group`, formData, {
+						headers: {
+							Authorization: `Bearer ${token}`,
+							'Content-Type': 'multipart/form-data',
 						},
-					)
+					})
+
+					const group = res.data
+					console.log(group)
+
 					dispatch({
 						type: 'CREATE_GROUP',
 						payload: {
-							id: res.data.id,
-							name,
-							description: desc,
-							memberCount: 1,
-							joinRequests: [],
+							id: group.id,
+							name: group.name,
+							description: group.description,
+							memberCount: group.groupMembers.length,
+							joinRequests: group.joinRequests,
+							imageUrl: group.imageUrl,
+							theme: group.theme,
 						},
 					})
 				},

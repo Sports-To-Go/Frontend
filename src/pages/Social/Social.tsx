@@ -125,7 +125,7 @@ const Social: FC = () => {
 											<ChatPreview
 												key={preview.id}
 												name={preview.name}
-												image={''}
+												image={preview.imageUrl}
 												description={getPreviewText(preview)}
 												members={preview.memberCount || 0}
 												onClick={() => selectGroup(preview)}
@@ -144,7 +144,7 @@ const Social: FC = () => {
 							<GroupChat groupID={selectedGroup.id} onBack={handleBack} onLeave={() => {}} />
 						) : (
 							<GroupDetails
-								image={''}
+								image={selectedGroup.imageUrl}
 								name={selectedGroup.name}
 								description={selectedGroup.description}
 								members={selectedGroup.memberCount || 0}
