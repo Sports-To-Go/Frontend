@@ -1,54 +1,104 @@
-import React from 'react'
-import './ActivityFeed.scss'
-import ActivityItem from '../ActivityItem/ActivityItem'
-import backgroundplaceholder from '../../assets/backgroundplaceholder.png'
+import { useEffect, useState } from 'react';
+import './ActivityFeed.scss';
+import ActivityItem from '../ActivityItem/ActivityItem';
+import { useAuth } from '../../context/UserContext';
+import axios from 'axios';
+import { BACKEND_URL } from '../../../integration-config';
+import { auth } from '../../firebase/firebase';
 
-const ActivityFeed: React.FC = () => {
-	return (
-		<div className="activity-feed">
-			<h2 className="activity-feed__title">Recent Activity</h2>
-
-			<div className="activity-feed__card">
-				<div className="activity-feed__header">
-					<p className="activity-feed__last-online">Last Online 2 days ago</p>
-				</div>
-
-				<div className="activity-feed__scroll-container">
-					<ActivityItem
-						image={backgroundplaceholder}
-						title="Played at - TerenName - TerenLocation"
-						time="2 hours"
-						description="Very fun match! Weather was perfect and the location was great."
-						rating={5}
-					/>
-
-					<ActivityItem
-						image={backgroundplaceholder}
-						title="Played at - Sala Sporturilor - Cluj"
-						time="1 hour"
-						description="Quick 3v3 match with friends!"
-						rating={4}
-					/>
-
-					<ActivityItem
-						image={backgroundplaceholder}
-						title="Played at - Sala Sporturilor - Cluj"
-						time="1 hour"
-						description="Quick 3v3 match with friends!"
-						rating={4}
-					/>
-
-					<ActivityItem
-						image={backgroundplaceholder}
-						title="Played at - Sala Sporturilor - Cluj"
-						time="1 hour"
-						description="Quick 3v3 match with friends!"
-						rating={4}
-					/>
-				</div>
-			</div>
-		</div>
-	)
+interface Reservation {
+    id: number;
+    locationId: number;
+    userId: string;
+    locationName?: string;
+    startTime: string;
+    endTime: string;
+    date: string;
+    paymentStatus: string;
+    totalCost: number;
+    locationImage?: string;
+    userRating?: number;
 }
 
-export default ActivityFeed
+const ActivityFeed = () => {
+    const { user } = useAuth();
+    const [activities, setActivities] = useState<Reservation[]>([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState('');
+
+    useEffect(() => {
+        const fetchReservations = async () => {
+            if (!user?.uid) {
+                setLoading(false);
+                return;
+            }
+            // Firebase user.uid is a string. Convert it.
+            const userIdAsNumber = parseInt(user.uid, 10);
+            if (isNaN(userIdAsNumber)) {
+                setError('Invalid user ID format for fetching reservations.');
+                setLoading(false);
+                return;
+            }
+
+            try {
+                const token = await auth.currentUser?.getIdToken();
+                const response = await axios.get<Reservation[]>(
+                    `http://${BACKEND_URL}/reservations/user/${userIdAsNumber}`,
+                    {
+                        headers: { Authorization: `Bearer ${token}` }
+                    }
+                );
+
+                setActivities(response.data || []);
+            } catch (err) {
+                setError('Failed to load activities');
+                console.error('Error fetching reservations:', err);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchReservations();
+    }, [user?.uid]);
+
+    const formatTimeDisplay = (start: string, end: string) => {
+        return `${start} - ${end}`;
+    };
+
+    const formatStatusDisplay = (status: string, cost: number) => {
+        return `Status: ${status} | Total: ${cost} RON`;
+    };
+
+    return (
+        <div className="activity-feed">
+            <h2 className="activity-feed__title">Recent Activity</h2>
+            <div className="activity-feed__card">
+                <div className="activity-feed__header">
+                    <p className="activity-feed__last-online">Your Reservations</p>
+                </div>
+                <div className="activity-feed__scroll-container">
+                    {loading ? (
+                        <p>Loading activities...</p>
+                    ) : error ? (
+                        <p className="error-message">{error}</p>
+                    ) : activities.length > 0 ? (
+                        activities.map(activity => (
+                            <ActivityItem
+                                key={activity.id}
+                                image={activity.locationImage || ''}
+                                title={`Reservation at ${activity.locationName || `Location #${activity.locationId}`}`}
+                                time={formatTimeDisplay(activity.startTime, activity.endTime)}
+                                description={formatStatusDisplay(activity.paymentStatus, activity.totalCost)}
+                                rating={activity.userRating}
+                            />
+                        ))
+                    ) : (
+                        <p>No activities found</p>
+                    )}
+                </div>
+            </div>
+        </div>
+    );
+};
+
+export default ActivityFeed;
