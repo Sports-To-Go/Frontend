@@ -6,7 +6,7 @@ import './Locations.scss'
 import axios from 'axios'
 import { BACKEND_URL } from '../../../integration-config'
 
-interface Location {
+export interface Location {
 	id: number
 	title: string
 	name: string
@@ -69,7 +69,7 @@ const Locations: FC = () => {
 		<Layout>
 			<div className="locations-page">
 				{/* Include FilterBar */}
-				{filteredLocations.length !== 0 && <FilterBar onFilterChange={handleFilterChange} />}
+				<FilterBar onFilterChange={handleFilterChange} />
 
 				<div className="locations-grid">
 					{filteredLocations.length === 0 ? (

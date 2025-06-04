@@ -1,9 +1,10 @@
 import React, { useState } from 'react'
 import LocationReservationModal from '../LocationComponent/LocationReservationModal'
-import { MdOutlineReportProblem } from 'react-icons/md'
+import { MdDeleteOutline, MdOutlineReportProblem } from 'react-icons/md'
 import './LocationComponent.scss'
 import ReportLocationModal from '../ReportLocationModal/ReportLocationModal'
-
+import axios from 'axios'
+import { BACKEND_URL } from '../../../integration-config'
 
 type LocationProps = {
 	location: {
@@ -17,18 +18,36 @@ type LocationProps = {
 		closingTime: string
 		image: string
 	}
+	isSameUser?: boolean
+	deleteLocationFromArr?: (id: number) => void
 }
 
-const LocationComponent: React.FC<LocationProps> = ({ location }) => {
+const LocationComponent: React.FC<LocationProps> = ({
+	location,
+	isSameUser = false,
+	deleteLocationFromArr,
+}) => {
 	const [isModalOpen, setIsModalOpen] = useState(false)
-
+	const [showDeleteModal, setShowDeleteModal] = useState(false)
 	const [showReportModal, setShowReportModal] = useState(false)
-
 
 	const handleOpenModal = () => {
 		setIsModalOpen(true)
 	}
 
+	const handleDeleteLocations = async () => {
+		try {
+			if (deleteLocationFromArr) {
+				deleteLocationFromArr(location.id)
+			}
+			await axios.delete(`http://${BACKEND_URL}/locations/${location.id}`)
+			console.log('Location deleted successfully')
+		} catch (error) {
+			console.error('Failed to delete location:', error)
+		} finally {
+			setShowDeleteModal(false)
+		}
+	}
 
 	const handleCloseReport = () => {
 		setShowReportModal(false)
@@ -46,15 +65,27 @@ const LocationComponent: React.FC<LocationProps> = ({ location }) => {
 						alt={`${location.name} Header`}
 						className="location-header-image"
 					/>
-					<div
-						className="report-location"
-						onClick={e => {
-							e.stopPropagation()
-							setShowReportModal(true)
-						}}
-					>
-						<MdOutlineReportProblem size={30} />
-					</div>
+					{isSameUser ? (
+						<div
+							className="report-location"
+							onClick={e => {
+								e.stopPropagation()
+								setShowDeleteModal(true)
+							}}
+						>
+							<MdDeleteOutline size={30} />
+						</div>
+					) : (
+						<div
+							className="report-location"
+							onClick={e => {
+								e.stopPropagation()
+								setShowReportModal(true)
+							}}
+						>
+							<MdOutlineReportProblem size={30} />
+						</div>
+					)}
 				</div>
 				<div className="location-content">
 					<div className="location-header">
@@ -86,8 +117,23 @@ const LocationComponent: React.FC<LocationProps> = ({ location }) => {
 					locationName={location.name}
 				/>
 			)}
+			{showDeleteModal && (
+				<div className="reservation-overlay" onClick={() => setShowDeleteModal(false)}>
+					<div className="delete-modal" onClick={e => e.stopPropagation()}>
+						<h2>Are you sure?</h2>
+						<div className="modal-buttons">
+							<button className="delete-button" onClick={handleDeleteLocations}>
+								Delete
+							</button>
+							<button className="cancel-button" onClick={() => setShowDeleteModal(false)}>
+								Cancel
+							</button>
+						</div>
+					</div>
+				</div>
+			)}
 
-			{isModalOpen && (
+			{!isSameUser && isModalOpen && (
 				<LocationReservationModal
 					location={{
 						id: location.id,

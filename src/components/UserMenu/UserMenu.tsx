@@ -10,6 +10,7 @@ import userplaceholder from '../../assets/userplaceholder.png'
 
 import './UserMenu.scss'
 import { FaQuestion } from 'react-icons/fa'
+import { FaMapLocationDot } from 'react-icons/fa6'
 
 interface UserMenuProps {
 	menuRef: RefObject<HTMLDivElement | null>
@@ -62,6 +63,13 @@ const UserMenu: FC<UserMenuProps> = ({ menuRef }) => {
 					>
 						<FiUser style={{ marginRight: '8px' }} />
 						Profile
+					</div>
+					<div
+						className="user-menu__item"
+						onClick={() => navigate(`/locations/${user?.uid || ''}`)}
+					>
+						<FaMapLocationDot style={{ marginRight: '8px' }} />
+						My locations
 					</div>
 					<div className="user-menu__item" onClick={() => navigate('/faq')}>
 						<FaQuestion style={{ marginRight: '8px' }} />

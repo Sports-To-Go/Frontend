@@ -85,3 +85,46 @@
 		color: #007bff;
 	}
 }
+
+.delete-modal {
+	background-color: white;
+	padding: 2rem;
+	border-radius: 12px;
+	box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+	text-align: center;
+	min-width: 300px;
+}
+
+.modal-buttons {
+	display: flex;
+	justify-content: center;
+	gap: 1rem;
+	margin-top: 1.5rem;
+}
+
+.delete-button {
+	background-color: #e53935;
+	color: white;
+	padding: 0.5rem 1.2rem;
+	border: none;
+	border-radius: 6px;
+	cursor: pointer;
+	font-weight: bold;
+
+	&:hover {
+		background-color: #c62828;
+	}
+}
+
+.cancel-button {
+	background-color: transparent;
+	color: #333;
+	padding: 0.5rem 1.2rem;
+	border: 1px solid #ccc;
+	border-radius: 6px;
+	cursor: pointer;
+
+	&:hover {
+		background-color: #f1f1f1;
+	}
+}
