@@ -10,14 +10,14 @@ interface Reservation {
     id: number;
     locationId: number;
     userId: string;
-    locationName?: string;  
+    locationName?: string;
     startTime: string;
-    endTime: string;
+    endTime: string;  
     date: string;
     paymentStatus: string;
     totalCost: number;
-    locationImage?: string;  
-    userRating?: number; 
+    locationImage?: string;
+    userRating?: number;
 }
 
 const ActivityFeed = () => {
@@ -28,22 +28,31 @@ const ActivityFeed = () => {
 
     useEffect(() => {
         const fetchReservations = async () => {
-            if (!user?.uid) return;
-            
+            if (!user?.uid) {
+                setLoading(false);
+                return;
+            }
+            // Firebase user.uid is a string. Convert it.
+            const userIdAsNumber = parseInt(user.uid, 10);
+            if (isNaN(userIdAsNumber)) {
+                setError('Invalid user ID format for fetching reservations.');
+                setLoading(false);
+                return;
+            }
+
             try {
                 const token = await auth.currentUser?.getIdToken();
                 const response = await axios.get<Reservation[]>(
-                    `http://${BACKEND_URL}/reservations`,
+                    `http://${BACKEND_URL}/reservations/user/${userIdAsNumber}`,
                     {
                         headers: { Authorization: `Bearer ${token}` }
                     }
                 );
-                
-                const userReservations = response.data.filter(r => r.userId === user.uid);
-                setActivities(userReservations);
+
+                setActivities(response.data || []);
             } catch (err) {
                 setError('Failed to load activities');
-                console.error('Error:', err);
+                console.error('Error fetching reservations:', err);
             } finally {
                 setLoading(false);
             }
@@ -76,11 +85,11 @@ const ActivityFeed = () => {
                         activities.map(activity => (
                             <ActivityItem
                                 key={activity.id}
-                                image={activity.locationImage || ''} 
+                                image={activity.locationImage || ''}
                                 title={`Reservation at ${activity.locationName || `Location #${activity.locationId}`}`}
                                 time={formatTimeDisplay(activity.startTime, activity.endTime)}
                                 description={formatStatusDisplay(activity.paymentStatus, activity.totalCost)}
-                                rating={activity.userRating} 
+                                rating={activity.userRating}
                             />
                         ))
                     ) : (

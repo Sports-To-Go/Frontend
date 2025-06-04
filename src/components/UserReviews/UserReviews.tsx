@@ -7,14 +7,12 @@ import { BACKEND_URL } from '../../../integration-config';
 import { auth } from '../../firebase/firebase';
 
 interface Report {
-    id: string;
+    id: number;
     createdAt: string;
     reason: string;
-    severity?: number;
-    reportedBy?: {
-        displayName?: string;
-        photoURL?: string;
-    };
+    reportedBy: string;
+    targetId: string;
+    targetType: string;
 }
 
 const UserReviews: React.FC = () => {
@@ -25,35 +23,49 @@ const UserReviews: React.FC = () => {
 
     useEffect(() => {
         const fetchReports = async () => {
-            if (!user?.uid) return;
-            
+            if (!user?.uid) {
+                setLoading(false);
+                return;
+            }
+
             try {
                 const token = await auth.currentUser?.getIdToken();
                 const response = await axios.get<Report[]>(
-                    `${BACKEND_URL}/reports`,
+                    `http://${BACKEND_URL}/admin/reports/targetUser/${user.uid}`,
                     {
-                        params: {
-                            targetId: user.uid,
-                            targetType: 'USER'
-                        },
                         headers: {
                             Authorization: `Bearer ${token}`,
                         },
                     }
                 );
 
-                const formattedReviews = response.data.map((report, index) => ({
+                const receivedReports = response.data || [];
+
+                const formattedReviews = receivedReports.map((report, index) => ({
+                    id: report.id,
                     date: new Date(report.createdAt).toLocaleDateString(),
                     text: report.reason,
-                    rating: report.severity ? Math.min(Math.max(report.severity, 1), 5) : 1,
-                    reportedById: report.id,
+                    rating: 1,
+                    reportedBy: report.reportedBy,
+                    targetId: report.targetId,
+                    targetType: report.targetType,
                     reporterIndex: index
                 }));
 
                 setReviews(formattedReviews);
             } catch (err) {
-                setError('Failed to load reports');
-                console.error('Error:', err);
+                if (axios.isAxiosError(err)) {
+                    if (err.response?.status === 403) {
+                        setError('You are not authorized to view these reports.');
+                    } else if (err.response?.status === 204) {
+                        setReviews([]);
+                    } else {
+                        setError('Failed to load reports: ' + (err.response?.data || err.message));
+                    }
+                } else {
+                    setError('An unexpected error occurred.');
+                }
+                console.error('Error fetching reports:', err);
             } finally {
                 setLoading(false);
             }
@@ -75,9 +87,9 @@ const UserReviews: React.FC = () => {
                     ) : reviews.length > 0 ? (
                         reviews.map((review, index) => (
                             <UserReviewItem
-                                key={review.reportedById || index}
+                                key={review.id}
                                 review={review}
-                                index={review.reporterIndex || index}
+                                index={index} 
                             />
                         ))
                     ) : (
