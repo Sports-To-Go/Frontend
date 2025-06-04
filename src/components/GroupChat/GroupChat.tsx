@@ -5,7 +5,6 @@ import ChatMessageBar from '../ChatMessageBar/ChatMessageBar'
 import GroupSettings from '../GroupSettings/GroupSettings'
 import './GroupChat.scss'
 import { useSocial, Message } from '../../context/SocialContext'
-import { auth } from '../../firebase/firebase'
 
 interface GroupProps {
 	groupID: number
@@ -17,15 +16,13 @@ const GroupChat: FC<GroupProps> = ({ groupID, onBack }) => {
 	const [newMessage, setNewMessage] = useState('')
 	const [isGroupSettingsOpen, setIsGroupSettingsOpen] = useState(false)
 	const [groupName, setGroupName] = useState('Loading...')
-	const [joinRequests, setJoinRequests] = useState<any[]>([])
 	const [loadingHistory, setLoadingHistory] = useState(false)
 
 	const {
 		state: { messages, members, selectedGroup, groups },
-		sendMessage,
 		loadMessageHistory,
 		changeTheme,
-		changeNickname
+		changeNickname,
 	} = useSocial()
 
 	const rawMessages = selectedGroup ? messages.get(selectedGroup.id) || [] : []
@@ -37,7 +34,7 @@ const GroupChat: FC<GroupProps> = ({ groupID, onBack }) => {
 			senderName:
 				msg.type === 'SYSTEM'
 					? ''
-					: groupMember?.nickname || groupMember?.displayName || 'Unknown User',
+					: groupMember?.nickname || groupMember?.displayName || '[not a member]',
 		}
 	})
 
@@ -80,40 +77,24 @@ const GroupChat: FC<GroupProps> = ({ groupID, onBack }) => {
 		SAKURA: 'linear-gradient(to right,rgb(203, 70, 112),rgb(127, 221, 210))',
 		DARKNESS: 'linear-gradient(to right,rgb(12, 1, 27),rgb(62, 2, 2))',
 		SOFT: 'linear-gradient(to right,rgb(255, 216, 245),rgb(255, 191, 203))',
-		WINDOWS: 'url(https://upload.wikimedia.org/wikipedia/en/2/27/Bliss_%28Windows_XP%29.png)',
-		'ELDEN RING':
-			'url(https://images.steamusercontent.com/ugc/2058741034012526512/379E6434B473E7BE31C50525EB946D4212A8C8B3/)',
-		'PIXEL DREAM': 'url(https://images.alphacoders.com/113/1138740.png)',
 	}
 
 	const handleThemeKeyChange = (themeKey: string) => {
 		if (!themeKey || !selectedGroup) return
 		const theme = themeMap[themeKey]
 		if (!theme) return
-		changeTheme(selectedGroup.id, themeKey);
-	}
-
-	const handleSendMessage = (content: string) => {
-		if (!newMessage.trim()) return
-		sendMessage({ content: content})
-		setNewMessage('')
+		changeTheme(selectedGroup.id, themeKey)
 	}
 
 	const handleNicknameChange = (memberID: string, newNickname: string) => {
 		const groupMembers = members.get(groupID)
-		if (!groupMembers|| !selectedGroup) return
+		if (!groupMembers || !selectedGroup) return
 
 		const member = groupMembers.get(memberID)
 		if (!member) return
 
-
-		changeNickname(selectedGroup.id, memberID, newNickname);
+		changeNickname(selectedGroup.id, memberID, newNickname)
 	}
-
-	const initialTheme =
-		selectedGroup && groups.length > 0
-			? themeMap[groups.find(g => g.id === selectedGroup.id)?.theme || 'DEFAULT']
-			: themeMap['DEFAULT']
 
 	const [themeGradient, setThemeGradient] = useState('')
 
@@ -142,6 +123,7 @@ const GroupChat: FC<GroupProps> = ({ groupID, onBack }) => {
 				groupName={groupName}
 				status="online"
 				onBack={onBack}
+				image={selectedGroup?.imageUrl}
 				onOpenSettings={() => setIsGroupSettingsOpen(true)}
 			/>
 			<ChatMessages
@@ -153,12 +135,9 @@ const GroupChat: FC<GroupProps> = ({ groupID, onBack }) => {
 			<ChatMessageBar
 				newMessage={newMessage}
 				onMessageChange={setNewMessage}
-				onSendMessage={handleSendMessage}
 			/>
 			{isGroupSettingsOpen && (
 				<GroupSettings
-					joinRequests={joinRequests}
-					handleJoinRequest={(id: string, accepted: boolean) => {}}
 					onClose={() => setIsGroupSettingsOpen(false)}
 					onThemeChange={handleThemeKeyChange}
 					onNicknameChange={handleNicknameChange}

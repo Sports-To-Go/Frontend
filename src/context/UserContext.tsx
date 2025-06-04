@@ -89,7 +89,8 @@ export const AuthProvider: FC<{ children: ReactNode }> = ({ children }) => {
 						setUser({
 							...baseUser,
 							description: response.data.description || '',
-							isAdmin: response.data.admin || false,
+							isAdmin: response.data.admin || false,	
+							photoURL: response.data.image.url || null
 						})
 					} catch (error) {
 						if (axios.isAxiosError(error) && error.response?.status === 404) {

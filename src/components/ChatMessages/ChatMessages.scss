@@ -40,6 +40,13 @@
 				color: var(--dark-text);
 				background-color: var(--background);
 			}
+
+			.chat-image {
+				max-width: 300px;
+				max-height: 300px;
+				border-radius: 10px;
+				margin-top: 8px;
+			}
 		}
 	}
 }

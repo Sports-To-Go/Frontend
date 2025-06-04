@@ -6,9 +6,10 @@ import { useNavigate } from 'react-router'
 import { auth } from '../../firebase/firebase'
 import { signOut } from 'firebase/auth'
 
-import placeholder from '../../assets/profilePhotoPlaceholder.png'
+import userplaceholder from '../../assets/userplaceholder.png'
 
 import './UserMenu.scss'
+import { FaQuestion } from 'react-icons/fa'
 
 interface UserMenuProps {
 	menuRef: RefObject<HTMLDivElement | null>
@@ -35,7 +36,7 @@ const UserMenu: FC<UserMenuProps> = ({ menuRef }) => {
 		<div className="user-menu" ref={menuRef}>
 			<div className="user-menu__header">
 				<img
-					src={user && user.photoURL ? user.photoURL : placeholder}
+					src={user && user.photoURL ? user.photoURL : userplaceholder}
 					alt="User avatar"
 					className="user-menu__avatar"
 				/>
@@ -62,7 +63,10 @@ const UserMenu: FC<UserMenuProps> = ({ menuRef }) => {
 						<FiUser style={{ marginRight: '8px' }} />
 						Profile
 					</div>
-
+					<div className="user-menu__item" onClick={() => navigate('/faq')}>
+						<FaQuestion style={{ marginRight: '8px' }} />
+						FaQ
+					</div>
 					<div className="user-menu__item" onClick={handleLogout}>
 						<FiLogOut style={{ marginRight: '8px' }} />
 						Disconnect
