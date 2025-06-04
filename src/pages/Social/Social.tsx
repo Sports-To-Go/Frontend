@@ -8,6 +8,7 @@ import GroupDetails from '../../components/GroupDetails/GroupDetails'
 import GroupForm from '../../components/GroupForm/GroupForm'
 import Spinner from '../../components/Spinner/Spinner'
 import { CiSearch } from 'react-icons/ci'
+import { useAuth } from '../../context/UserContext'
 
 const Social: FC = () => {
 	const [activeTab, setActiveTab] = useState<'myGroups' | 'lookForGroups'>('myGroups')
@@ -21,6 +22,9 @@ const Social: FC = () => {
 		connectSocial,
 		selectGroup,
 	} = useSocial()
+
+	const { user } = useAuth()
+	if (user === null) return
 
 	const mounted = useRef(false)
 
@@ -66,9 +70,7 @@ const Social: FC = () => {
 
 		// For myGroups, show last message if it exists, otherwise show description
 		if (group.lastMessage) {
-			const senderName =
-				members.get(group.id)?.get(group.lastMessage.senderID)?.displayName || 'Unknown'
-			return `${senderName}: ${group.lastMessage.content}`
+			return `${group.lastMessage.senderID === user.uid ? 'You' : members.get(group.id)?.get(group.lastMessage.senderID)?.displayName || 'Unknown'}: ${group.lastMessage.content}`
 		}
 
 		return group.description
@@ -116,21 +118,20 @@ const Social: FC = () => {
 
 							{isLoading ? (
 								<Spinner />
+							) : filteredGroupPreviews.length === 0 ? (
+								<div className="no-data">No groups found</div>
 							) : (
 								<ul className="message-list">
-									{filteredGroupPreviews.map(preview => {
-										return (
-											<ChatPreview
-												key={preview.id}
-												name={preview.name}
-												image={''}
-												isOnline={true}
-												description={getPreviewText(preview)}
-												members={preview.memberCount || 0}
-												onClick={() => selectGroup(preview)}
-											/>
-										)
-									})}
+									{filteredGroupPreviews.map(preview => (
+										<ChatPreview
+											key={preview.id}
+											name={preview.name}
+											image={preview.imageUrl}
+											description={getPreviewText(preview)}
+											members={preview.memberCount || 0}
+											onClick={() => selectGroup(preview)}
+										/>
+									))}
 								</ul>
 							)}
 						</>
@@ -143,11 +144,10 @@ const Social: FC = () => {
 							<GroupChat groupID={selectedGroup.id} onBack={handleBack} onLeave={() => {}} />
 						) : (
 							<GroupDetails
-								image={''}
+								image={selectedGroup.imageUrl}
 								name={selectedGroup.name}
 								description={selectedGroup.description}
 								members={selectedGroup.memberCount || 0}
-								isOnline={true}
 								onBack={handleBack}
 								groupID={selectedGroup.id}
 							/>

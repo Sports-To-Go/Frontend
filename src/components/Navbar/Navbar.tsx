@@ -5,7 +5,7 @@ import NavTab from '../NavTab/NavTab.tsx'
 import { GrHomeRounded, GrLanguage } from 'react-icons/gr'
 import { FaRegSquarePlus } from 'react-icons/fa6'
 import { CiUser } from 'react-icons/ci'
-import { FaUsers } from 'react-icons/fa';
+import { FaUsers } from 'react-icons/fa'
 import UserMenu from '../UserMenu/UserMenu'
 
 interface NavbarProps {
@@ -48,7 +48,6 @@ const Navbar: React.FC<NavbarProps> = ({ showTabs }) => {
 					</div>
 				)}
 				<div className="navbar-right-container">
-					<GrLanguage />
 					<div className="navbar-profile-container" style={{ position: 'relative' }}>
 						<div onClick={toggleMenu}>
 							<CiUser style={{ fontSize: 32 }} cursor={'pointer'} />

@@ -12,7 +12,7 @@ interface Reservation {
     userId: string;
     locationName?: string;
     startTime: string;
-    endTime: string;  
+    endTime: string;
     date: string;
     paymentStatus: string;
     totalCost: number;
