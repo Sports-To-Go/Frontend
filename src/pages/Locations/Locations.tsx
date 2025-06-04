@@ -31,21 +31,13 @@ interface Filters {
 }
 
 const Locations: FC = () => {
-	const [locations, setLocations] = useState<Location[]>([])
 	const [filteredLocations, setFilteredLocations] = useState<Location[]>([])
-	const [filters, setFilters] = useState<Filters>({
-		sport: '',
-		price: '',
-		startTime: '',
-		endTime: '',
-	})
 
 	// Fetch locations from the backend API
 	useEffect(() => {
 		axios
 			.get(`http://${BACKEND_URL}/locations`)
 			.then(response => {
-				setLocations(response.data)
 				setFilteredLocations(response.data)
 			})
 			.catch(error => {
@@ -55,8 +47,6 @@ const Locations: FC = () => {
 
 	// Handle filter changes
 	const handleFilterChange = (newFilters: Filters) => {
-		setFilters(newFilters)
-
 		// Build the URL for the GET request with filters
 		const params: any = {}
 		if (newFilters.sport) params.sport = newFilters.sport
@@ -79,12 +69,18 @@ const Locations: FC = () => {
 		<Layout>
 			<div className="locations-page">
 				{/* Include FilterBar */}
-				<FilterBar onFilterChange={handleFilterChange} />
+				{filteredLocations.length !== 0 && <FilterBar onFilterChange={handleFilterChange} />}
 
 				<div className="locations-grid">
-					{filteredLocations.map(location => (
-						<LocationComponent key={location.id} location={location} />
-					))}
+					{filteredLocations.length === 0 ? (
+						<div className="empty-place--container">
+							<h2>No locations...</h2>
+						</div>
+					) : (
+						filteredLocations.map(location => (
+							<LocationComponent key={location.id} location={location} />
+						))
+					)}
 				</div>
 			</div>
 		</Layout>
