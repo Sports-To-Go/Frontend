@@ -10,6 +10,7 @@
 		background-color 0.3s,
 		backdrop-filter 0.3s;
 	pointer-events: none; /* bara nu primește clickuri */
+	z-index: 10;
 }
 
 .filter-bar * {

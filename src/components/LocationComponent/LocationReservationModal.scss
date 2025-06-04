@@ -45,6 +45,9 @@
 }
 
 /* LEFT SIDE */
+.reservation-left {
+	max-width: 600px;
+}
 .reservation-left img.reservation-image {
 	width: 100%;
 	height: 280px;
@@ -90,6 +93,7 @@
 .reservation-left p {
 	font-size: 1rem;
 	margin: 0.3rem 0;
+	overflow-wrap: break-word;
 }
 
 .reservation-left p strong {

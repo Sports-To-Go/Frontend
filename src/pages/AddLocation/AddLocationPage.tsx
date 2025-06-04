@@ -152,7 +152,7 @@ const AddLocationPage: React.FC<{}> = () => {
 			address,
 			longitude: lng,
 			latitude: lat,
-			createdBy: "17",
+			createdBy: '17',
 			description,
 			sport,
 			calendarId: 'cID',
@@ -162,7 +162,7 @@ const AddLocationPage: React.FC<{}> = () => {
 		}
 
 		try {
-			console.log('payload', payload);
+			console.log('payload', payload)
 			const response = await fetch('http://localhost:8081/locations', {
 				method: 'POST',
 				headers: {
@@ -197,7 +197,7 @@ const AddLocationPage: React.FC<{}> = () => {
 
 							<h2 id="form-title">Courts Details</h2>
 
-							<form onSubmit={handleSubmit}>
+							<form onSubmit={handleSubmit} className="location-form">
 								{/* Container for two columns */}
 								<div className="form-columns">
 									{/* Left Column: Text-based inputs */}

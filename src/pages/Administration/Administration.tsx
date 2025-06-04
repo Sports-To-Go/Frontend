@@ -15,7 +15,6 @@ import { BACKEND_URL } from '../../../integration-config'
 export const Administration: React.FC = () => {
 	const [monthlyRevenue, setMonthlyRevenue] = useState<number[]>([])
 	const [isMobile, setIsMobile] = useState(window.innerWidth < 1000)
-	const [pass, setPass] = useState('')
 	const [reports, setReports] = useState<adminTableRow[]>([])
 
 	useEffect(() => {
@@ -29,7 +28,6 @@ export const Administration: React.FC = () => {
 			const year = new Date().toISOString().split('T')[0].split('-')[0]
 			try {
 				const token = await currentUser.getIdToken(true)
-				setPass(token)
 				const res = await axios.get(`http://${BACKEND_URL}/admin/revenue/monthly`, {
 					params: {
 						from: `${year}-01-01`,
