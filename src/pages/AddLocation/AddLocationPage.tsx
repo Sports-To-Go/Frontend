@@ -8,6 +8,7 @@ import { useNavigate } from 'react-router-dom'
 import './AddLocationPage.scss'
 import Layout from '../../components/Layout/Layout'
 import { toast } from 'react-toastify'
+import { auth } from '../../firebase/firebase'
 
 type FormErrors = {
 	courtName?: string
@@ -35,6 +36,7 @@ const AddLocationPage: React.FC<{}> = () => {
 	const [imagePreviews, setImagePreviews] = useState<string[]>([])
 	const [errors, setErrors] = useState<Record<string, string>>({})
 	const navigate = useNavigate()
+	const currentUser = auth.currentUser
 
 	const handleAddressSelect = (coords: { lat: number; lng: number }) => {
 		setLat(coords.lat)
@@ -152,7 +154,7 @@ const AddLocationPage: React.FC<{}> = () => {
 			address,
 			longitude: lng,
 			latitude: lat,
-			createdBy: '17',
+			createdBy: currentUser!.uid,
 			description,
 			sport,
 			calendarId: 'cID',

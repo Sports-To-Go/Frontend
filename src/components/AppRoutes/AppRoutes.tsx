@@ -12,6 +12,7 @@ import Social from '../../pages/Social/Social'
 import VerifyEmail from '../../pages/VerifyEmail/VerifyEmail'
 import Spinner from '../Spinner/Spinner'
 import Layout from '../Layout/Layout'
+import MyLocations from '../../pages/MyLocations/MyLocations'
 
 const AppRoutes: React.FC = () => {
 	const { user, loading } = useAuth()
@@ -71,6 +72,7 @@ const AppRoutes: React.FC = () => {
 			<Route path="/profile/:uid" element={<Profile />} />
 			<Route path="/add-location" element={<AddLocationPage />} />
 			<Route path="/faq" element={<FAQPage />} />
+			<Route path="/locations/:uid" element={<MyLocations />} />
 			<Route path="*" element={<Navigate to="/locations" replace />} />
 		</Routes>
 	)
