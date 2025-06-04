@@ -3,15 +3,15 @@ import './ReportModal.scss'
 
 interface ReportModalProps {
 	onClose: () => void
-	onSubmit: (reason: string) => void
+	onSubmit: (e: React.FormEvent, reason: string) => void
 }
 
 const ReportModal = ({ onClose, onSubmit }: ReportModalProps) => {
 	const [reason, setReason] = useState('')
 
-	const handleSubmit = () => {
+	const handleSubmit = (event: React.FormEvent) => {
 		if (reason.trim()) {
-			onSubmit(reason)
+			onSubmit(event, reason)
 			onClose()
 		}
 	}

@@ -1,6 +1,9 @@
 import React, { useState } from 'react'
 import LocationReservationModal from '../LocationComponent/LocationReservationModal'
+import { MdOutlineReportProblem } from 'react-icons/md'
 import './LocationComponent.scss'
+import ReportLocationModal from '../ReportLocationModal/ReportLocationModal'
+
 
 type LocationProps = {
 	location: {
@@ -19,8 +22,16 @@ type LocationProps = {
 const LocationComponent: React.FC<LocationProps> = ({ location }) => {
 	const [isModalOpen, setIsModalOpen] = useState(false)
 
+	const [showReportModal, setShowReportModal] = useState(false)
+
+
 	const handleOpenModal = () => {
 		setIsModalOpen(true)
+	}
+
+
+	const handleCloseReport = () => {
+		setShowReportModal(false)
 	}
 
 	return (
@@ -35,6 +46,15 @@ const LocationComponent: React.FC<LocationProps> = ({ location }) => {
 						alt={`${location.name} Header`}
 						className="location-header-image"
 					/>
+					<div
+						className="report-location"
+						onClick={e => {
+							e.stopPropagation()
+							setShowReportModal(true)
+						}}
+					>
+						<MdOutlineReportProblem size={30} />
+					</div>
 				</div>
 				<div className="location-content">
 					<div className="location-header">
@@ -59,6 +79,13 @@ const LocationComponent: React.FC<LocationProps> = ({ location }) => {
 					</div>
 				</div>
 			</div>
+			{showReportModal && (
+				<ReportLocationModal
+					close={handleCloseReport}
+					locationId={location.id}
+					locationName={location.name}
+				/>
+			)}
 
 			{isModalOpen && (
 				<LocationReservationModal
