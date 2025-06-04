@@ -5,7 +5,7 @@ import './LocationComponent.scss'
 import ReportLocationModal from '../ReportLocationModal/ReportLocationModal'
 import axios from 'axios'
 import { BACKEND_URL } from '../../../integration-config'
-
+import backgroundplaceholder from '../../assets/backgroundplaceholder.png'
 type LocationProps = {
 	location: {
 		id: number
@@ -16,7 +16,7 @@ type LocationProps = {
 		hourlyRate: number
 		openingTime: string
 		closingTime: string
-		image: string
+		images: string[]
 	}
 	isSameUser?: boolean
 	deleteLocationFromArr?: (id: number) => void
@@ -58,10 +58,7 @@ const LocationComponent: React.FC<LocationProps> = ({
 			<div className="location-box" onClick={handleOpenModal} style={{ cursor: 'pointer' }}>
 				<div className="location-image-container">
 					<img
-						src={
-							location.image ||
-							'https://www.indfloor.ro/wp-content/uploads/2021/07/DJI_0467.jpg'
-						}
+						src={location.images[0] || backgroundplaceholder}
 						alt={`${location.name} Header`}
 						className="location-header-image"
 					/>
@@ -90,7 +87,6 @@ const LocationComponent: React.FC<LocationProps> = ({
 				<div className="location-content">
 					<div className="location-header">
 						<h3 className="location-title">{location.name}</h3>
-						<div className="location-stars">{'⭐'.repeat(5)}</div>
 					</div>
 					<p className="location-description">{location.description}</p>
 					<div className="location-price">{location.hourlyRate} RON / hour</div>
@@ -139,12 +135,11 @@ const LocationComponent: React.FC<LocationProps> = ({
 						id: location.id,
 						name: location.name,
 						description: location.description,
-						stars: 5, // Assuming a default value for stars
 						address: location.address,
 						sport: location.sport,
 						openingTime: location.openingTime,
 						closingTime: location.closingTime,
-						image: location.image,
+						images: location.images,
 						pricePerHour: location.hourlyRate,
 					}}
 					onClose={() => setIsModalOpen(false)}

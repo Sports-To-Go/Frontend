@@ -11,6 +11,7 @@ const MyLocations: React.FC = () => {
 	const { uid } = useParams()
 	const [userLocations, setUserLocations] = useState<Location[]>([])
 	const [isSameUser, setIsSameUser] = useState(false)
+	
 	useEffect(() => {
 		const getUserLocations = async () => {
 			const currentUser = auth.currentUser
@@ -23,7 +24,11 @@ const MyLocations: React.FC = () => {
 						Authorization: `Bearer ${token}`,
 					},
 				})
-				setUserLocations(res.data)
+				const normalized = res.data.map((loc: any) => ({
+					...loc,
+					images: loc.imageUrls ?? [], // 👈 Normalize field
+				}))
+				setUserLocations(normalized)
 			} catch (e) {
 				console.error(e)
 			}

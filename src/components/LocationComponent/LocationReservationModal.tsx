@@ -6,17 +6,17 @@ import { BACKEND_URL } from '../../../integration-config'
 import axios from 'axios'
 import { auth } from '../../firebase/firebase'
 import PaymentModal from '../../pages/PaymentModal/PaymentModal'
+import backgroundplaceholder from '../../assets/backgroundplaceholder.png'
 
 type Props = {
 	location: {
 		id: number
 		name: string
 		description: string
-		stars: number
 		address: string
 		sport: string
 		pricePerHour: number
-		image: string
+		images: string[]
 		openingTime: string
 		closingTime: string
 	}
@@ -47,6 +47,16 @@ const LocationReservationModal: React.FC<Props> = ({ location, onClose }) => {
 	const [selectedGroupId, setSelectedGroupId] = useState('')
 	const [finalAmount, setFinalAmount] = useState(0)
 	const { user } = useAuth()
+
+	const [currentImageIndex, setCurrentImageIndex] = useState(0)
+
+	const prevImage = () => {
+		setCurrentImageIndex(prev => (prev === 0 ? location.images.length - 1 : prev - 1))
+	}
+
+	const nextImage = () => {
+		setCurrentImageIndex(prev => (prev === location.images.length - 1 ? 0 : prev + 1))
+	}
 
 	useEffect(() => {
 		if (!date) return
@@ -173,17 +183,36 @@ const LocationReservationModal: React.FC<Props> = ({ location, onClose }) => {
 				<div className="reservation-grid">
 					{/* Left: Image & Info */}
 					<div className="reservation-left">
-						<img
-							src={
-								location.image ||
-								'https://www.indfloor.ro/wp-content/uploads/2021/07/DJI_0467.jpg'
-							}
-							alt={location.name}
-							className="reservation-image"
-						/>
+						<div className="carousel">
+							{location.images && location.images.length > 0 ? (
+								<>
+									<img
+										src={location.images[currentImageIndex]}
+										alt={`Location ${currentImageIndex + 1}`}
+										className="reservation-image"
+									/>
+									{location.images.length > 1 && (
+										<div className="carousel-controls">
+											<button onClick={prevImage} className="carousel-btn left">
+												‹
+											</button>
+											<button onClick={nextImage} className="carousel-btn right">
+												›
+											</button>
+										</div>
+									)}
+								</>
+							) : (
+								<img
+									src={backgroundplaceholder}
+									alt={location.name}
+									className="reservation-image"
+								/>
+							)}
+						</div>
+
 						<h2>{location.name}</h2>
 						<p className="location-description">{location.description}</p>
-						<p className="location-stars">{'⭐'.repeat(location.stars)}</p>
 						<p className="price">{location.pricePerHour} RON / hour</p>
 						<p>
 							<strong>Sport:</strong> {location.sport}

@@ -9,6 +9,7 @@ import './AddLocationPage.scss'
 import Layout from '../../components/Layout/Layout'
 import { toast } from 'react-toastify'
 import { auth } from '../../firebase/firebase'
+import { BACKEND_URL } from '../../../integration-config'
 
 type FormErrors = {
 	courtName?: string
@@ -16,7 +17,7 @@ type FormErrors = {
 	description?: string
 	price?: string
 	address?: string
-	images?: string
+	images: string[]
 	time?: string
 }
 
@@ -146,10 +147,10 @@ const AddLocationPage: React.FC<{}> = () => {
 
 	const handleSubmit = async (e: React.FormEvent) => {
 		e.preventDefault()
-
 		if (!validate()) return
 
-		const payload = {
+		const formData = new FormData()
+		const locationPayload = {
 			name: courtName,
 			address,
 			longitude: lng,
@@ -162,27 +163,25 @@ const AddLocationPage: React.FC<{}> = () => {
 			openingTime: startTime,
 			closingTime: endTime,
 		}
+		formData.append(
+			'location',
+			new Blob([JSON.stringify(locationPayload)], { type: 'application/json' }),
+		)
+		images.forEach(img => formData.append('images', img))
 
 		try {
-			console.log('payload', payload)
-			const response = await fetch('http://localhost:8081/locations', {
+			const response = await fetch(`http://${BACKEND_URL}/locations/upload`, {
 				method: 'POST',
-				headers: {
-					'Content-Type': 'application/json',
-				},
-				body: JSON.stringify(payload),
+				body: formData,
 			})
 
-			if (!response.ok) {
-				throw new Error('Failed to submit')
-			}
+			if (!response.ok) throw new Error(await response.text())
 
 			toast.success('Court added successfully!')
-			setTimeout(() => {
-				navigate('/locations')
-			}, 3000)
-		} catch (error) {
-			console.error('Error submitting form:', error)
+			setTimeout(() => navigate('/locations'), 3000)
+		} catch (err) {
+			console.error('Upload failed:', err)
+			toast.error('Upload failed.')
 		}
 	}
 
