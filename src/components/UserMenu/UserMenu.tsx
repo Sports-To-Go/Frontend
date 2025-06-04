@@ -6,7 +6,7 @@ import { useNavigate } from 'react-router'
 import { auth } from '../../firebase/firebase'
 import { signOut } from 'firebase/auth'
 
-import placeholder from '../../assets/profilePhotoPlaceholder.png'
+import userplaceholder from '../../assets/userplaceholder.png'
 
 import './UserMenu.scss'
 import { FaQuestion } from 'react-icons/fa'
@@ -36,7 +36,7 @@ const UserMenu: FC<UserMenuProps> = ({ menuRef }) => {
 		<div className="user-menu" ref={menuRef}>
 			<div className="user-menu__header">
 				<img
-					src={user && user.photoURL ? user.photoURL : placeholder}
+					src={user && user.photoURL ? user.photoURL : userplaceholder}
 					alt="User avatar"
 					className="user-menu__avatar"
 				/>

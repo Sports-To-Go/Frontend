@@ -10,6 +10,7 @@ export interface GroupPreview {
 	name: string
 	memberCount?: number
 	description: string
+	imageUrl: string
 }
 
 export interface GroupMember {
@@ -17,6 +18,7 @@ export interface GroupMember {
 	displayName: string
 	role: string
 	nickname: string | null
+	imageUrl: string | null
 }
 
 export interface JoinRequest {
@@ -41,7 +43,7 @@ export interface Message {
 	groupID: number
 	content: string
 	timestamp: string
-	type: 'TEXT' | 'SYSTEM'
+	type: 'TEXT' | 'SYSTEM' | 'IMAGE'
 	systemEvent?: SystemEventType
 	meta?: Record<string, any>
 	senderName?: string
@@ -69,13 +71,15 @@ interface SocialContextType {
 	leaveGroup: (groupID: number) => void
 	changeTheme: (groupID: number, theme: string) => void
 	changeNickname: (groupID: number, memberID: string, nickname: string) => void
-	createGroup: (name: string, description: string) => void
+	createGroup: (name: string, description: string, image: File | null) => void
 	sendMessage: (args: { content: string }) => void
 	loadMessageHistory: (groupID: number, before: string) => void
 	removeRecommendation: (groupID: number) => void
 	handleJoinRequest: (groupID: number, uid: string, accepted: boolean) => void
 	promoteDemoteMember: (groupID: number, targetUID: string, newRole: string) => Promise<void>
 	kickMember: (groupID: number, targetUID: string) => Promise<void>
+	sendTextMessage: (content: string) => void
+	sendImageMessage: (file: File) => void
 }
 
 const initialState: SocialState = {
@@ -116,6 +120,7 @@ const socialReducer = (state: SocialState, action: any): SocialState => {
 				role: 'admin',
 				nickname: null,
 				displayName: user?.displayName || 'Unknown',
+				imageUrl: user?.photoURL || null
 			}
 
 			newMembers.get(groupID)?.set(user?.uid, member)
@@ -132,6 +137,7 @@ const socialReducer = (state: SocialState, action: any): SocialState => {
 					displayName: m.displayName,
 					role: m.groupRole,
 					nickname: m.nickname,
+					imageUrl: m.imageUrl
 				})
 			})
 			newMembers.set(group.id, memberMap)
@@ -143,6 +149,7 @@ const socialReducer = (state: SocialState, action: any): SocialState => {
 				description: group.description,
 				memberCount: group.groupMembers.length,
 				joinRequests: group.joinRequests,
+				imageUrl: group.imageUrl,
 			}
 
 			const updatedGroups = [newGroup, ...state.groups.filter(g => g.id !== group.id)]
@@ -247,14 +254,15 @@ const socialReducer = (state: SocialState, action: any): SocialState => {
 					}
 
 					case 'USER_JOINED': {
-						const { uid, displayName, role } = message.meta || {}
-						if (!uid || !displayName || !role) return state
+						const { uid, displayName, role, imageUrl } = message.meta || {}
+						if (!uid || !displayName || !role || !imageUrl) return state
 
 						const newMember: GroupMember = {
 							id: uid,
 							displayName,
 							nickname: null,
 							role,
+							imageUrl
 						}
 
 						const updatedMembers = new Map(state.members)
@@ -340,7 +348,6 @@ const socialReducer = (state: SocialState, action: any): SocialState => {
 					}
 
 					default: {
-						console.log('implement this: ' + message.systemEvent)
 					}
 				}
 			}
@@ -426,6 +433,8 @@ export const SocialProvider: FC<{ children: ReactNode }> = ({ children }) => {
 			const groupData: GroupData[] = []
 			const membersByGroup = new Map<number, Map<string, GroupMember>>()
 			response.data.forEach((group: any) => {
+				console.log(group)
+
 				const memberMap = new Map<string, GroupMember>()
 				group.groupMembers.forEach((m: any) =>
 					memberMap.set(m.id, {
@@ -433,6 +442,7 @@ export const SocialProvider: FC<{ children: ReactNode }> = ({ children }) => {
 						displayName: m.displayName,
 						role: m.groupRole,
 						nickname: m.nickname,
+						imageUrl: m.imageUrl
 					}),
 				)
 				membersByGroup.set(group.id, memberMap)
@@ -443,6 +453,7 @@ export const SocialProvider: FC<{ children: ReactNode }> = ({ children }) => {
 					description: group.description,
 					memberCount: group.groupMembers.length,
 					joinRequests: group.joinRequests,
+					imageUrl: group.imageUrl,
 				})
 			})
 			dispatch({ type: 'SET_MEMBERS', payload: membersByGroup })
@@ -590,36 +601,53 @@ export const SocialProvider: FC<{ children: ReactNode }> = ({ children }) => {
 						},
 					)
 				},
-				createGroup: async (name, desc) => {
+				createGroup: async (name, desc, image) => {
 					if (!name.trim()) return
 					const token = await auth.currentUser?.getIdToken(true)
-					const res = await axios.post(
-						`http://${BACKEND_URL}/social/group`,
-						{ name, description: desc },
-						{
-							headers: { Authorization: `Bearer ${token}` },
+					const formData = new FormData()
+					formData.append('name', name)
+					formData.append('description', desc)
+					if (image) formData.append('image', image)
+
+					const res = await axios.post(`http://${BACKEND_URL}/social/group`, formData, {
+						headers: {
+							Authorization: `Bearer ${token}`,
+							'Content-Type': 'multipart/form-data',
 						},
-					)
+					})
+
+					const group = res.data
+					console.log(group)
+
 					dispatch({
 						type: 'CREATE_GROUP',
 						payload: {
-							id: res.data.id,
-							name,
-							description: desc,
-							memberCount: 1,
-							joinRequests: [],
+							id: group.id,
+							name: group.name,
+							description: group.description,
+							memberCount: group.groupMembers.length,
+							joinRequests: group.joinRequests,
+							imageUrl: group.imageUrl,
+							theme: group.theme,
 						},
 					})
 				},
-				sendMessage: ({ content }: { content: string }) => {
+				sendMessage: ({
+					content,
+					type = 'TEXT',
+				}: {
+					content: string
+					type?: 'TEXT' | 'IMAGE'
+				}) => {
 					const g = state.selectedGroup
 					if (!g || !websocket.current) return
 					if (!content.trim()) return
+
 					websocket.current.send(
 						JSON.stringify({
 							groupID: g.id,
 							content,
-							type: 'TEXT',
+							type,
 						}),
 					)
 				},
@@ -663,6 +691,48 @@ export const SocialProvider: FC<{ children: ReactNode }> = ({ children }) => {
 						`http://${BACKEND_URL}/social/group/${groupID}/members/${targetUID}`,
 						{ headers: { Authorization: `Bearer ${token}` } },
 					)
+				},
+
+				sendTextMessage: (content: string) => {
+					const g = state.selectedGroup
+					if (!g || !websocket.current) return
+					if (!content.trim()) return
+					websocket.current.send(
+						JSON.stringify({
+							groupID: g.id,
+							content,
+							type: 'TEXT',
+						}),
+					)
+				},
+
+				sendImageMessage: async (file: File) => {
+					const g = state.selectedGroup
+					if (!g || !websocket.current) return
+
+					const token = await auth.currentUser?.getIdToken()
+					const formData = new FormData()
+					formData.append('image', file)
+
+					try {
+						const res = await axios.post(`http://${BACKEND_URL}/social/images/upload`, formData, {
+							headers: {
+								Authorization: `Bearer ${token}`,
+								'Content-Type': 'multipart/form-data',
+							},
+						})
+						const imageUrl = res.data.imageUrl
+						websocket.current.send(
+							JSON.stringify({
+								groupID: g.id,
+								content: imageUrl,
+								type: 'IMAGE',
+							}),
+						)
+					} catch (err) {
+						console.error('Failed to upload image', err)
+						toast.error('Image upload failed')
+					}
 				},
 			}}
 		>

@@ -1,15 +1,15 @@
-import React from 'react'
+import { FC } from 'react'
 import './RoundedPhoto.scss'
 
 interface RoundedPhotoProps {
-	imagePath?: string
+	imagePath: string
 	size?: number
 }
 
-const RoundedPhoto: React.FC<RoundedPhotoProps> = ({ imagePath, size }) => {
+const RoundedPhoto: FC<RoundedPhotoProps> = ({ imagePath, size }) => {
 	return (
 		<img
-			src={`${imagePath ? imagePath : './src/assets/placeholder.png'}`}
+			src={`${imagePath}`}
 			className="rounded-photo"
 			width={size || 24}
 			height={size || 24}

@@ -41,11 +41,7 @@ const GroupDetails: FC<GroupDetailsProps> = ({
 
 			<div className="group-header">
 				<img
-					src={
-						image != ''
-							? image
-							: 'https://dashboard.codeparrot.ai/api/image/Z_T76IDi91IKZZrg/image.png'
-					}
+					src={image || 'https://dashboard.codeparrot.ai/api/image/Z_T76IDi91IKZZrg/image.png'}
 					alt={`${name}'s avatar`}
 					className="group-image"
 				/>

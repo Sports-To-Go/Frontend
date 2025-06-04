@@ -1,7 +1,7 @@
 import React from 'react'
 import './ActivityFeed.scss'
 import ActivityItem from '../ActivityItem/ActivityItem'
-import placeholder from '../../assets/placeholder_football_field.jpg'
+import backgroundplaceholder from '../../assets/backgroundplaceholder.png'
 
 const ActivityFeed: React.FC = () => {
 	return (
@@ -15,7 +15,7 @@ const ActivityFeed: React.FC = () => {
 
 				<div className="activity-feed__scroll-container">
 					<ActivityItem
-						image={placeholder}
+						image={backgroundplaceholder}
 						title="Played at - TerenName - TerenLocation"
 						time="2 hours"
 						description="Very fun match! Weather was perfect and the location was great."
@@ -23,7 +23,7 @@ const ActivityFeed: React.FC = () => {
 					/>
 
 					<ActivityItem
-						image={placeholder}
+						image={backgroundplaceholder}
 						title="Played at - Sala Sporturilor - Cluj"
 						time="1 hour"
 						description="Quick 3v3 match with friends!"
@@ -31,7 +31,7 @@ const ActivityFeed: React.FC = () => {
 					/>
 
 					<ActivityItem
-						image={placeholder}
+						image={backgroundplaceholder}
 						title="Played at - Sala Sporturilor - Cluj"
 						time="1 hour"
 						description="Quick 3v3 match with friends!"
@@ -39,7 +39,7 @@ const ActivityFeed: React.FC = () => {
 					/>
 
 					<ActivityItem
-						image={placeholder}
+						image={backgroundplaceholder}
 						title="Played at - Sala Sporturilor - Cluj"
 						time="1 hour"
 						description="Quick 3v3 match with friends!"

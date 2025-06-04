@@ -118,20 +118,20 @@ const Social: FC = () => {
 
 							{isLoading ? (
 								<Spinner />
+							) : filteredGroupPreviews.length === 0 ? (
+								<div className="no-data">No groups found</div>
 							) : (
 								<ul className="message-list">
-									{filteredGroupPreviews.map(preview => {
-										return (
-											<ChatPreview
-												key={preview.id}
-												name={preview.name}
-												image={''}
-												description={getPreviewText(preview)}
-												members={preview.memberCount || 0}
-												onClick={() => selectGroup(preview)}
-											/>
-										)
-									})}
+									{filteredGroupPreviews.map(preview => (
+										<ChatPreview
+											key={preview.id}
+											name={preview.name}
+											image={preview.imageUrl}
+											description={getPreviewText(preview)}
+											members={preview.memberCount || 0}
+											onClick={() => selectGroup(preview)}
+										/>
+									))}
 								</ul>
 							)}
 						</>
@@ -144,7 +144,7 @@ const Social: FC = () => {
 							<GroupChat groupID={selectedGroup.id} onBack={handleBack} onLeave={() => {}} />
 						) : (
 							<GroupDetails
-								image={''}
+								image={selectedGroup.imageUrl}
 								name={selectedGroup.name}
 								description={selectedGroup.description}
 								members={selectedGroup.memberCount || 0}

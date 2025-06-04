@@ -3,6 +3,7 @@ import RoundedPhoto from '../RoundedPhoto/RoundedPhoto'
 import './ChatMessages.scss'
 import Spinner from '../Spinner/Spinner'
 import { useSocial, Message } from '../../context/SocialContext'
+import userplaceholder from '../../assets/userplaceholder.png'
 
 interface ChatMessagesProps {
 	messages: (Message & { senderName?: string })[]
@@ -28,7 +29,6 @@ function formatSystemMessage(msg: Message, members: any): string {
 			return `Theme changed to ${meta.themeName}.`
 		case 'NICKNAME_CHANGED': {
 			const { changedByName, uid, nickname } = meta
-
 			return `${members.get(msg.groupID)?.get(changedByName)?.displayName || 'UNDEFINED'} set nickname for ${members.get(msg.groupID)?.get(uid)?.displayName || 'UNDEFINED'} to "${nickname}".`
 		}
 		case 'JOIN_REQUEST':
@@ -46,6 +46,7 @@ const ChatMessages: FC<ChatMessagesProps> = ({ messages, onTopReached, loadingTo
 	const {
 		state: { members },
 	} = useSocial()
+
 	useEffect(() => {
 		if (!loadingTop) {
 			messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
@@ -86,17 +87,21 @@ const ChatMessages: FC<ChatMessagesProps> = ({ messages, onTopReached, loadingTo
 
 				return (
 					<div key={`${groupID}-${msg.id}`} className="message-container">
-						<RoundedPhoto size={40} />
+						<RoundedPhoto size={40} imagePath={members.get(groupID)?.get(msg.senderID)?.imageUrl || userplaceholder} />
 						<div className="message-content">
 							<div className="message-title">
 								<strong className="message-sender">
-									{msg.senderName || 'Unknown User'}
+									{msg.senderName}
 								</strong>
 								<small className="message-timestamp">
 									{new Date(msg.timestamp).toLocaleTimeString()}
 								</small>
 							</div>
-							<div className="message">{msg.content}</div>
+							{msg.type === 'IMAGE' ? (
+								<img src={msg.content} className="chat-image" alt="sent image" />
+							) : (
+								<div className="message">{msg.content}</div>
+							)}
 						</div>
 					</div>
 				)

@@ -20,7 +20,6 @@ const GroupChat: FC<GroupProps> = ({ groupID, onBack }) => {
 
 	const {
 		state: { messages, members, selectedGroup, groups },
-		sendMessage,
 		loadMessageHistory,
 		changeTheme,
 		changeNickname,
@@ -35,7 +34,7 @@ const GroupChat: FC<GroupProps> = ({ groupID, onBack }) => {
 			senderName:
 				msg.type === 'SYSTEM'
 					? ''
-					: groupMember?.nickname || groupMember?.displayName || 'Unknown User',
+					: groupMember?.nickname || groupMember?.displayName || '[not a member]',
 		}
 	})
 
@@ -78,10 +77,6 @@ const GroupChat: FC<GroupProps> = ({ groupID, onBack }) => {
 		SAKURA: 'linear-gradient(to right,rgb(203, 70, 112),rgb(127, 221, 210))',
 		DARKNESS: 'linear-gradient(to right,rgb(12, 1, 27),rgb(62, 2, 2))',
 		SOFT: 'linear-gradient(to right,rgb(255, 216, 245),rgb(255, 191, 203))',
-		WINDOWS: 'url(https://upload.wikimedia.org/wikipedia/en/2/27/Bliss_%28Windows_XP%29.png)',
-		'ELDEN RING':
-			'url(https://images.steamusercontent.com/ugc/2058741034012526512/379E6434B473E7BE31C50525EB946D4212A8C8B3/)',
-		'PIXEL DREAM': 'url(https://images.alphacoders.com/113/1138740.png)',
 	}
 
 	const handleThemeKeyChange = (themeKey: string) => {
@@ -89,12 +84,6 @@ const GroupChat: FC<GroupProps> = ({ groupID, onBack }) => {
 		const theme = themeMap[themeKey]
 		if (!theme) return
 		changeTheme(selectedGroup.id, themeKey)
-	}
-
-	const handleSendMessage = (content: string) => {
-		if (!newMessage.trim()) return
-		sendMessage({ content: content })
-		setNewMessage('')
 	}
 
 	const handleNicknameChange = (memberID: string, newNickname: string) => {
@@ -134,6 +123,7 @@ const GroupChat: FC<GroupProps> = ({ groupID, onBack }) => {
 				groupName={groupName}
 				status="online"
 				onBack={onBack}
+				image={selectedGroup?.imageUrl}
 				onOpenSettings={() => setIsGroupSettingsOpen(true)}
 			/>
 			<ChatMessages
@@ -145,7 +135,6 @@ const GroupChat: FC<GroupProps> = ({ groupID, onBack }) => {
 			<ChatMessageBar
 				newMessage={newMessage}
 				onMessageChange={setNewMessage}
-				onSendMessage={handleSendMessage}
 			/>
 			{isGroupSettingsOpen && (
 				<GroupSettings
