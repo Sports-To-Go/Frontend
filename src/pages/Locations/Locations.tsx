@@ -5,6 +5,7 @@ import FilterBar from '../../components/FilterBar/FilterBar'
 import './Locations.scss'
 import axios from 'axios'
 import { BACKEND_URL } from '../../../integration-config'
+import NoData from '../../components/NoData/NoData'
 
 interface Location {
 	id: number
@@ -74,7 +75,7 @@ const Locations: FC = () => {
 				<div className="locations-grid">
 					{filteredLocations.length === 0 ? (
 						<div className="empty-place--container">
-							<h2>No locations...</h2>
+							<NoData>No locations found</NoData>
 						</div>
 					) : (
 						filteredLocations.map(location => (

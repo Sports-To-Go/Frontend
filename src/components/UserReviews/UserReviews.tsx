@@ -5,6 +5,7 @@ import { useAuth } from '../../context/UserContext';
 import axios from 'axios';
 import { BACKEND_URL } from '../../../integration-config';
 import { auth } from '../../firebase/firebase';
+import NoData from '../NoData/NoData';
 
 interface Report {
     id: number;
@@ -93,7 +94,7 @@ const UserReviews: React.FC = () => {
                             />
                         ))
                     ) : (
-                        <p>No reports found</p>
+                        <NoData>This user did not cause any issues</NoData>
                     )}
                 </div>
             </div>

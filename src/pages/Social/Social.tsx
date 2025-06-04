@@ -9,6 +9,7 @@ import GroupForm from '../../components/GroupForm/GroupForm'
 import Spinner from '../../components/Spinner/Spinner'
 import { CiSearch } from 'react-icons/ci'
 import { useAuth } from '../../context/UserContext'
+import NoData from '../../components/NoData/NoData'
 
 const Social: FC = () => {
 	const [activeTab, setActiveTab] = useState<'myGroups' | 'lookForGroups'>('myGroups')
@@ -119,7 +120,7 @@ const Social: FC = () => {
 							{isLoading ? (
 								<Spinner />
 							) : filteredGroupPreviews.length === 0 ? (
-								<div className="no-data">No groups found</div>
+								<NoData>No groups found</NoData>
 							) : (
 								<ul className="message-list">
 									{filteredGroupPreviews.map(preview => (
