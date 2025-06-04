@@ -244,9 +244,6 @@ const EditProfileModal = ({
 			{showDeleteModal && (
 				<DeleteProfileModal
 					onClose={() => setShowDeleteModal(false)}
-					onConfirm={(password: string) => {
-						console.log('Delete confirmed with password:', password)
-					}}
 				/>
 			)}
 		</>
