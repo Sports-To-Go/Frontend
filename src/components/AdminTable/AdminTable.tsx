@@ -6,12 +6,14 @@ import { Link } from 'react-router'
 import axios from 'axios'
 import { auth } from '../../firebase/firebase'
 import { BACKEND_URL } from '../../../integration-config'
+import NoData from '../NoData/NoData'
 
 export interface adminTableRow {
 	name?: string
 	id: string
 	type: 'User' | 'Location' | 'Group'
 	reports: number
+	imageUrl?: string // 👈 new field
 }
 
 interface adminTableProps {
@@ -40,17 +42,18 @@ const AdminTable: React.FC<adminTableProps> = ({ header, rows }) => {
 				const updated = await Promise.all(
 					rows.map(async row => {
 						try {
-							const res = await axios.get<{ name: string }>(
+							const res = await axios.get<{ name: string; imageUrl?: string }>(
 								`http://${BACKEND_URL}/admin/${row.id}/${row.type}/name`,
 								{ headers: { Authorization: `Bearer ${token}` } },
 							)
-							return { ...row, name: res.data.name }
+							return { ...row, name: res.data.name, imageUrl: res.data.imageUrl }
 						} catch (err) {
 							console.error('Failed to fetch name for', row, err)
-							return { ...row, name: '—' }
+							return { ...row, name: '—', imageUrl: undefined }
 						}
 					}),
 				)
+
 				setTableRows(updated)
 			} finally {
 				setTimeout(() => setIsLoading(false), 500)
@@ -90,7 +93,7 @@ const AdminTable: React.FC<adminTableProps> = ({ header, rows }) => {
 		)
 
 	if (tableRows.length === 0) {
-		return <div className="nodata-container">No data found...</div>
+		return <NoData>No data found...</NoData>
 	}
 
 	return (
@@ -115,15 +118,26 @@ const AdminTable: React.FC<adminTableProps> = ({ header, rows }) => {
 					</tr>
 				</thead>
 				<tbody>
-					{tableRows.map(({ name, id, type, reports }) => (
+					{tableRows.map(({ name, id, type, reports, imageUrl }) => (
 						<tr key={id}>
 							<td>
 								{type === 'User' ? (
 									<Link to={`/profile/${id}`} style={{ cursor: 'pointer' }}>
-										View profile
+										<span>View profile</span>
 									</Link>
+								) : imageUrl ? (
+									<img
+										src={imageUrl}
+										alt={`${name} preview`}
+										style={{
+											width: '50px',
+											height: '35px',
+											objectFit: 'cover',
+											borderRadius: '4px',
+										}}
+									/>
 								) : (
-									<img src="https://i.pravatar.cc/100?u=5" alt="poza" />
+									<span>No image</span>
 								)}
 							</td>
 							<td>{name}</td>

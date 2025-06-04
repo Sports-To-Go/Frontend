@@ -17,7 +17,7 @@ type FormErrors = {
 	description?: string
 	price?: string
 	address?: string
-	images: string[]
+	images?: string
 	time?: string
 }
 

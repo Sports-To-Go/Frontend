@@ -111,7 +111,6 @@ const LocationReservationModal: React.FC<Props> = ({ location, onClose }) => {
 	const isValid = () => {
 		if (!date || !startTime || !endTime) return false
 		if (startTime >= endTime) return false
-		if (!selectedGroupId) return false
 		if (hasOverlap()) return false
 		return true
 	}
