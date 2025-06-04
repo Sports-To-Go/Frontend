@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import './ActivityFeed.scss';
 import ActivityItem from '../ActivityItem/ActivityItem';
 import { useAuth } from '../../context/UserContext';
