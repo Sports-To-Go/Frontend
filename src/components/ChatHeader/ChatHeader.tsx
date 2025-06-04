@@ -2,6 +2,7 @@ import { FC } from 'react'
 import RoundedPhoto from '../RoundedPhoto/RoundedPhoto'
 import { CiSettings } from 'react-icons/ci'
 import './ChatHeader.scss'
+import groupplaceholder from '../../assets/groupplaceholder.png'
 
 interface ChatHeaderProps {
     groupName: string
@@ -19,7 +20,7 @@ const ChatHeader: FC<ChatHeaderProps> = ({groupName, status, image, onBack, onOp
                     {'<'}
                 </span>
                 <RoundedPhoto size={40} imagePath={
-							image || 'https://dashboard.codeparrot.ai/api/image/Z_T76IDi91IKZZrg/image.png'
+							image || groupplaceholder
 						} />
                 <div className="title">
                     <div>{groupName}</div>

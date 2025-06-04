@@ -1,6 +1,7 @@
 import { FC, memo } from 'react'
 import { CiUser } from 'react-icons/ci'
 import './ChatPreview.scss'
+import groupplaceholder from '../../assets/groupplaceholder.png'
 
 interface GroupPreviewProps {
 	image: string
@@ -16,9 +17,7 @@ const GroupPreview: FC<GroupPreviewProps> = memo(
 			<li className="message-item" onClick={onClick}>
 				<div className="group-avatar-container">
 					<img
-						src={
-							image || 'https://dashboard.codeparrot.ai/api/image/Z_T76IDi91IKZZrg/image.png'
-						}
+						src={image || groupplaceholder}
 						alt={`${name}'s avatar`}
 						className="group-avatar"
 					/>
@@ -27,10 +26,12 @@ const GroupPreview: FC<GroupPreviewProps> = memo(
 					<div className="group-name">{name}</div>
 					<div className="group-description">{description}</div>
 				</div>
-				<div className="members-info">
-					<CiUser />
-					<span className="members-count">{members}</span>
-				</div>
+				{members !== 0 && (
+					<div className="members-info">
+						<CiUser />
+						<span className="members-count">{members}</span>
+					</div>
+				)}
 			</li>
 		)
 	},

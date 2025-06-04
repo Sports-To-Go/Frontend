@@ -26,7 +26,7 @@ const ChatMessageBar: FC<ChatMessageBarProps> = ({ newMessage, onMessageChange }
 					const file = e.target.files?.[0]
 					if (file) {
 						sendImageMessage(file)
-						e.target.value = '' // reset input
+						e.target.value = ''
 					}
 				}}
 			/>

@@ -7,7 +7,7 @@ import ReportModal from '../ReportModal/ReportModal'
 import { useParams } from 'react-router-dom'
 import { auth } from '../../firebase/firebase'
 
-import placeholder from '../../assets/profilePhotoPlaceholder.png'
+import userplaceholder from '../../assets/userplaceholder.png'
 
 
 const UserCard: FC = () => {	
@@ -46,7 +46,7 @@ const UserCard: FC = () => {
             <div className="user-card__header">
                 <div className="user-card__avatar">
                     <img 
-                        src={user?.photoURL ? user.photoURL : placeholder} 
+                        src={user?.photoURL ? user.photoURL : userplaceholder} 
                         alt="User avatar" 
                     />
                 </div>

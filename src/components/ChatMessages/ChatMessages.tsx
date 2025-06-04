@@ -3,6 +3,7 @@ import RoundedPhoto from '../RoundedPhoto/RoundedPhoto'
 import './ChatMessages.scss'
 import Spinner from '../Spinner/Spinner'
 import { useSocial, Message } from '../../context/SocialContext'
+import userplaceholder from '../../assets/userplaceholder.png'
 
 interface ChatMessagesProps {
 	messages: (Message & { senderName?: string })[]
@@ -86,16 +87,11 @@ const ChatMessages: FC<ChatMessagesProps> = ({ messages, onTopReached, loadingTo
 
 				return (
 					<div key={`${groupID}-${msg.id}`} className="message-container">
-						<RoundedPhoto
-							size={40}
-							imagePath={
-								'https://dashboard.codeparrot.ai/api/image/Z_T76IDi91IKZZrg/image.png'
-							}
-						/>
+						<RoundedPhoto size={40} imagePath={members.get(groupID)?.get(msg.senderID)?.imageUrl || userplaceholder} />
 						<div className="message-content">
 							<div className="message-title">
 								<strong className="message-sender">
-									{msg.senderName || 'Unknown User'}
+									{msg.senderName}
 								</strong>
 								<small className="message-timestamp">
 									{new Date(msg.timestamp).toLocaleTimeString()}

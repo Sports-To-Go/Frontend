@@ -8,6 +8,8 @@ import { useAuth } from '../../context/UserContext'
 import { updateProfile } from 'firebase/auth'
 import { useNavigate } from 'react-router-dom'
 
+import userplaceholder from '../../assets/userplaceholder.png'
+
 interface Props {
 	onClose: () => void
 	description: string
@@ -29,6 +31,8 @@ const EditProfileModal = ({
 	const [localDescription, setLocalDescription] = useState(description)
 	const [localInterests, setLocalInterests] = useState<string[]>(interests)
 	const [localDisplayName, setLocalDisplayName] = useState(user?.displayName || '')
+	const [imageFile, setImageFile] = useState<File | null>(null)
+	const [imagePreviewUrl, setImagePreviewUrl] = useState<string | null>(user?.photoURL || null)
 	const navigate = useNavigate()
 
 	useEffect(() => {
@@ -37,7 +41,8 @@ const EditProfileModal = ({
 	}, [description, interests])
 	useEffect(() => {
 		setLocalDisplayName(user?.displayName || '')
-	}, [user?.displayName])
+		setImagePreviewUrl(user?.photoURL || null)
+	}, [user?.displayName, user?.photoURL])
 
 	const sports = ['Football', 'Basketball', 'Gym', 'Climbing', 'Tennis']
 
@@ -49,16 +54,75 @@ const EditProfileModal = ({
 		)
 	}
 
-	const handleDelete = (password: string) => {
-		console.log('Delete confirmed with password:', password)
-		// aici vei trimite datele spre backend în viitor
+	const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+		if (e.target.files && e.target.files.length > 0) {
+			const file = e.target.files[0]
+			setImageFile(file)
+			setImagePreviewUrl(URL.createObjectURL(file))
+		}
+	}
+
+	const handleRemoveImage = async () => {
+		if (!auth.currentUser) return
+		const token = await auth.currentUser.getIdToken()
+
+		try {
+			await axios.delete(`http://${BACKEND_URL}/users/profile/picture`, {
+				headers: { Authorization: `Bearer ${token}` },
+			})
+			setImageFile(null)
+			setImagePreviewUrl(null)
+			setUser(user ? { ...user, photoURL: null } : null)
+		} catch (err) {
+			console.error('Failed to remove profile image:', err)
+		}
+	}
+
+	const handleApply = async () => {
+		setDescription(localDescription)
+		setInterests(localInterests)
+		onClose()
+
+		try {
+			const token = await auth.currentUser?.getIdToken()
+
+			// update Firebase profile
+			await updateProfile(auth.currentUser!, {
+				displayName: localDisplayName,
+			})
+
+			// prepare multipart form data
+			const formData = new FormData()
+			formData.append('description', localDescription)
+			if (imageFile) {
+				formData.append('image', imageFile)
+			}
+
+			const response = await axios.put(`http://${BACKEND_URL}/users/profile`, formData, {
+				headers: {
+					Authorization: `Bearer ${token}`,
+					'Content-Type': 'multipart/form-data',
+				},
+			})
+
+			if (user) {
+				setUser({
+					...user,
+					displayName: localDisplayName,
+					description: response.data.description,
+					photoURL: response.data.image?.url || null,
+				})
+				navigate(`/profile/${user.uid}`)
+			}
+		} catch (err) {
+			console.error('Failed to update user profile:', err)
+		}
 	}
 
 	return (
 		<>
 			<div className="edit-profile-modal-overlay">
 				<div className="edit-profile-modal">
-					{/* Sidebar */}
 					<div className="edit-profile-modal__sidebar">
 						<button
 							className={tab === 'profile' ? 'active' : ''}
@@ -74,17 +138,37 @@ const EditProfileModal = ({
 						</button>
 					</div>
 
-					{/* Content + Footer */}
 					<div className="edit-profile-modal__content-wrapper">
 						<div className="edit-profile-modal__content">
 							{tab === 'profile' ? (
 								<>
 									<div className="edit-profile-modal__picture-preview">
-										<img src="https://i.pravatar.cc/100?u=mockuser" alt="Preview" />
-										<label className="upload-label">
-											Change Picture
-											<input type="file" accept="image/*" />
-										</label>
+										<input
+											type="file"
+											accept="image/*"
+											id="profile-photo-input"
+											onChange={handleImageChange}
+											style={{ display: 'none' }}
+										/>
+										
+											<div className="preview-wrapper">
+												<img
+													src={imagePreviewUrl || userplaceholder}
+													alt="Preview"
+													className="image-preview"
+													onClick={() =>
+														document.getElementById('profile-photo-input')?.click()
+													}
+												/>
+												<button
+													type="button"
+													className="remove-photo-button"
+													onClick={handleRemoveImage}
+												>
+													Remove
+												</button>
+											</div>
+										
 									</div>
 
 									<label>
@@ -101,12 +185,9 @@ const EditProfileModal = ({
 										<textarea
 											placeholder="Short description..."
 											value={localDescription}
-											onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) =>
-												setLocalDescription(e.target.value)
-											}
+											onChange={e => setLocalDescription(e.target.value)}
 										/>
 									</label>
-
 									<label>
 										Interests
 										<div className="edit-profile-modal__interests">
@@ -134,7 +215,6 @@ const EditProfileModal = ({
 										Email
 										<input type="email" value={user?.email || ''} readOnly />
 									</label>
-
 									<label>
 										Phone
 										<input type="tel" placeholder="0721 325 812" />
@@ -153,44 +233,7 @@ const EditProfileModal = ({
 							<button className="edit-profile-modal__footer-button cancel" onClick={onClose}>
 								Cancel
 							</button>
-							<button
-								className="edit-profile-modal__footer-button"
-								onClick={async () => {
-									setDescription(localDescription)
-									setInterests(localInterests)
-									onClose()
-
-									try {
-										const token = await auth.currentUser?.getIdToken()
-
-										await updateProfile(auth.currentUser!, {
-											displayName: localDisplayName,
-										})
-
-										const response = await axios.put(
-											`http://${BACKEND_URL}/users/profile`,
-											{ description: localDescription },
-											{
-												headers: {
-													Authorization: `Bearer ${token}`,
-												},
-											},
-										)
-
-										if (user) {
-											setUser({
-												...user,
-												displayName: localDisplayName,
-												description: response.data.description,
-											})
-
-											navigate(`/profile/${user.uid}`)
-										}
-									} catch (err) {
-										console.error('Failed to update user profile:', err)
-									}
-								}}
-							>
+							<button className="edit-profile-modal__footer-button" onClick={handleApply}>
 								Apply
 							</button>
 						</div>
@@ -201,7 +244,9 @@ const EditProfileModal = ({
 			{showDeleteModal && (
 				<DeleteProfileModal
 					onClose={() => setShowDeleteModal(false)}
-					onConfirm={handleDelete}
+					onConfirm={(password: string) => {
+						console.log('Delete confirmed with password:', password)
+					}}
 				/>
 			)}
 		</>

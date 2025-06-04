@@ -18,6 +18,7 @@ export interface GroupMember {
 	displayName: string
 	role: string
 	nickname: string | null
+	imageUrl: string | null
 }
 
 export interface JoinRequest {
@@ -119,6 +120,7 @@ const socialReducer = (state: SocialState, action: any): SocialState => {
 				role: 'admin',
 				nickname: null,
 				displayName: user?.displayName || 'Unknown',
+				imageUrl: user?.photoURL || null
 			}
 
 			newMembers.get(groupID)?.set(user?.uid, member)
@@ -135,6 +137,7 @@ const socialReducer = (state: SocialState, action: any): SocialState => {
 					displayName: m.displayName,
 					role: m.groupRole,
 					nickname: m.nickname,
+					imageUrl: m.imageUrl
 				})
 			})
 			newMembers.set(group.id, memberMap)
@@ -251,14 +254,15 @@ const socialReducer = (state: SocialState, action: any): SocialState => {
 					}
 
 					case 'USER_JOINED': {
-						const { uid, displayName, role } = message.meta || {}
-						if (!uid || !displayName || !role) return state
+						const { uid, displayName, role, imageUrl } = message.meta || {}
+						if (!uid || !displayName || !role || !imageUrl) return state
 
 						const newMember: GroupMember = {
 							id: uid,
 							displayName,
 							nickname: null,
 							role,
+							imageUrl
 						}
 
 						const updatedMembers = new Map(state.members)
@@ -429,6 +433,8 @@ export const SocialProvider: FC<{ children: ReactNode }> = ({ children }) => {
 			const groupData: GroupData[] = []
 			const membersByGroup = new Map<number, Map<string, GroupMember>>()
 			response.data.forEach((group: any) => {
+				console.log(group)
+
 				const memberMap = new Map<string, GroupMember>()
 				group.groupMembers.forEach((m: any) =>
 					memberMap.set(m.id, {
@@ -436,10 +442,10 @@ export const SocialProvider: FC<{ children: ReactNode }> = ({ children }) => {
 						displayName: m.displayName,
 						role: m.groupRole,
 						nickname: m.nickname,
+						imageUrl: m.imageUrl
 					}),
 				)
 				membersByGroup.set(group.id, memberMap)
-				console.log(group)
 				groupData.push({
 					id: group.id,
 					name: group.name,

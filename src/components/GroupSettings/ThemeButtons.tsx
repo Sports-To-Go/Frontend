@@ -13,9 +13,6 @@ const themeKeys = [
   'SAKURA',
   'DARKNESS',
   'SOFT',
-  'WINDOWS',
-  'ELDEN RING',
-  'PIXEL DREAM',
 ];
 
 const ThemeButtons: React.FC<ThemeButtonsProps> = ({ onThemeChange }) => {
