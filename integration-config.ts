@@ -1,1 +1,1 @@
-export const BACKEND_URL = "51.21.181.126:8081"
+export const BACKEND_URL = "13.53.205.167:8081"
