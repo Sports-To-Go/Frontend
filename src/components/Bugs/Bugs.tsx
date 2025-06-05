@@ -4,6 +4,7 @@ import './Bugs.scss'
 import { auth } from '../../firebase/firebase'
 import axios from 'axios'
 import { BACKEND_URL } from '../../../integration-config'
+import NoData from '../NoData/NoData'
 
 interface BugInfoProps {
 	title: string
@@ -68,7 +69,7 @@ const Bugs: React.FC = () => {
 					/>
 				))
 			) : (
-				<div>No bugs..</div>
+				<NoData>No bugs reported</NoData>
 			)}
 		</div>
 	)

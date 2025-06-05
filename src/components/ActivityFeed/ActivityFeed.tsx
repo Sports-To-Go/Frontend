@@ -81,7 +81,6 @@ const ActivityFeed = () => {
 									activity.paymentStatus,
 									activity.totalCost,
 								)}
-								rating={activity.userRating}
 							/>
 						))
 					) : (

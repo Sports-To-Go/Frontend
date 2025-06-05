@@ -1,6 +1,5 @@
 import { FC, useEffect, useState } from 'react'
 import './UserCard.scss'
-import { FaStar } from 'react-icons/fa'
 import { useAuth } from '../../context/UserContext'
 import { FiAlertTriangle } from 'react-icons/fi'
 import ReportModal from '../ReportModal/ReportModal'
@@ -43,7 +42,7 @@ const UserCard: FC = () => {
 			await axios.post(
 				`http://${BACKEND_URL}/admin/reports`,
 				{
-					reportedBy: currentUser.displayName,
+					reportedBy: currentUser.uid,
 					targetType: 'User',
 					targetId: uid,
 					reason: reason,
@@ -82,11 +81,6 @@ const UserCard: FC = () => {
 
 				<div className="user-card__info">
 					<h1 className="user-card__name">{user?.displayName}</h1>
-					<div className="user-card__rating">
-						{[...Array(5)].map((_, i) => (
-							<FaStar key={i} />
-						))}
-					</div>
 				</div>
 			</div>
 

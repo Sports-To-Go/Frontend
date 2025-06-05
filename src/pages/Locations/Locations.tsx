@@ -17,7 +17,7 @@ export interface Location {
 	longitude: number
 	stars: number
 	pricePerHour: string
-	image: string
+	images: string[]
 	sport: string
 	hourlyRate: number
 	openingTime: string
@@ -39,7 +39,11 @@ const Locations: FC = () => {
 		axios
 			.get(`http://${BACKEND_URL}/locations`)
 			.then(response => {
-				setFilteredLocations(response.data)
+				const normalized = response.data.map((loc: any) => ({
+					...loc,
+					images: loc.imageUrls ?? [], // 👈 normalize imageUrls → images
+				}))
+				setFilteredLocations(normalized)
 			})
 			.catch(error => {
 				console.error('Error fetching locations:', error)
@@ -48,18 +52,20 @@ const Locations: FC = () => {
 
 	// Handle filter changes
 	const handleFilterChange = (newFilters: Filters) => {
-		// Build the URL for the GET request with filters
 		const params: any = {}
 		if (newFilters.sport) params.sport = newFilters.sport
 		if (newFilters.price) params.price = newFilters.price
 		if (newFilters.startTime) params.start = newFilters.startTime
 		if (newFilters.endTime) params.end = newFilters.endTime
 
-		// Fetch filtered locations
 		axios
 			.get(`http://${BACKEND_URL}/locations/filter`, { params })
 			.then(response => {
-				setFilteredLocations(response.data)
+				const normalized = response.data.map((loc: any) => ({
+					...loc,
+					images: loc.imageUrls ?? [],
+				}))
+				setFilteredLocations(normalized)
 			})
 			.catch(error => {
 				console.error('Error fetching filtered locations:', error)
@@ -69,7 +75,6 @@ const Locations: FC = () => {
 	return (
 		<Layout>
 			<div className="locations-page">
-				{/* Include FilterBar */}
 				<FilterBar onFilterChange={handleFilterChange} />
 
 				<div className="locations-grid">
