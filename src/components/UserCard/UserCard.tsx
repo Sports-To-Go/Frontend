@@ -42,7 +42,7 @@ const UserCard: FC = () => {
 			await axios.post(
 				`http://${BACKEND_URL}/admin/reports`,
 				{
-					reportedBy: currentUser.displayName,
+					reportedBy: currentUser.uid,
 					targetType: 'User',
 					targetId: uid,
 					reason: reason,
