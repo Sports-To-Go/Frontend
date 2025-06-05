@@ -28,7 +28,7 @@ const ReportLocationModal: React.FC<ReportLocationProps> = ({
 			await axios.post(
 				`http://${BACKEND_URL}/admin/reports`,
 				{
-					reportedBy: currentUser.displayName,
+					reportedBy: currentUser.uid,
 					targetType: 'Location',
 					targetId: locationId,
 					reason: reason,
