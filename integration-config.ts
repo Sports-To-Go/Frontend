@@ -1,1 +1,1 @@
-export const BACKEND_URL = "localhost:8081"
+export const BACKEND_URL = "51.21.181.126:8081"
